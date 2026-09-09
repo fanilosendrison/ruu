@@ -63,6 +63,7 @@
         "snapshot_is_immutable",
         "active_artifact_bytes_must_match_snapshot",
         "active_discovery_excludes",
+        "retained_discovery_excludes",
         "missing_historical_baseline_is_never_a_pass"
       ],
       "properties": {
@@ -80,6 +81,11 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "retained_discovery_excludes": {
+          "const": [
+            "qualification/state-space/post-baseline"
+          ]
         },
         "missing_historical_baseline_is_never_a_pass": {
           "const": true
@@ -141,7 +147,7 @@
         },
         "current_path": {
           "type": "string",
-          "pattern": "^qualification/(state-space|git-smoke)/"
+          "pattern": "^qualification/(state-space/v[0-9]{3}/state-space-audit-v[0-9]+[.](md|py|txt)|git-smoke/[a-z0-9-]+/git-[a-z0-9-]+-smoke-v[0-9]+[.](sh|txt))$"
         },
         "sha256": {
           "$ref": "#/$defs/sha256"

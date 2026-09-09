@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ruu.dev/schemas/post-baseline-state-space-qualification-v1.schema.json",
+  "title": "Ruu post-baseline state-space qualification metadata version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "qualification_id",
+    "qualification_kind",
+    "provenance",
+    "baseline",
+    "version",
+    "artifacts",
+    "supporting_artifacts",
+    "replay"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../qualification-metadata-v1.schema.json"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "qualification_id": {
+      "type": "string",
+      "pattern": "^state-space-v[0-9]{3,}$"
+    },
+    "qualification_kind": {
+      "const": "state-space"
+    },
+    "provenance": {
+      "const": "POST_BASELINE"
+    },
+    "baseline": {
+      "const": "ADR-080"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "executable",
+        "recorded_output"
+      ],
+      "properties": {
+        "report": {
+          "$ref": "#/$defs/artifact"
+        },
+        "executable": {
+          "$ref": "#/$defs/artifact"
+        },
+        "recorded_output": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "supporting_artifacts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runner",
+        "expected_exit_code",
+        "stdout_sha256"
+      ],
+      "properties": {
+        "runner": {
+          "const": "python3"
+        },
+        "expected_exit_code": {
+          "const": 0
+        },
+        "stdout_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

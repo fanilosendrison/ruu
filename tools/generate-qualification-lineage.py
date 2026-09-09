@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the active qualification lineage from the immutable ADR-080 snapshot."""
+"""Generate retained qualification lineage from the immutable ADR-080 snapshot."""
 
 from __future__ import annotations
 
@@ -111,7 +111,7 @@ def main() -> None:
     output = {
         "$schema": "lineage-v2.schema.json",
         "schema_version": 2,
-        "generated_for": "Ruu active layout derived from the immutable ADR-080 flat package",
+        "generated_for": "Ruu retained layout derived from the immutable ADR-080 flat package",
         "generated_on": "2026-09-08",
         "source_snapshot": {
             "path": "qualification/releases/adr-080-flat",
@@ -123,6 +123,9 @@ def main() -> None:
             "snapshot_is_immutable": True,
             "active_artifact_bytes_must_match_snapshot": True,
             "active_discovery_excludes": ["qualification/releases"],
+            "retained_discovery_excludes": [
+                "qualification/state-space/post-baseline"
+            ],
             "missing_historical_baseline_is_never_a_pass": True,
         },
         "source_packages": source["sources"],

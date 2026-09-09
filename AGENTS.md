@@ -105,13 +105,13 @@ ruu/
 - Verify the snapshot through its own legacy lineage and manifest.
 - Preserve its historical filenames and flat layout even when they violate current naming conventions.
 
-### Organized active evidence
+### Retained and post-baseline evidence
 
-- Treat `qualification/state-space/` and `qualification/git-smoke/` as organized, byte-identical projections of retained snapshot evidence.
+- Treat direct `qualification/state-space/vNNN/` directories through the retained checkpoint and the existing `qualification/git-smoke/` families as byte-identical ADR-080 snapshot projections.
 - Do not edit retained audit executables, reports, smoke scripts, or recorded outputs directly.
-- Keep each state-space version in its `vNNN/` directory.
-- Keep Git smoke suites grouped by behavioral family.
-- Use `qualification/lineage/lineage-v2.json` to map every `original_path` to its `current_path` and admitted SHA-256.
+- Use `qualification/lineage/lineage-v2.json` only for snapshot-backed retained artifacts; never add post-baseline evidence to that lineage.
+- Put every new state-space qualification under `qualification/state-space/post-baseline/vNNN/` with valid `qualification-metadata.json`.
+- Keep state-space versions contiguous across the retained and post-baseline boundaries.
 - Exclude `qualification/releases/` from active recursive discovery and the active manifest.
 
 ### Replay integrity
@@ -126,11 +126,12 @@ Git smoke replay requires Git 2.28.0 or newer. An older Git installation is an u
 
 ## Tool responsibilities
 
-- `tools/generate-qualification-lineage.py` generates the path-aware active lineage from the immutable snapshot.
+- `tools/generate-qualification-lineage.py` generates only the retained path-aware lineage from the immutable snapshot.
 - `tools/generate-current-manifest.py` generates the SHA-256 manifest for the active layout.
-- `tools/verify-qualification-layout.py` verifies the snapshot, active evidence, lineage, permissions, and manifests.
+- `tools/verify-qualification-layout.py` verifies the snapshot, retained evidence, post-baseline registrations, continuity, permissions, and manifests.
 - `tools/verify-markdown-links.py` verifies maintained relative Markdown links.
-- `tools/replay-historical-qualification.py` enforces exact-baseline state-space replay.
+- `tools/replay-historical-qualification.py` enforces exact-baseline retained state-space replay.
+- `tools/replay-post-baseline-qualification.py` replays registered post-baseline state-space evidence and compares exact recorded output.
 - `tools/replay-git-smokes.py` enforces the minimum Git version before smoke replay.
 
 Do not duplicate these responsibilities in ad hoc scripts.
@@ -144,26 +145,20 @@ python3 tools/generate-qualification-lineage.py
 python3 tools/generate-current-manifest.py
 ```
 
-Then run:
+Confirm that generation produced no uncommitted difference, then run:
 
 ```bash
+git diff --exit-code
 python3 tools/verify-qualification-layout.py
 python3 tools/verify-markdown-links.py
-```
-
-When the installed Git version is supported, also run:
-
-```bash
+python3 tools/tests/test-qualification-infrastructure.py
+python3 tools/replay-historical-qualification.py latest
+python3 tools/replay-post-baseline-qualification.py
 python3 tools/replay-git-smokes.py
+git diff --check
 ```
 
-Replay the current state-space checkpoint when qualification behavior or tooling changes:
-
-```bash
-python3 tools/replay-historical-qualification.py 45
-```
-
-Do not declare work complete when a change-caused validation failure remains unresolved.
+The Git smoke command must fail as unsupported when Git is older than 2.28.0. The GitHub Actions qualification workflow runs the same sequence. Do not declare work complete when a change-caused validation failure remains unresolved.
 
 ## Quick navigation
 
