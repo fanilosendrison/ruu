@@ -1,0 +1,66 @@
+Qualification replay — Ruu / ADR-080
+Date: 2026-09-09
+
+LINEAGE VALIDATION
+QUALIFICATION LINEAGE: PASS
+state-space audits retained: v2..v45 (44)
+Git smoke scripts retained: 15
+registered qualification artifacts: 161
+all state-space Python files compile: PASS
+all retained Git smoke shell files bash -n: PASS
+
+PROVENANCE / RENAME MIGRATION
+The complete qualification lineage had been restored from verified source packages before the project rename.
+The Ruu package then applied a naming-only migration to every textual artifact and matching filename.
+Historical artifacts that contained the former project token are therefore rename-migrated snapshots, not byte-identical pre-rename files.
+Current hashes are recorded in QUALIFICATION-LINEAGE.json.
+Pre-rename source-package hashes remain provenance anchors.
+
+Legacy brand-form scan:
+  hyphenated form: 0 occurrences
+  underscored form: 0 occurrences
+  concatenated form: 0 occurrences
+  matching filenames: 0
+
+STATE-SPACE REPLAY SEMANTICS
+Recorded .txt outputs were NOT overwritten by replay.
+
+Current-package direct replay:
+  v2: PASS / 14,220 represented combinations
+  v3..v37: historical-context package assertions remain intentionally snapshot-scoped
+    example current replay: v37 reaches its ADR-count assertion expecting its historical ADR-001..070 package and sees ADR-001..080
+    interpretation: retained executables are historical qualification snapshots, not forward-rewritten current tests beyond naming migration
+  v38: PASS / 14,992
+  v39: PASS / 15,140
+  v40: PASS / 15,424
+  v41: PASS / 15,588
+  v42: PASS / 15,740
+  v43: PASS / 15,868
+  v44: PASS / 16,124
+  v45: PASS / 16,380
+
+CURRENT GIT SMOKE REPLAY
+  git-checkpoint-canonicalization-smoke-v1.sh: PASS
+  git-direct-target-advance-smoke-v1.sh: PASS
+  git-group-local-correction-smoke-v1.sh: PASS
+  git-materialization-smoke-v1.sh: PASS
+  git-native-observation-smoke-v2.sh: PASS
+  git-native-observation-smoke-v3.sh: PASS
+  git-native-observation-smoke-v4.sh: PASS
+  git-native-observation-smoke-v5.sh: PASS
+  git-provider-realization-smoke-v1.sh: PASS
+  git-provider-realization-smoke-v2.sh: PASS
+  git-reference-transaction-abandonment-smoke-v1.sh: PASS
+  git-remote-observation-smoke-v1.sh: PASS
+  git-repository-bootstrap-smoke-v1.sh: PASS
+  git-restack-smoke-v1.sh: PASS
+  git-run-lock-noninheritable-smoke-v1.sh: PASS
+
+PACKAGE STRUCTURE
+ADR continuity 001..080: PASS
+RUU-SPEC.md == ruu-requirements-v1-merge-policy.md: PASS
+local Markdown links checked: 106 / missing 0
+Markdown fence parity: PASS
+
+VERDICT
+PASS — Ruu naming migration preserves the complete qualification lineage and current architectural behavior while eliminating the former project-name token from the packaged corpus.
