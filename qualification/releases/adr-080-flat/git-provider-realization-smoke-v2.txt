@@ -1,0 +1,5 @@
+provider-route C-H-R-O realization smoke: PASS
+candidate=798e81adb714540f3f88955c0896a4a18daf4ef0
+submitted_revision=e507dbce699797149f5bdb9ed2e0c40c5624ae68
+provider_result=93516fb806066909714c90223fe5ef5521a69f92
+observed_target=3de429b880d2071ee2dcfdc4b1e536543e7d7a3d

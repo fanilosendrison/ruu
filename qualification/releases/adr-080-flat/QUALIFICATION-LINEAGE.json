@@ -1,0 +1,995 @@
+{
+  "schema_version": 1,
+  "generated_for": "ADR-080 qualification lineage after project rename to Ruu",
+  "generated_on": "2026-09-08",
+  "incident": {
+    "classification": "PACKAGING_TRACEABILITY_REGRESSION",
+    "summary": "Historical executable state-space audits and retained Git smokes disappeared from later packages without an explicit archive/supersession record.",
+    "correction": "Restore exact source bytes; do not reconstruct historical evidence from prose reports."
+  },
+  "retention_policy": {
+    "silent_removal_forbidden": true,
+    "silent_mutation_forbidden": true,
+    "archive_requires": [
+      "status=ARCHIVED",
+      "content_sha256",
+      "durable_location",
+      "reason"
+    ],
+    "current_rule": "Every RETAINED artifact listed here must exist at the recorded path with the recorded SHA-256."
+  },
+  "sources": {
+    "adr070": {
+      "package_sha256": "2d164a160e3a41e33633fdce564e6debfb7b42c8b78b015892cafa43951ac984",
+      "manifest_sha256": "5c066c3cef81970f486f36f129860ee1d6906241118e13d04e33603d1f6f660f",
+      "manifest_entries": 210,
+      "role": "exact historical restoration source for state-space v2-v37 and retained Git smokes through ADR-070",
+      "source_label": "ADR070 SOURCE PACKAGE"
+    },
+    "adr073": {
+      "package_sha256": "4638e4d9edaa5b941c35ee41bdd364659fb588b830574f1865aa18a44c78277b",
+      "manifest_sha256": "263c53f1c2a4b7715d1dfc31e67fec0fbec5583c73a35f8ac30c887501d0cd10",
+      "manifest_entries": 137,
+      "role": "exact historical restoration source for state-space v38 and ADR-071/072 observation/run-lock smokes",
+      "source_label": "ADR073 SOURCE PACKAGE"
+    },
+    "adr080_pre_restoration": {
+      "package_sha256": "b4b9f9a212b600be117efc7545459cf9f1671b08abb37e53b66b5f9b24a6e63a",
+      "manifest_sha256": "f2ea00a9716d9bcce97f36a630017b203291579a0b0abe9fcd5896687022d5c5",
+      "manifest_entries": 183,
+      "role": "pre-restoration current source for state-space v39-v45 and current native/remote observation smokes",
+      "source_label": "ADR080-PRE-RESTORATION SOURCE PACKAGE"
+    }
+  },
+  "state_space_audits": [
+    {
+      "version": 2,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v2.md",
+        "sha256": "f37013f345a40ab35b46618c07670bae03505efdbfc3b49e267be24025189dbd"
+      },
+      "executable": {
+        "path": "state-space-audit-v2.py",
+        "sha256": "282276f05aa69e16fb314220ed6b3af7eeeaa3faa14512c56f4ddf2a56a64088"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v2.txt",
+        "sha256": "c97dd350e92899c40b40b44fd4aec3609e051cf6141b215ded952e14729392f3"
+      }
+    },
+    {
+      "version": 3,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v3.md",
+        "sha256": "9115b5a3fd06cec22c3cc2a6b9d7ff4d41742180c146ddc4b0c63960ab7862be"
+      },
+      "executable": {
+        "path": "state-space-audit-v3.py",
+        "sha256": "17bd45f061606e153b136e79a8ae7aac2c00f984e6c2ff15e455730474f440fa"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v3.txt",
+        "sha256": "580e9f407e7805eae9dc0608f54c8f44641f3ad2ea7082e15d1af85fe39611dc"
+      }
+    },
+    {
+      "version": 4,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v4.md",
+        "sha256": "346cf86806cba34bdbfed92ecab6698541e590946b9ca66dbdcf550f7127477a"
+      },
+      "executable": {
+        "path": "state-space-audit-v4.py",
+        "sha256": "34362e4312d810b6a1c01a015a7d0a2433c69091761ad96216c6a121def11f88"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v4.txt",
+        "sha256": "167f8f81e18606cc75a6a32bfc5f547ba8b381e82a5d444ed63c9ebafeeeeabb"
+      }
+    },
+    {
+      "version": 5,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v5.md",
+        "sha256": "60eac23e59a525dba10e6ad2acafeaf44dd46d89c5551b948a5ec424ad0075c7"
+      },
+      "executable": {
+        "path": "state-space-audit-v5.py",
+        "sha256": "0761eb69e385ea3122f9f4ed3d48cb438c61f0ba485e2ebd538a6cd90e607ea1"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v5.txt",
+        "sha256": "8965e5763bd2015aed731ad142e6ae5d761ce858eb4b0c9507f0ee03dff922e9"
+      }
+    },
+    {
+      "version": 6,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v6.md",
+        "sha256": "263ce6c1f9821c52fee5c484f5027bafddfe82c462a3441af03784d89cc1e499"
+      },
+      "executable": {
+        "path": "state-space-audit-v6.py",
+        "sha256": "d16f84c5ada665a412e55e843d371db88f55b7925075d2166efc0707b823e0d6"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v6.txt",
+        "sha256": "9710e9f17029e5d02a04f69fef2c86f0322af3eb197d598b24d88a7243a4a316"
+      }
+    },
+    {
+      "version": 7,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v7.md",
+        "sha256": "f2c75468bc1ade18ed2c1310e04918fa821b746948bf03ed5c014bf41f602691"
+      },
+      "executable": {
+        "path": "state-space-audit-v7.py",
+        "sha256": "0a21a5a710d7f535f82cc5e5f5715c496b59cb44ea7e68b8399635f514a51f25"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v7.txt",
+        "sha256": "138f3bdb2fd45f1802d6ce1ca947f194af49df4f2288e47bfea61f603ff6ef40"
+      }
+    },
+    {
+      "version": 8,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v8.md",
+        "sha256": "35501aeff95db42c7d36d204ed85873e98a079466b9b8d63aaf31982bc8d8a12"
+      },
+      "executable": {
+        "path": "state-space-audit-v8.py",
+        "sha256": "41c05ecc929673ba11924eab5eb38e474afed6b4af14904259195ce758da09d7"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v8.txt",
+        "sha256": "eb2839cfb92951f50a4a409d17b5da05169afc1d4cd3e11caa754cdc8635f517"
+      }
+    },
+    {
+      "version": 9,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v9.md",
+        "sha256": "f450a2d6c70ac5d79aa40ee71b5fc37af190509ba7f0a9bef24bab140cc2636a"
+      },
+      "executable": {
+        "path": "state-space-audit-v9.py",
+        "sha256": "a94b340eeb846083fcb308b9f8bd1525ed0341f14a1ff4ad5ee106e7e9973317"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v9.txt",
+        "sha256": "52fc737d0d2f23a3dacd7502ed0f1a83ee5ece79cee0d5cab105e9e3f1fb53f9"
+      }
+    },
+    {
+      "version": 10,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v10.md",
+        "sha256": "e51b756345173aea27c83680fb2ad0dbf339e39f9cac0685111d0f78f8e9babf"
+      },
+      "executable": {
+        "path": "state-space-audit-v10.py",
+        "sha256": "b75cd043a92f7155c72ec7c69e1b7f078445526abda0f8c3ba233cdf50a5c47c"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v10.txt",
+        "sha256": "ca9e915dc8ba11ffd6bb838e3bc69b21021798daffe0fbba943a122b534f468d"
+      }
+    },
+    {
+      "version": 11,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v11.md",
+        "sha256": "c76b043acfb9e2e70232bbef637f368a3d13dd8220fd86e101c900737a49eb8d"
+      },
+      "executable": {
+        "path": "state-space-audit-v11.py",
+        "sha256": "05c9fb0595ac74455a025ee9b52c72b12954e713301b0a44dc97cb4372c8803b"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v11.txt",
+        "sha256": "654a902787b2fff03b2de2d1b998017d06c15176d538643d0ba492e0e747262a"
+      }
+    },
+    {
+      "version": 12,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v12.md",
+        "sha256": "d908e503caf4abe064a5e0fbbe5317748cdeccce35e8243dfd8f58dd626bd354"
+      },
+      "executable": {
+        "path": "state-space-audit-v12.py",
+        "sha256": "c776c35459a1edd7518d3902125242675953a01af877493d91612f7b53542cfd"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v12.txt",
+        "sha256": "ab5252ca9be51a34e9d1c7bd9883dd5d6941c35247494b719835b081e404a5e9"
+      }
+    },
+    {
+      "version": 13,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v13.md",
+        "sha256": "4c96dbd3993d94d867486cfedf12cdcb0bef457f1f56b2b5aa7a302a6d5e387f"
+      },
+      "executable": {
+        "path": "state-space-audit-v13.py",
+        "sha256": "7ba0386981642d7bf0b8a1ffbeb2da578407ac5f965c6fda246499749651b7e0"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v13.txt",
+        "sha256": "e768d5830795a0571cb86b5eaf26dc135061a9885f30f99a7cc72ac659bb144c"
+      }
+    },
+    {
+      "version": 14,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v14.md",
+        "sha256": "10394130f43bc7ddfe214f944ad4687412d9083b913b11a15d25a4d4960d965a"
+      },
+      "executable": {
+        "path": "state-space-audit-v14.py",
+        "sha256": "d99433f9f90ac4f8c4f8ea70f8140c578b63e54a08a7eac0341d1e3f7daee24c"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v14.txt",
+        "sha256": "92e751fbb98546444c3e88114a57358c5560db4ed1c92e619569336dadfdfbda"
+      }
+    },
+    {
+      "version": 15,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v15.md",
+        "sha256": "42eed43a7e696ec9a9caad53fbb91f2752953550d72610ba1b0995efe478b9e3"
+      },
+      "executable": {
+        "path": "state-space-audit-v15.py",
+        "sha256": "3685bfbaa5b0eefe1c645ac4ea482c09d2d6117796999c3c77ac41411782aabe"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v15.txt",
+        "sha256": "5991a50471f6af5be4c607823e3bb634dd3e705859428927d47029fb7a1e7b65"
+      }
+    },
+    {
+      "version": 16,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v16.md",
+        "sha256": "4fe4b7611d280273597340d71768c21fb608916c291190d5aed4e0d17a33efb5"
+      },
+      "executable": {
+        "path": "state-space-audit-v16.py",
+        "sha256": "966efb3a28714879bdf4ba99d2448f07f351450b3959ddefad3d8d08b5c8c3c0"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v16.txt",
+        "sha256": "c75480ff24f9c3ceede39d81bbd4266e5cddad1e13ab129321f6a5a043dbb9b4"
+      }
+    },
+    {
+      "version": 17,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v17.md",
+        "sha256": "01e9574289cb557b5dfb5cf322772987ec01b7eadb654070cd70d9db457942c1"
+      },
+      "executable": {
+        "path": "state-space-audit-v17.py",
+        "sha256": "ea1c973e4e2237fd308226b0964c1652b454c16d33da2843692c54b3ddc5fa1e"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v17.txt",
+        "sha256": "9d28fb312920a8f46d5d5ce52c34ba5eee90c96a2b3993f33a6b794b20a0aad4"
+      }
+    },
+    {
+      "version": 18,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v18.md",
+        "sha256": "2d9c92aa08a8f42d070673446f64c5fe0c688c23725cc7c4f4d3d06c37abda93"
+      },
+      "executable": {
+        "path": "state-space-audit-v18.py",
+        "sha256": "a8604615b25098f9256413d57d76055ef51704cdb0d5bf2a8ca511275d740655"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v18.txt",
+        "sha256": "e63b10af588e35b3c28e9864388e232615d023a9bf4a847bdc4ca1caa45dcc7b"
+      }
+    },
+    {
+      "version": 19,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v19.md",
+        "sha256": "8bdf2b01a2e0c933aa276cd5de870a7cd29d0608e0ed0cbac6cd037e7760513b"
+      },
+      "executable": {
+        "path": "state-space-audit-v19.py",
+        "sha256": "2614bf5e7b41efa0201011f1dace1a56dd0fcc43a6e92b2410ea152a0e78a5ad"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v19.txt",
+        "sha256": "0f63b3503435cb66e86f22b30b31f9ae8f361e1f027571933d76ba8c8b0a339a"
+      }
+    },
+    {
+      "version": 20,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v20.md",
+        "sha256": "163d64e147f43136f12b4bb3452840deac64d1a46891c2437b20e669f00dc3f0"
+      },
+      "executable": {
+        "path": "state-space-audit-v20.py",
+        "sha256": "693f9246dfc3f87a22de15b4dd8d1213ce20e5613974f835db2d9b261169ffdd"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v20.txt",
+        "sha256": "466c29855946a1959ccd0a0c23b875ae3f1da31e399ecbc833af679f3b84304d"
+      }
+    },
+    {
+      "version": 21,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v21.md",
+        "sha256": "fba8053b3f31089e58ce296c87686108b53861b170aeacec3907583e806398a3"
+      },
+      "executable": {
+        "path": "state-space-audit-v21.py",
+        "sha256": "01545b0a1956d96c423627350fb1ff2bdb8339dc438a811fbd050276e676b4a1"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v21.txt",
+        "sha256": "0429706e7cf9807e471f0c9b6af665d4098dcf84773d340ba4de924f7ce7ec34"
+      }
+    },
+    {
+      "version": 22,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v22.md",
+        "sha256": "4d5cbaf29d95a975ff2de3321ae39ee37358f9688f27c0635c495244dcf00f9f"
+      },
+      "executable": {
+        "path": "state-space-audit-v22.py",
+        "sha256": "2671f14f8acefa16dfc3de534a463c31f12605020e5859fbf9740dade3338402"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v22.txt",
+        "sha256": "e777edda1481fc1a9778cab2de2039601bb452537e9d241d27047facf408a961"
+      }
+    },
+    {
+      "version": 23,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v23.md",
+        "sha256": "2dfa5547dec3cdda082069396ef787d22e37783d82733a310269c7002b36e57f"
+      },
+      "executable": {
+        "path": "state-space-audit-v23.py",
+        "sha256": "d75495bb862dd88504a7383875c4ad6d210537dd2100aed1b0f7a904e924430e"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v23.txt",
+        "sha256": "d19a7843da794defc702c6125da2c3315bdd7e935b8237dc9d6093930db1935f"
+      }
+    },
+    {
+      "version": 24,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v24.md",
+        "sha256": "bc7b3966a5cd10ba640e6c123fef8798e6139474858ab310f1e00da013e92a7d"
+      },
+      "executable": {
+        "path": "state-space-audit-v24.py",
+        "sha256": "f8761f22905aa33fb2029c08b1574d38500945c2ba89b3e65a8233c157946b79"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v24.txt",
+        "sha256": "2b34723355fc0737b726cb63eb9af8f503059a7a0f01144429739aea84f3bc14"
+      }
+    },
+    {
+      "version": 25,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v25.md",
+        "sha256": "8e8a481102954d1344a49b572beb69dc8d4041c010491c1ea1b81fbeb114d9ee"
+      },
+      "executable": {
+        "path": "state-space-audit-v25.py",
+        "sha256": "f5ea68df1abc4df1d1d086fc2a0e1718a434da6cfe9ef9575cc358bc2dd28930"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v25.txt",
+        "sha256": "b653a1d92216448a5ad1edae98723c305d0fb06f9444b433cf0db7a8f6b7c020"
+      }
+    },
+    {
+      "version": 26,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v26.md",
+        "sha256": "578d0733a68cb7b530987100c4e3210e188f4b9004d3369e21c229ed1917c5fb"
+      },
+      "executable": {
+        "path": "state-space-audit-v26.py",
+        "sha256": "b01d6c591218d2d7eb3e59cd5b79467d673201d1aa67de50e41b247b5cf821fd"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v26.txt",
+        "sha256": "14933934e2f11fd31eebbc8e694b5b36198cacd7976bd120a27d1c675c683483"
+      }
+    },
+    {
+      "version": 27,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v27.md",
+        "sha256": "21d7593853c58a21b5b4ea3b43af5544c5a256c7e0554d090f9894938d65ab0d"
+      },
+      "executable": {
+        "path": "state-space-audit-v27.py",
+        "sha256": "89fb9da1a92b7ae232c6486e43323f607f70837cd2a105cb5e8e5be3aaf2447e"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v27.txt",
+        "sha256": "05cea79b10564a08a53baeff3c5aabc250c1cc9ac5f28c7447311f798fb946c3"
+      }
+    },
+    {
+      "version": 28,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v28.md",
+        "sha256": "fb9df2e28e30b8eeb8c5678804689e0963cb0d1553e622b8d5c7929a4df21f90"
+      },
+      "executable": {
+        "path": "state-space-audit-v28.py",
+        "sha256": "7d0199e23b4bce6afced61e43fc88be9c01b399021f58b73a9fbca85d6e92226"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v28.txt",
+        "sha256": "453163d4a7b7d4531cd39f81ff16064c5474f0ec2998a7bb4873bd8098205c2e"
+      }
+    },
+    {
+      "version": 29,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v29.md",
+        "sha256": "75d32298ffa71a681699783068970a9367fd4f4521e67ccae7cd2dd0854585e6"
+      },
+      "executable": {
+        "path": "state-space-audit-v29.py",
+        "sha256": "bb9a5f2867e91dabd9ab7d1b98c02ae0f7734a0e0abaef9f65ec75da44ee5e89"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v29.txt",
+        "sha256": "b19ebad5e104fe6b0d0698ea7e554b211543e817329a93fe5a9d0a0070ae14f7"
+      }
+    },
+    {
+      "version": 30,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v30.md",
+        "sha256": "dfc7254f0a2e494fd4a25d26aa6246b1475ed59e545ba31ef4569fe1143f6a52"
+      },
+      "executable": {
+        "path": "state-space-audit-v30.py",
+        "sha256": "470c8ba4bf24ca9e5333c456ba8821e87d253c7e8281cb2014cc903f06e26958"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v30.txt",
+        "sha256": "e875ba8d45d55a0151cd81f6eb0df8998fcd52118530d173fb4b8659aac59cca"
+      }
+    },
+    {
+      "version": 31,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v31.md",
+        "sha256": "9d939a5383d502d2ac8980b12264132b4ba53ea928130a951732a907836d659b"
+      },
+      "executable": {
+        "path": "state-space-audit-v31.py",
+        "sha256": "3a659c8ba2d64689a5c2acd6ee11ffce347dfc7d1ebcda93e27f689cf70dcbd4"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v31.txt",
+        "sha256": "f606c93e336e311df554470af8e2876676a917667502ae56001925d6b98eaca7"
+      }
+    },
+    {
+      "version": 32,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v32.md",
+        "sha256": "cadd6c887765e6499ed9c8868faaf06fce7888dc9a414cdacbc6e56d695b9772"
+      },
+      "executable": {
+        "path": "state-space-audit-v32.py",
+        "sha256": "fc670e3305efc09425b7e454199b6a568cd7e29805aa84b732430bf892d3b708"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v32.txt",
+        "sha256": "2fae2a9d1758a6a04258be35e49e7ecba9f32a44bb5690e701e59bd6687d8691"
+      }
+    },
+    {
+      "version": 33,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v33.md",
+        "sha256": "2c41cc104ecdecf5a324c20316d1303c20f4cbca7f6c50470f2ea65004e1992c"
+      },
+      "executable": {
+        "path": "state-space-audit-v33.py",
+        "sha256": "69b80801125dd9a3468712bee23752b359f0e1684e0822812fe25d3ebddeb320"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v33.txt",
+        "sha256": "08ec368d081134c28ea1a6f2803a2347047f90c1f5e07da76b16623f1232fc94"
+      }
+    },
+    {
+      "version": 34,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v34.md",
+        "sha256": "b842374d7a10fa1eac5514bd5b2622c2918b350780e77ba88fa059118f0bb680"
+      },
+      "executable": {
+        "path": "state-space-audit-v34.py",
+        "sha256": "0fc2cdefa1ea2abe1bfad742346118f7b181690d3551ac8eaa2dfb017ca18be1"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v34.txt",
+        "sha256": "f0803fda7c41c58148e93e5a55243662798f87182a022bea277db9d3495a3a60"
+      }
+    },
+    {
+      "version": 35,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v35.md",
+        "sha256": "3be04710f24e4381fe2bf5120d4c74c70aac64cc46be0dd2ae25357d6021d19a"
+      },
+      "executable": {
+        "path": "state-space-audit-v35.py",
+        "sha256": "f494482d044875184c89dee83ac659adccf2cc124be017cb20800b0ef8f70746"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v35.txt",
+        "sha256": "b1f8e542e3cc7b136f0c63f7130a87731b1602170c71765ccd10e9ba4800bf04"
+      }
+    },
+    {
+      "version": 36,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v36.md",
+        "sha256": "d0e7170eaf6e73c720c00bee003af52f3c2efd22e955f269bb768af925277047"
+      },
+      "executable": {
+        "path": "state-space-audit-v36.py",
+        "sha256": "f0ea7d0ab99ffe0fbd80a7a1f42a8aea1dd9f82da10a2365713d453327c53bbc"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v36.txt",
+        "sha256": "4d8cc458ff43eae701287aba73c17963163a9b31cd0509a703d6d41b71fc7dca"
+      }
+    },
+    {
+      "version": 37,
+      "status": "RETAINED",
+      "source": "adr070",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v37.md",
+        "sha256": "15c1a742e1d11f0651b30e44b77981b14179a66d84be30025062344682ae40e7"
+      },
+      "executable": {
+        "path": "state-space-audit-v37.py",
+        "sha256": "b2501ba95b7a9e1aa7cd135d5a14da8084a0209ac5721820f108f3c23560a1da"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v37.txt",
+        "sha256": "51fc74d7d8e4e743177db931f999ee06bbe75c8a73e44581204e7fc8ae8c2a3d"
+      }
+    },
+    {
+      "version": 38,
+      "status": "RETAINED",
+      "source": "adr073",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v38.md",
+        "sha256": "02dc1cba64de04bf4a8ace5b0f9c0f6d99493188c6f47918c433d6632e07906f"
+      },
+      "executable": {
+        "path": "state-space-audit-v38.py",
+        "sha256": "52a7f1ceae983a34e2ed771bbfd05d3e3f755ad73c3ddfa3c098697ec95b30df"
+      },
+      "recorded_output": {
+        "path": "STATE-SPACE-AUDIT-v38.txt",
+        "sha256": "5e85ae8b1c31626861ea6dd82809a345de09e0f556ea45de1c6a999c52186351"
+      }
+    },
+    {
+      "version": 39,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v39.md",
+        "sha256": "057444853e75adeebbfc5e63f799ebc0733d3f05a8b3fef48b47db395081bff0"
+      },
+      "executable": {
+        "path": "state-space-audit-v39.py",
+        "sha256": "961fd2af4ee677487774eb835f163767eb1919c50693932c4407649666bfb04c"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v39.txt",
+        "sha256": "454eace2878a2ea380eccde5fb1c9955c824f10f00c530c868baa27bdf336e7b"
+      }
+    },
+    {
+      "version": 40,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v40.md",
+        "sha256": "0d0a58f272c3a2513e259ce06d4f6c912e416d6c4248d4f8b81314d162658ea0"
+      },
+      "executable": {
+        "path": "state-space-audit-v40.py",
+        "sha256": "1e87662f15e5354695fbc446589dbf2dc477c99656701a8585850771acec99f0"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v40.txt",
+        "sha256": "ae4ccd4f2ac92e84ed46478d3714fe7ab85f8897b485a671f8c45ad23aa5d4bd"
+      }
+    },
+    {
+      "version": 41,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v41.md",
+        "sha256": "66eeaadd0f4e215334259bf76151d05327cad5ef71263c0315d463dadad307e2"
+      },
+      "executable": {
+        "path": "state-space-audit-v41.py",
+        "sha256": "6c79e9ce49628d50728242526fe9e674087597bd14839a9ad8c603a40f81437c"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v41.txt",
+        "sha256": "d885497f0447f3da2863ce1787212458ee3a6b4b82b4aa5cf5fb40c9236404eb"
+      }
+    },
+    {
+      "version": 42,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v42.md",
+        "sha256": "d38258addf15ee30ff6b46c68e678dcea587fa85bc442d3fe7a160bdb3cbfefb"
+      },
+      "executable": {
+        "path": "state-space-audit-v42.py",
+        "sha256": "4dfa01627e64c6a5e172e95e99763b38939cd55e903baf33c42fedfd04b6e276"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v42.txt",
+        "sha256": "b73bd2f7d3e90d73b99ca8ebfb2400644860249b10e6a340eab46a71fdbdab69"
+      }
+    },
+    {
+      "version": 43,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v43.md",
+        "sha256": "73d5e26bd64af4d05df1eda6af8e4fb96d30e0c22e8f9687bf47383e95f47e76"
+      },
+      "executable": {
+        "path": "state-space-audit-v43.py",
+        "sha256": "61acedfabd5917e9a4d144071ff4aaa88bb23ba8c9bcff49288ac3e08305d9bc"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v43.txt",
+        "sha256": "0f7e491d89e98001aae42b83e304795b500cf91f2a938c4b98492e077191548d"
+      }
+    },
+    {
+      "version": 44,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v44.md",
+        "sha256": "c68c230dbea8d7820de756367df8381c39074b45fe370826984addddd5ca6d65"
+      },
+      "executable": {
+        "path": "state-space-audit-v44.py",
+        "sha256": "ee768c4728020b63ee2960360caa10214bff52c554648fc7e9caaffb791a33c1"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v44.txt",
+        "sha256": "693497f0e005a19f7822ad3f5d946b098e18718af7ef8c761fdd3b81ac096be3"
+      }
+    },
+    {
+      "version": 45,
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "report": {
+        "path": "STATE-SPACE-AUDIT-v45.md",
+        "sha256": "fcd7e7a05aa14f7cae709ebeadf71ea049ad1fcddcaf9725e2fb70f086bb2ed3"
+      },
+      "executable": {
+        "path": "state-space-audit-v45.py",
+        "sha256": "84b9016765a5a8713db40df11888b657f63d309335d4e6890410d423057738ea"
+      },
+      "recorded_output": {
+        "path": "state-space-audit-v45.txt",
+        "sha256": "76bc0a73f54bbcbe167a4bf985d6aff5bf6d60b0a03fe51e78bdaff9ca4765ae"
+      }
+    }
+  ],
+  "git_smokes": [
+    {
+      "id": "git-checkpoint-canonicalization-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-checkpoint-canonicalization-smoke-v1.sh",
+        "sha256": "6789255f5ca3dfdeb1ec8b2e9e1b4dcbbdc41b0b94d98e021975275740eb95a4"
+      },
+      "recorded_output": {
+        "path": "git-checkpoint-canonicalization-smoke-v1.txt",
+        "sha256": "c279abf3bdb62e12d75f42f87d6fc119e5a5e463a19c02b0c343483174bdba23"
+      }
+    },
+    {
+      "id": "git-direct-target-advance-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-direct-target-advance-smoke-v1.sh",
+        "sha256": "c7c1005980ba6466aa6b6c1c3204af891d1948bb0960e27b40eb2fa052bd3e66"
+      },
+      "recorded_output": {
+        "path": "git-direct-target-advance-smoke-v1.txt",
+        "sha256": "6b3714ffc95425082f4512bd3a426a45215b37047b4f40e178575d3dd1e936a6"
+      }
+    },
+    {
+      "id": "git-group-local-correction-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-group-local-correction-smoke-v1.sh",
+        "sha256": "c5450bc56adc5433a532ec9317e94ba9b1a3478cae38446134cba72b2c111904"
+      },
+      "recorded_output": {
+        "path": "git-group-local-correction-smoke-v1.txt",
+        "sha256": "9581c95c6a2b2e51018f48c21a1d34e399286f4f3a259f9d48bc16a9642bbadb"
+      }
+    },
+    {
+      "id": "git-materialization-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-materialization-smoke-v1.sh",
+        "sha256": "aad317bd6351dbccbc7f4d67390d55a4e8817f2f30250a1c55050e7dce76cc74"
+      },
+      "recorded_output": {
+        "path": "git-materialization-smoke-v1.txt",
+        "sha256": "3bc01c2047bdb2e3438742e5af8461f4fa2d668499c028a00f6ecd0c09e7d9ef"
+      }
+    },
+    {
+      "id": "git-native-observation-smoke-v2",
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "script": {
+        "path": "git-native-observation-smoke-v2.sh",
+        "sha256": "16d578147180c068b34d7960bb466f38c96e804dca1183f9557b5b51b515aa66"
+      },
+      "recorded_output": {
+        "path": "git-native-observation-smoke-v2.txt",
+        "sha256": "2097a4beee335d1451448b97fb26128e1496586ac07b06b3632f48123587a978"
+      }
+    },
+    {
+      "id": "git-native-observation-smoke-v3",
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "script": {
+        "path": "git-native-observation-smoke-v3.sh",
+        "sha256": "666f6fc06757a029039a49502ebf37ebbd08af33cd73c66863eb873929ef7f65"
+      },
+      "recorded_output": {
+        "path": "git-native-observation-smoke-v3.txt",
+        "sha256": "92028376d95f84c8282cc382f064f6bec2f3fa489c355de154617fc48a8720f6"
+      }
+    },
+    {
+      "id": "git-native-observation-smoke-v4",
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "script": {
+        "path": "git-native-observation-smoke-v4.sh",
+        "sha256": "e5af57142369b2cba9c320f4d54c604e47d2edea070cab60c4d8f1f742b5da3b"
+      },
+      "recorded_output": {
+        "path": "git-native-observation-smoke-v4.txt",
+        "sha256": "e96cd7704913ec0f95d2cb637a8f8a6e344fa640191b3f39c0178bfc5902176b"
+      }
+    },
+    {
+      "id": "git-native-observation-smoke-v5",
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "script": {
+        "path": "git-native-observation-smoke-v5.sh",
+        "sha256": "c61b89345b85f99dbe8fd349df161b824859ab61e63e8aafd22e9ca3b12eae0e"
+      },
+      "recorded_output": {
+        "path": "git-native-observation-smoke-v5.txt",
+        "sha256": "b4356bf172f05943cbcab9d1f22a230a3ee229c85e88644c7608de90d88ea8b6"
+      }
+    },
+    {
+      "id": "git-provider-realization-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-provider-realization-smoke-v1.sh",
+        "sha256": "fe9500d12a4f87bfe85a06de7be59821844b1163f78a999d1eb78ae43c557b18"
+      },
+      "recorded_output": {
+        "path": "git-provider-realization-smoke-v1.txt",
+        "sha256": "dc7ec931a9229d0ec870a11d26069aa54110f08b529221092116ac9e97f3df5c"
+      }
+    },
+    {
+      "id": "git-provider-realization-smoke-v2",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-provider-realization-smoke-v2.sh",
+        "sha256": "a8de5de89c0d41a8d76a797cf68fce6c75500e4aae85bdac0a566c77eb71cb3e"
+      },
+      "recorded_output": {
+        "path": "git-provider-realization-smoke-v2.txt",
+        "sha256": "87d93b31f5a52d548ba86e7caf1d4d5dedb7d1cfdb0530ab786e8c5cb89a7b59"
+      }
+    },
+    {
+      "id": "git-reference-transaction-abandonment-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr073",
+      "script": {
+        "path": "git-reference-transaction-abandonment-smoke-v1.sh",
+        "sha256": "69be9e95c7fe7cda173a2deeed23ddbdc7466e87c9ae4d423189a9ff18c03c1a"
+      },
+      "recorded_output": null
+    },
+    {
+      "id": "git-remote-observation-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr080_pre_restoration",
+      "script": {
+        "path": "git-remote-observation-smoke-v1.sh",
+        "sha256": "38d5acc898557a7cddd930b3caab63351a8ea22b635f3e670879e0c3f9fcaf3d"
+      },
+      "recorded_output": {
+        "path": "git-remote-observation-smoke-v1.txt",
+        "sha256": "10e62faba305ebf4de55e5c1550c44975e2846496f9b968b3c6e1791319738eb"
+      }
+    },
+    {
+      "id": "git-repository-bootstrap-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-repository-bootstrap-smoke-v1.sh",
+        "sha256": "5d09b4bdb6bb669df009a8dbad7b97176580b7ef5e7a922fdeb8cf612c56e8cc"
+      },
+      "recorded_output": {
+        "path": "git-repository-bootstrap-smoke-v1.txt",
+        "sha256": "1a54d0bc815bf36dc362efbb5e8e6d72b68338a9514b89c324d21f39d7d924de"
+      }
+    },
+    {
+      "id": "git-restack-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr070",
+      "script": {
+        "path": "git-restack-smoke-v1.sh",
+        "sha256": "4c94aa8297b02b9ea6ad7ba615df326d36b820d54acb3ab155f4aac403d37c53"
+      },
+      "recorded_output": {
+        "path": "git-restack-smoke-v1.txt",
+        "sha256": "1744335533bb31f49132ce430e584876290d0426d51bdb8360fe20c2521df13e"
+      }
+    },
+    {
+      "id": "git-run-lock-noninheritable-smoke-v1",
+      "status": "RETAINED",
+      "source": "adr073",
+      "script": {
+        "path": "git-run-lock-noninheritable-smoke-v1.sh",
+        "sha256": "80933893da1dbdaa721992cd661d4bd5d233c2c9eaabbbcd5b8b21bb5ed64b5d"
+      },
+      "recorded_output": {
+        "path": "git-run-lock-noninheritable-smoke-v1.txt",
+        "sha256": "e65aa2acc268465cb90353448bb9f5025d6e3ade26985d92ed17bc2a9dd57b46"
+      }
+    }
+  ],
+  "rename_migration": {
+    "status": "APPLIED",
+    "new_product_name": "Ruu",
+    "scope": "All packaged filenames and textual qualification/documentation artifacts were mechanically rename-migrated. Historical semantic content and audit logic were otherwise preserved.",
+    "source_package_sha256": "9bb847bd1dc7c5e005f3d8da183c1484d11278539e4d70add5f1bf1b3c36772b",
+    "historical_byte_identity_note": "Current retained hashes identify the rename-migrated corpus. Pre-rename source hashes remain provenance anchors but current historical artifacts are no longer byte-identical to those source packages because the former product-name token was removed."
+  }
+}

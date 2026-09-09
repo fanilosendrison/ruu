@@ -1,0 +1,8 @@
+git version: 2.47.3
+remote_tracking_is_stale_cache: PASS
+direct_remote_observation_current: PASS
+exact_old_remote_cas_rejects_stale: PASS
+exact_old_remote_cas_success: PASS
+remote_deletion_not_equal_tracking_cache: PASS
+provider_free_bare_remote_progression: PASS
+git-remote observation smoke v1: PASS

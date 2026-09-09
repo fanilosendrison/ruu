@@ -1,0 +1,6 @@
+git version: 2.47.3
+retained_v3_regressions: PASS
+linked_worktree_common_hook_visible: PASS
+functional_attestation_veto_effective: PASS
+foreign_core_hookspath_detected_without_takeover: PASS
+git-native observation smoke v4: PASS

@@ -1,0 +1,32 @@
+Ruu state-space audit v11: PASS
+contribution_unit_cardinality_identity: 256
+actor_correlation_irrelevance: 96
+contribution_unit_lifecycle: 144
+contribution_unit_artifact_exact_state_continuity: 36
+contribution_unit_checkpoint_record_cas: 216
+external_convergence_grouping_authority: 15
+external_control_plane_responsibility_boundary: 95
+reconciliation_required_contract: 192
+candidate_attribution_boundary: 60
+convergence_demand_coalescing: 12
+single_executor_fencing: 24
+trigger_authority_independence: 96
+executor_release_demand_race: 4
+coordination_store_fail_closed: 24
+recovery_namespace_nonaliasing: 8
+eager_contribution_integration: 6,912
+convergence_membership_readiness: 720
+experimental_isolation_level: 18
+global_managed_obligation_coverage: 648
+external_wait_recheck: 96
+contribution_unit_worktree_mutation_authority: 192
+contribution_unit_commit_verification_crosscheck: 1,080
+state_producing_transition_verification: 432
+verification_evidence_reuse: 72
+verification_fixed_point: 108
+verification_capacity_scheduler: 180
+review_request_intent: 108
+review_revision_invalidation: 24
+internal_integration_evidence: 240
+changed/revalidated finite combinations evaluated: 12,108
+markdown artifacts statically cross-checked: 55

@@ -1,0 +1,11 @@
+ADR-080 source-domain authority family: 32 PASS
+ADR-080 remote-cache/currentness family: 32 PASS
+ADR-080 remote-CAS/recovery family: 32 PASS
+ADR-080 provider-optionality family: 32 PASS
+ADR-080 webhook-positive-evidence family: 32 PASS
+ADR-080 delivery-idempotency family: 32 PASS
+ADR-080 cross-source-causality family: 32 PASS
+ADR-080 remote-artifact-semantics family: 32 PASS
+new combinations: 256 PASS
+retained v44 baseline: 16124
+v45 total: 16380 PASS

@@ -1,0 +1,11 @@
+Ruu ADR-048 materialization smoke: PASS
+Ruu ADR-050 restack smoke: PASS
+Ruu DIRECT target advance v1 smoke: PASS
+Ruu repository bootstrap v1 smoke: PASS
+Ruu canonical checkpoint v1 smoke: PASS
+Ruu ADR-061 target-binding finite family: PASS (144 combinations)
+retained v29 finite combinations: 14222
+v30 changed/revalidated finite combinations: 14366
+ADR numbering: PASS (1..61)
+markdown artifacts currently statically checked: 94
+static normative checks: PASS

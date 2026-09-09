@@ -1,0 +1,6 @@
+git version: 2.47.3
+retained_v4_regressions: PASS
+existing_ref_noop_admission_barrier: PASS
+absent_ref_admission_barrier: PASS
+worktree_lock_is_not_authoring_topology_fence: PASS
+git-native observation smoke v5: PASS

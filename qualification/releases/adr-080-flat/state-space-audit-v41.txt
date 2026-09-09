@@ -1,0 +1,10 @@
+ADR-076 witness-vs-operation family: 16 PASS
+ADR-076 non-authoritative-provenance family: 16 PASS
+ADR-076 active-occurrence-idempotency family: 16 PASS
+ADR-076 outcome-replay-recovery family: 48 PASS
+ADR-076 scan-nonmanufacture family: 36 PASS
+ADR-076 wakeup-coalescing family: 16 PASS
+ADR-076 logical-exactly-once family: 16 PASS
+new combinations: 164 PASS
+retained v40 baseline: 15424
+v41 total: 15588 PASS

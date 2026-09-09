@@ -1,0 +1,12 @@
+ADR-079 minimal-rejection family: 32 PASS
+ADR-079 protection-filter family: 32 PASS
+ADR-079 preparation-batch family: 32 PASS
+ADR-079 outcome-advisory family: 32 PASS
+ADR-079 ref-admission family: 32 PASS
+ADR-079 admission-crash family: 32 PASS
+ADR-079 initial-handoff family: 32 PASS
+ADR-079 lock-order family: 16 PASS
+ADR-079 failure-classification family: 16 PASS
+new combinations: 256 PASS
+retained v43 baseline: 15868
+v44 total: 16124 PASS

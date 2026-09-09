@@ -1,0 +1,14 @@
+Ruu state-space audit v4: PASS
+work_context_cardinality_identity: 128
+actor_correlation_irrelevance: 120
+work_context_worktree_mutation_authority: 150
+work_context_commit_verification_crosscheck: 900
+state_producing_transition_verification: 432
+verification_evidence_reuse: 72
+verification_fixed_point: 108
+verification_capacity_scheduler: 180
+review_request_intent: 108
+review_revision_invalidation: 24
+internal_integration_evidence: 240
+changed/revalidated finite combinations evaluated: 2,462
+markdown artifacts statically cross-checked: 40

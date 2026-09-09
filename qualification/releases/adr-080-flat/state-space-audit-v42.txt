@@ -1,0 +1,12 @@
+ADR-077 repository-common-coverage family: 16 PASS
+ADR-077 ownership-composition family: 20 PASS
+ADR-077 admission-attestation family: 12 PASS
+ADR-077 mutation-engine-boundary family: 20 PASS
+ADR-077 unwitnessed-recovery family: 16 PASS
+ADR-077 coverage-epoch family: 24 PASS
+ADR-077 recreation-reattestation family: 16 PASS
+ADR-077 owned-install-CAS family: 12 PASS
+ADR-077 hook-order-persistence family: 16 PASS
+new combinations: 152 PASS
+retained v41 baseline: 15588
+v42 total: 15740 PASS
