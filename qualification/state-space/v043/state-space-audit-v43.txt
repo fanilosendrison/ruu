@@ -1,0 +1,9 @@
+ADR-078 zero-preflight-supported-harness family: 16 PASS
+ADR-078 pre-edit-safety-timing family: 16 PASS
+ADR-078 authority-vs-packaging family: 16 PASS
+ADR-078 checkpoint-simplicity family: 16 PASS
+ADR-078 lazy-multi-repo-first-touch family: 32 PASS
+ADR-078 admin-vs-ordinary-interface family: 32 PASS
+new combinations: 128 PASS
+retained v42 baseline: 15740
+v43 total: 15868 PASS

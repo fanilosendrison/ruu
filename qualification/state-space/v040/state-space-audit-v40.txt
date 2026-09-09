@@ -1,0 +1,9 @@
+ADR-075 observation-strength family: 36 PASS
+ADR-075 adapter/core preparation family: 96 PASS
+ADR-075 positive-disposition-proof family: 54 PASS
+ADR-075 backend-capability family: 64 PASS
+ADR-075 reflog-baseline family: 18 PASS
+ADR-075 canonical-ancestry family: 16 PASS
+new combinations: 284 PASS
+retained v39 baseline: 15140
+v40 total: 15424 PASS

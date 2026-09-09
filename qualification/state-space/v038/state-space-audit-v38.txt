@@ -1,0 +1,5 @@
+ADR-071 causal authorization family: PASS (48)
+ADR-071 transactional managed-ref deletion family: PASS (24)
+ADR-071 external/provider cancellation race family: PASS (54)
+ADR-071 new finite combinations: PASS (126)
+v38 total with retained v37 baseline: PASS (14992)

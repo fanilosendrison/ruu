@@ -1,0 +1,7 @@
+ADR-074 binding-transition family: 72 PASS
+ADR-074 recovery family: 36 PASS
+ADR-074 observation-taxonomy family: 24 PASS
+ADR-074 ancestry-environment family: 16 PASS
+new combinations: 148 PASS
+retained v38 baseline: 14992
+v39 total: 15140 PASS

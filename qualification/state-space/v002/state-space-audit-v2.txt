@@ -1,0 +1,12 @@
+Ruu state-space audit v2: PASS
+baseline existing factorized combinations: 12,246
+writer_commit_verification_crosscheck: 810
+state_producing_transition_verification: 432
+verification_evidence_reuse: 72
+verification_fixed_point: 108
+verification_capacity_scheduler: 180
+review_request_intent: 108
+review_revision_invalidation: 24
+internal_integration_evidence: 240
+new combinations evaluated: 1,974
+combined factorized combinations represented: 14,220

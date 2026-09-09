@@ -1,0 +1,28 @@
+Ruu ADR-048 materialization smoke: PASS
+Ruu ADR-050 restack smoke: PASS
+Ruu DIRECT_TARGET_ADVANCE v1 smoke: PASS
+Ruu repository bootstrap v1 smoke: PASS
+Ruu canonical checkpoint v1 smoke: PASS
+Ruu provider-route C-H-R-O realization v2 smoke: PASS
+Ruu ordinary branch deletion / managed checkpoint neutrality smoke: PASS
+Ruu ADR-069 group-local correction / descendant restack smoke: PASS
+ADR-062 provider projection/finalization finite family retained: PASS (72 combinations)
+ADR-063 finding/backlog boundary finite family retained: PASS (16 combinations)
+ADR-064 frozen handoff/checkpoint identity finite family retained: PASS (16 combinations)
+ADR-066 route-conformant realization finite family retained: PASS (108 combinations)
+ADR-066 policy-drift/commitment recovery finite family retained: PASS (96 combinations)
+ADR-067 supersession finite family retained: PASS (12 combinations)
+ADR-068 group cancellation finite family: PASS (48 combinations)
+ADR-068 ConvergenceUnit disposition finite family: PASS (64 combinations)
+ADR-068 immutable membership-change finite family retained: PASS (8 combinations)
+Hostile-audit H4 historical PROMOTED finite family: PASS (12 combinations)
+ADR-069 invocation/group occurrence finite family: PASS (16 combinations)
+ADR-069 group-local resolution/freeze finite family: PASS (24 combinations)
+ADR-069 descendant restack/revision finite family: PASS (8 combinations)
+retained v34 finite combinations: 14686
+retained v35 finite combinations: 14806
+retained v36 finite combinations: 14818
+v37 changed/revalidated finite combinations: 14866
+ADR numbering: PASS (1..70; ADR-070 adds product governance, no new finite transition family)
+markdown artifacts currently statically checked: 121
+static normative checks: PASS
