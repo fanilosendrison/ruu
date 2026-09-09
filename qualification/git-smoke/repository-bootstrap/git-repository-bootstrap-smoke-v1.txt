@@ -1,0 +1,3 @@
+Ruu repository bootstrap smoke v1: PASS
+B0=69355f0755628710afe8ab0d27a176dfc78ce7ce
+C1=8944b706d74abf0f1215f4a141017aa491945d0c

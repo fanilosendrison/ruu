@@ -1,0 +1,10 @@
+git version: 2.47.3
+retained_v2_regressions: PASS
+files_rename_carry_prepared: PASS
+files_terminal_removal_prepared: PASS
+files_force_rename_two_bindings: PASS
+prelinearization_veto_effective: PASS
+reftable_delete_callback_visible: PASS
+reftable_rename_bypass_detected: PASS
+reftable_force_rename_bypass_detected: PASS
+git-native observation smoke v3: PASS

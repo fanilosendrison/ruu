@@ -1,0 +1,2 @@
+successor acquisition with surviving child: PASS
+run-lock non-inheritance smoke: PASS

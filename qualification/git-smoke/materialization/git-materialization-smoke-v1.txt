@@ -1,0 +1,9 @@
+Ruu ADR-048 materialization smoke: PASS
+git_version=git version 2.47.3
+pairwise_merge_tree=PASS
+rename_plus_modify=PASS
+multi_parent_commit=PASS
+base_and_all_source_ancestry=PASS
+deterministic_oid_recreation=PASS
+native_octopus_rejected_complex_case=PASS
+candidate_oid=1408b956d2074e8e1e3ee99c4eaa7bb3cda76db2

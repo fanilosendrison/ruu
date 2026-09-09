@@ -1,0 +1,8 @@
+Ruu ADR-050 restack smoke: PASS
+exact_three_way_transplant=PASS
+predecessor_evolution_preserved=PASS
+child_owned_effect_preserved=PASS
+deterministic_tree=PASS
+deterministic_submission_head=PASS
+new_head_parent_is_new_base=PASS
+semantic_conflict_blocks=PASS

@@ -1,0 +1,7 @@
+git version: 2.47.3
+native_rename_continuity: PASS
+copy_then_delete_not_rename: PASS
+prepared_failure_aborts_removal: PASS
+ancestry_environment_detectable: PASS
+reflog_baseline_supports_future_rename_evidence: PASS
+git-native observation smoke v2: PASS

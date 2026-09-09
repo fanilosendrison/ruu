@@ -1,0 +1,4 @@
+provider-result realization smoke: PASS
+candidate=5b95b017f1af0792a6401035470ff48e56104187
+provider_result=0739ee95346e12b82605b5046ebbeaa91e3af1ea
+observed_target=a0d306e0a2632318af7fe35b039e3460d1dc6c78
