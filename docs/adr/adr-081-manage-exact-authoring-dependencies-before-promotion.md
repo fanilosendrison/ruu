@@ -13,7 +13,7 @@ status: "accepted"
 - **Status:** Accepted — 2026-11-03
 - **Decision order:** 081
 - **Closes:** backlog 30.56
-- **Opens:** backlog 30.57 and 30.58
+- **Engineering follow-ups:** [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1) and [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2)
 - **Supersedes:** none
 - **Amends/clarifies:** ADR-003, ADR-009, ADR-023, ADR-033, ADR-035, ADR-038, ADR-039, ADR-040, ADR-042, ADR-047, ADR-048, ADR-050, ADR-054, ADR-068, ADR-069, ADR-071, ADR-073, ADR-074, ADR-075, ADR-076, and ADR-078
 
@@ -260,7 +260,7 @@ consumer initial exact base = consumed_exact_oid A
 
 If a finite selected set has one existing exact commit that canonically contains every selected OID, that commit may be the single Git authoring base. ADR-081 does not synthesize an authoring-base merge. Incomparable selected commits with no already-existing exact containing base block consumer provisioning pending an explicit architecture/semantic resolution; dirty state is never used to bridge them.
 
-This decision does not authorize rewriting or refounding a consumer that has already authored from another base. That late-discovery case remains backlog 30.58.
+This decision does not authorize rewriting or refounding a consumer that has already authored from another base. Possible future refoundation semantics are tracked non-normatively in [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2).
 
 ### 8. A clean native tip can become a managed checkpoint only at handoff
 
@@ -466,11 +466,11 @@ The `AUTHORING_DEPENDENCY_OID_ANCHOR` remains `REQUIRED` while any raw, resolved
 
 Unexpected external mutation/deletion of the anchor is an integrity/data-loss condition, never evidence that the dependency disappeared or was satisfied.
 
-### 16. Cardinality and late discovery remain bounded open questions
+### 16. Cardinality and late discovery remain bounded constraints
 
 The dependency record model safely represents a finite set. ADR-081 does not ratify provider/publication semantics for more than one independently unsatisfied predecessor when an ordinary Git/provider submission has one exact base and ADR-050 has one parent submission relation.
 
-Until backlog 30.57 is decided:
+Until a later accepted ADR resolves [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1):
 
 ```text
 more than one independently unsatisfied external promotion predecessor
@@ -481,7 +481,7 @@ more than one independently unsatisfied external promotion predecessor
 
 ADR-048 canonical multi-source composition does not by itself solve this authority/topology problem; it composes exact sources within one repository-local PromotionUnit, not several independently governed predecessor groups.
 
-ADR-081 also does not authorize a late rewrite/refoundation after a consumer has authored from an ordinary baseline and only then discovers a dependency. ADR-050 restacks provider projection after managed handoff; it does not grant mutation authority over an active consumer worktree. Backlog 30.58 must decide whether a new ContributionUnit, exact transplant, merge, or another explicit semantic mechanism owns that transition.
+ADR-081 also does not authorize a late rewrite/refoundation after a consumer has authored from an ordinary baseline and only then discovers a dependency. ADR-050 restacks provider projection after managed handoff; it does not grant mutation authority over an active consumer worktree. [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2) tracks the non-normative engineering question of whether a new ContributionUnit, exact transplant, merge, or another explicit semantic mechanism should own that transition.
 
 ### 17. Zero-preflight remains governing
 
@@ -591,7 +591,7 @@ Crash/retry and concurrent reconciliation preserve one dependency identity, one 
 - Dependency adoption adds a recoverable operation and long-lived Git recovery anchor.
 - Source handoff compression needs exact causal attribution and CAS, not only ancestry.
 - Implementations must preserve consumed-base/owned-candidate provenance across promotion.
-- Multi-unsatisfied-predecessor publication and late dependency refoundation remain explicit HIGH design questions.
+- Multi-unsatisfied-predecessor publication and late dependency refoundation remain explicit HIGH engineering follow-ups in the Ruu Engineering project; project state cannot alter the current fail-closed semantics.
 
 ## Rejected alternatives
 

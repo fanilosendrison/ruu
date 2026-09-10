@@ -13,7 +13,7 @@ status: "final"
 - **Date:** 2026-11-03
 - **Mode:** final global scan after integration
 - **Authority reviewed:** complete active Ruu specification, External Control Plane contract, accepted ADR history through ADR-081, architecture overview, design backlog/log, and active qualification infrastructure
-- **Result:** **NO BLOCKING FINDING; TWO HIGH UNRATIFIED DECISIONS REMAIN**
+- **Result:** **NO BLOCKING FINDING; TWO HIGH UNRATIFIED ENGINEERING FOLLOW-UPS REMAIN**
 - **Finite evidence:** post-baseline v46 executes 648 new ADR-081 cases; 17,028 cumulative modeled cases including 16,380 retained historical cases
 - **Native Git evidence:** dependency-anchor retention smoke PASS on the installed default object format and SHA-256 when supported
 
@@ -37,8 +37,9 @@ The burden of proof remained on the corpus. A behavior was classified `CONFIRMED
 
 ### H081-001 — HIGH — Multiple independently unsatisfied predecessors have no ratified publication model
 
-- **Affected authoritative sources:** ADR-081 §16; Ruu specification §§22.8, 30.57, 33.26; open design backlog 30.57; ADR-048; ADR-050.
-- **Classification:** genuinely unratified architectural choice exposed by ADR-081.
+- **Affected authoritative sources:** ADR-081 §16; Ruu specification §§22.8 and 33.26; ADR-048; ADR-050.
+- **Engineering tracking:** [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1) in the Ruu Engineering project.
+- **Classification:** genuinely unratified architectural choice exposed by ADR-081; the GitHub item is non-normative work management.
 - **Minimal counterexample:**
 
 ```text
@@ -58,12 +59,13 @@ provider submission exposes only one exact base/parent relation
   3. require semantic consolidation into another authoritative source/group;
   4. define multiple provider surfaces or another exact representation.
 - **Required decision detail:** identity, cycle rules, base selection, provider capability contract, exact target-satisfaction reduction, restack order, conflict ownership, and crash/retry adoption.
-- **Recommendation:** decide backlog 30.57 before claiming general dependency-DAG publication support. Retain the current local block until then.
+- **Recommendation:** resolve [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1) through an accepted ADR before claiming general dependency-DAG publication support. Retain the current local block until then.
 
 ### H081-002 — HIGH — Late dependency discovery has no active-authoring refoundation transition
 
-- **Affected authoritative sources:** ADR-081 §§7 and 16; Ruu specification §§30.58 and 33.4; open design backlog 30.58; ADR-050; ADR-064; ADR-073.
-- **Classification:** genuinely unratified architectural choice exposed by ADR-081.
+- **Affected authoritative sources:** ADR-081 §§7 and 16; Ruu specification §33.4; ADR-050; ADR-064; ADR-073.
+- **Engineering tracking:** [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2) in the Ruu Engineering project.
+- **Classification:** genuinely unratified architectural choice exposed by ADR-081; the GitHub item is non-normative work management.
 - **Minimal counterexample:**
 
 ```text
@@ -80,7 +82,7 @@ only later the Development System discovers required source α@A
   3. a dedicated immutable refoundation object/state machine;
   4. mandatory Development System semantic reconstruction.
 - **Required decision detail:** mutation authority, old/new base and owned candidate identity, conflict state, lifecycle, dependency adoption ordering, object retention, rollback prohibition, and crash/retry recovery.
-- **Recommendation:** decide backlog 30.58 before supported harnesses advertise late dependency adoption.
+- **Recommendation:** resolve [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2) through an accepted ADR before supported harnesses advertise late dependency adoption.
 
 ## 3. Confirmed-safe results
 
@@ -257,7 +259,7 @@ No active normative source grants semantic selection to ancestry, publication au
 - The native retention smoke proves current Git ref reachability/GC behavior, not resistance to malicious deletion of `.git`, object databases, or reserved Ruu refs.
 - Concrete supported-harness pre-first-write interception remains an implementation conformance obligation for each Pi/Codex/Claude integration.
 - Provider-specific stack, queue, and finalization behavior remains subject to contextual adapter qualification.
-- Multi-predecessor publication and late refoundation are intentionally unverified because their architecture is not ratified.
+- Multi-predecessor publication and late refoundation are intentionally unverified because their architecture is not ratified; work is tracked in GitHub issues [#1](https://github.com/fanilosendrison/ruu/issues/1) and [#2](https://github.com/fanilosendrison/ruu/issues/2).
 
 ## 7. Required final answers
 
@@ -271,7 +273,7 @@ No active normative source grants semantic selection to ancestry, publication au
 
 ### Are there remaining BLOCKING/HIGH architectural decisions?
 
-**No BLOCKING finding remains. Two HIGH decisions remain:** H081-001 / backlog 30.57 and H081-002 / backlog 30.58.
+**No BLOCKING finding remains. Two HIGH engineering follow-ups remain:** H081-001 / [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1) and H081-002 / [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2).
 
 ### Does zero-preflight naked-harness usage still work conceptually?
 
@@ -303,4 +305,4 @@ No active normative source grants semantic selection to ancestry, publication au
 
 ## 8. Final verdict
 
-> **Ruu is coherent through ADR-081 for the ratified pre-authoring exact-dependency path. No BLOCKING architecture defect remains. General multi-unsatisfied-predecessor publication and late consumer refoundation remain explicit HIGH decisions and must not be implemented by guesswork.**
+> **Ruu is coherent through ADR-081 for the ratified pre-authoring exact-dependency path. No BLOCKING architecture defect remains. General multi-unsatisfied-predecessor publication and late consumer refoundation remain explicit HIGH engineering follow-ups in the Ruu Engineering project and must not be implemented by guesswork.**

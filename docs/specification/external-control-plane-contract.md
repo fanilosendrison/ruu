@@ -321,7 +321,7 @@ The declaration is accepted only after an ADR-042 recoverable adoption operation
 
 The ordinary supported-harness path performs selection, anchoring, adoption, and exact consumer-base provisioning invisibly before first write. The human user does not construct the declaration manually or invoke the source first.
 
-This contract does not authorize late refoundation after consumer authoring has already started from another base. It also does not choose publication topology for more than one independently unsatisfied predecessor. Those cases remain explicit open design items and fail closed only for the affected authoring/refoundation or realization transition.
+This contract does not authorize late refoundation after consumer authoring has already started from another base. It also does not choose publication topology for more than one independently unsatisfied predecessor. Those cases fail closed only for the affected authoring/refoundation or realization transition. Non-normative engineering work is tracked in the Ruu Engineering project as [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2) and [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1), respectively.
 
 ### 2.5 External mutation-authority declaration
 

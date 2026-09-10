@@ -1,6 +1,6 @@
-# Ruu — Open Design Backlog
+# Ruu — Design Backlog History and Tracking Pointers
 
-This backlog records design questions raised during the 2026-09-07/08 architecture review and their closure status. Accepted semantics live in the main requirements document, ADRs, and the normative `EXTERNAL-CONTROL-PLANE-CONTRACT.md`. **ADR-070 / §0 Product intent governs how every open item is resolved: a technically coherent solution is not acceptable if it re-exports avoidable multi-session/repository/concurrency orchestration to the user without explicitly amending ADR-070.** ADR-068 closed the preceding item 30.41. A subsequent hostile falsification pass opened 30.42–30.48; ADR-069 closed 30.42 and 30.43, ADR-071 closed 30.44 and 30.45, v38 closed 30.48, ADR-072 closes 30.46, ADR-073 closes 30.47, and ADR-074 closes 30.50 while correcting ADR-071 native managed-binding classification. The native-Git observation-plane investigation is now closed: ADR-074 closes 30.50, ADR-075 closes 30.51, ADR-076 closes 30.52, ADR-077 closes 30.53, ADR-079 closes 30.54, and ADR-080 closes 30.55 plus umbrella 30.49. ADR-081 closes 30.56 for exact authoring dependencies before promotion. The ADR-081 repository-wide hostile audit opens 30.57 and 30.58 as HIGH unratified decisions: multi-unsatisfied-predecessor publication and late consumer refoundation.
+This backlog records design questions raised during the 2026-09-07/08 architecture review and their closure status. Accepted semantics live in the main requirements document, ADRs, and the normative `EXTERNAL-CONTROL-PLANE-CONTRACT.md`. **ADR-070 / §0 Product intent governs how every open item is resolved: a technically coherent solution is not acceptable if it re-exports avoidable multi-session/repository/concurrency orchestration to the user without explicitly amending ADR-070.** ADR-068 closed the preceding item 30.41. A subsequent hostile falsification pass opened 30.42–30.48; ADR-069 closed 30.42 and 30.43, ADR-071 closed 30.44 and 30.45, v38 closed 30.48, ADR-072 closes 30.46, ADR-073 closes 30.47, and ADR-074 closes 30.50 while correcting ADR-071 native managed-binding classification. The native-Git observation-plane investigation is now closed: ADR-074 closes 30.50, ADR-075 closes 30.51, ADR-076 closes 30.52, ADR-077 closes 30.53, ADR-079 closes 30.54, and ADR-080 closes 30.55 plus umbrella 30.49. ADR-081 closes 30.56 for exact authoring dependencies before promotion. Subsequent durable engineering follow-ups are tracked in the GitHub Project **Ruu Engineering**, while accepted semantics remain in the repository.
 
 ## A. Checkpoint candidate canonical snapshot / identity — closed by ADR-059 (30.27)
 
@@ -543,31 +543,11 @@ ContributionUnit is the sole v1 authoring-occurrence identity. Ruu independently
 
 A current authoritative target may satisfy the dependency directly. Otherwise a qualifying source handoff accepted after durable selection may resolve it to stable `(PromotionGroup, source repository)` identity only when the source's own frozen pre-sync checkpoint contains the consumed OID, group-local state incorporates that checkpoint, and source/consumer immutable PromotionTargets are exactly equal. This preserves the consumed OID and uses ADR-050 `Restack(old_base, owned_candidate, current_parent)` semantics without laundering source ancestry back through the consumer. Same-group dependencies create no provider edge. Source abandonment without prior realization produces reconciliation and never transfers publication authority.
 
-## 30.57 Multiple independently unsatisfied authoring predecessors — OPEN — HIGH
+## ADR-081 engineering follow-ups
 
-Minimal counterexample:
+The two unratified generalizations exposed by the ADR-081 hostile audit are tracked in the GitHub Project **Ruu Engineering** rather than this repository backlog:
 
-```text
-consumer β requires source α@A and source γ@Q
-A and Q are both exact and durably retained
-neither source effect is target-realized
-α and γ later resolve to different PromotionGroups
-```
+- [#1 — Define publication semantics for multiple unsatisfied authoring predecessors](https://github.com/fanilosendrison/ruu/issues/1)
+- [#2 — Define late authoring-dependency refoundation after consumer writes](https://github.com/fanilosendrison/ruu/issues/2)
 
-The durable relation model can retain both obligations, and consumer authoring may proceed only if one already-existing exact base canonically contains both. The current publication model cannot represent the general remaining case: ADR-050 has one `parent_submission_id`, while an ordinary Git/provider submission has one base. ADR-048 composes sources inside one PromotionUnit but does not grant cross-group source publication authority.
-
-Decision required: choose whether publication waits for all but one dependency to become target-satisfied, derives a deterministic promotion DAG/linearization, creates multiple provider surfaces, requires semantic consolidation into another authoritative source, or adopts another exact model. No option is ratified. Until then, realization with more than one independently unsatisfied external predecessor is locally blocked.
-
-## 30.58 Late authoring-dependency discovery and consumer refoundation — OPEN — HIGH
-
-Minimal counterexample:
-
-```text
-consumer β starts from M
-β authors exact work W
-only then the Development System discovers required source α@A
-```
-
-ADR-081's accepted path adopts dependencies before β's first write. Later Git ancestry cannot manufacture semantic selection. ADR-050 restacks a provider projection after managed handoff and grants no mutation authority over β's active worktree. Current ADRs do not choose whether to create a new ContributionUnit from `A`, exact-transplant `M→W` onto `A`, perform an ordinary semantic merge, or retain another explicit refoundation object/freeze protocol.
-
-Decision required: define the authority, exact inputs, conflict state, lifecycle, and retry/retention semantics of late refoundation. Until then, Ruu performs no implicit active-worktree rewrite and exposes the condition for Development System action.
+GitHub Issues and project fields are work-management records, not normative sources. Until a later accepted ADR changes the model, ADR-081's current fail-closed boundaries remain authoritative.

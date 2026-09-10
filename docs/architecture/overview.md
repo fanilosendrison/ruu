@@ -309,7 +309,7 @@ same source ContributionUnit later hands off its own exact pre-sync checkpoint S
 
 Source advancement never changes `A` or mutates an active consumer worktree. Aggregate group ancestry cannot launder `A` back from the consumer when the source's own frozen pre-sync checkpoint omitted it. If the source loses its realization path before `A` is validly target-realized, the consumer remains blocked with exact reconciliation work; it does not inherit authority to publish `A`. An already-adopted valid target-satisfaction proof remains historical authority after later target drift, while every later consumer realization still revalidates current route/policy/CAS guards.
 
-The exact anchor remains retained through source reset/amend/ref deletion and Git GC. Multiple independently unsatisfied predecessors and dependency discovery after consumer authoring has already begun remain explicit open design questions; Ruu invents neither provider topology nor active-worktree refoundation.
+The exact anchor remains retained through source reset/amend/ref deletion and Git GC. Multiple independently unsatisfied predecessors and dependency discovery after consumer authoring has already begun remain HIGH engineering follow-ups in the GitHub Project **Ruu Engineering** ([#1](https://github.com/fanilosendrison/ruu/issues/1), [#2](https://github.com/fanilosendrison/ruu/issues/2)); project state is non-normative, and Ruu invents neither provider topology nor active-worktree refoundation.
 
 Normative anchor: [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
 
@@ -873,7 +873,7 @@ For a new reader, the shortest path from product intent to detailed mechanics is
 6. **[ADR-045](../adr/adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) through [ADR-050](../adr/adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md), plus [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md)** — promotion model and provider projection.
 7. **[ADR-074](../adr/adr-074-minimize-native-git-event-observation-to-managed-authoring-binding-disposition.md) through [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md)** — local/remote/provider observation and native-Git coexistence.
 8. **[ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md)** — exact source-attributed native versions consumed before source promotion.
-9. **[`OPEN-DESIGN-BACKLOG.md`](../design/open-design-backlog.md)** only after the current model is understood; it contains design history and remaining open nodes rather than the primary architecture description.
+9. **[`open-design-backlog.md`](../design/open-design-backlog.md)** only after the current model is understood; it preserves design-question/closure history and points to the non-normative [Ruu Engineering project](https://github.com/users/fanilosendrison/projects/3) for current durable engineering follow-ups.
 
 ---
 

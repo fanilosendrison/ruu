@@ -34,11 +34,12 @@ ADRs remain chronological. Their directory is not subdivided by topic because de
 
 ### Design and history
 
-- [Open design backlog](design/open-design-backlog.md)
+- [Design-backlog history and tracking pointers](design/open-design-backlog.md)
+- [Ruu Engineering GitHub Project](https://github.com/users/fanilosendrison/projects/3)
 - [Decision integration log](design/decision-integration-log.md)
 - [Ruu rename migration](history/rename-migration-ruu.md)
 
-The design backlog records current and closed questions. It is not a substitute for the normative specification.
+The repository design backlog preserves prior question/closure history. New durable engineering follow-ups are tracked in Ruu Engineering. GitHub Issues and project fields are work-management records, not substitutes for normative specifications or accepted ADRs.
 
 ## Recommended reading order
 

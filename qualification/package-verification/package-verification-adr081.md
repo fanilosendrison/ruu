@@ -72,12 +72,12 @@ The cumulative 17,028 figure is arithmetic traceability over 16,380 retained his
 
 `qualification/audits/hostile/hostile-audit-adr081.md` performs the final repository-wide pass.
 
-Remaining HIGH decisions:
+Remaining HIGH engineering follow-ups in the GitHub Project **Ruu Engineering**:
 
-1. backlog 30.57 — publication with more than one independently unsatisfied predecessor;
-2. backlog 30.58 — dependency discovery/refoundation after consumer authoring has begun.
+1. [issue #1](https://github.com/fanilosendrison/ruu/issues/1) — publication with more than one independently unsatisfied predecessor;
+2. [issue #2](https://github.com/fanilosendrison/ruu/issues/2) — dependency discovery/refoundation after consumer authoring has begun.
 
-Both cases fail closed locally. No BLOCKING finding remains for the ratified pre-first-write, single-unsatisfied-predecessor path.
+Both cases fail closed locally. Project status is non-normative and cannot alter that boundary. No BLOCKING finding remains for the ratified pre-first-write, single-unsatisfied-predecessor path.
 
 ## Found-and-fixed regressions
 
@@ -130,4 +130,4 @@ The expected v37 non-replayable result is not counted as a pass. Its exact ADR-0
 
 ## Verdict
 
-**PASS for the ADR-081 architecture package, subject to the explicitly retained HIGH design backlog 30.57 and 30.58.** Exact intermediate native Git versions can be consumed without invoking their producer first; dirty state cannot be captured implicitly; dependency objects remain anchored; later promotion compression requires source-owned handoff proof; abandonment transfers no authority; and crash/retry reconciliation is idempotent under the current fenced model.
+**PASS for the ADR-081 architecture package, subject to HIGH engineering follow-ups [#1](https://github.com/fanilosendrison/ruu/issues/1) and [#2](https://github.com/fanilosendrison/ruu/issues/2) in the Ruu Engineering project.** Exact intermediate native Git versions can be consumed without invoking their producer first; dirty state cannot be captured implicitly; dependency objects remain anchored; later promotion compression requires source-owned handoff proof; abandonment transfers no authority; and crash/retry reconciliation is idempotent under the current fenced model.
