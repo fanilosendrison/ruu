@@ -423,3 +423,9 @@ ADR-053 corrections remain session-independent, but correction authoring is expl
 ADR-054's multiple-group ConvergenceUnit sharing is retained and becomes a normal case with independent group-local exact snapshots.
 
 ADR-067 supersession remains repository-local exact-snapshot lifecycle, now triggered only by a legitimate newer resolution of the same PromotionGroup.
+
+## Amendment by ADR-081 — source handoff claims raw authoring provenance
+
+A raw AuthoringDependency predates PromotionGroup identity. The first qualifying handoff accepted after durable dependency-selection TX-A may CAS-claim the pending/raw obligation for its `(PromotionGroup, source repository)` projection only when the same source ContributionUnit's exact frozen checkpoint contains the consumed OID before downward synchronization, the group-local exact state incorporates that checkpoint, and source/consumer immutable PromotionTargets are exactly equal. A handoff accepted between TX-A and dependency-adoption TX-B may be adopted directly as resolved during TX-B/recovery. A historical group or arbitrary candidate containing the OID by ancestry does not qualify.
+
+If source and consumer handoffs already belong to the same immutable group and the source's own exact frozen pre-sync checkpoint contains the consumed OID, the dependency is internal to the existing repository projection and creates no provider edge. Group membership is never changed to force that result.

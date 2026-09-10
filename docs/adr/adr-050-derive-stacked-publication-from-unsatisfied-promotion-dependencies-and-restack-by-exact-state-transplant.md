@@ -296,3 +296,9 @@ If restack requires semantic authoring, there is no valid automatic `H`; Develop
 
 ADR-050 is the normative descendant mechanism when an older PromotionGroup revision changes a predecessor exact state. A clean exact-state transplant updates only the dependent provider/submission projection and does not automatically rewrite the descendant group's immutable owned exact state. Only transplant conflict that creates explicit semantic `RECONCILIATION_REQUIRED` authority may lead to a `REVISE_EXISTING_GROUP` invocation and a new exact descendant PromotionUnit.
 
+## Amendment by ADR-081 — predecessor provenance may begin before promotion
+
+ADR-050 still governs only after a stable parent promotion projection is known. ADR-081 adds the earlier durable AuthoringDependency `(source ContributionUnit, consumed exact OID A)`. A qualifying source handoff accepted after durable dependency-selection TX-A may map that relation to `(source PromotionGroup, repository)` only when the same source ContributionUnit's exact frozen checkpoint `S` contained `A` before downward synchronization, group-local `K` incorporates `S`, source/consumer immutable PromotionTargets are exactly equal, current disposition permits the path, and CAS succeeds. Aggregate `A ancestor-or-equal K` alone is insufficient. Arbitrary candidate ancestry remains non-authoritative.
+
+The child's immutable owned anchor remains `(old_base=A, owned_candidate=B)` even when the parent projection's current exact state is `K`; restack uses `Restack(A,B,K)`. Raw dependencies and more than one independently unsatisfied external predecessor do not invent provider topology and block only affected realization.
+

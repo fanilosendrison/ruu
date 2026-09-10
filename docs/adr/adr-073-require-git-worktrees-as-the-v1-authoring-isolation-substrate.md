@@ -108,3 +108,9 @@ The concrete v1 managed authoring surface is now explicitly `dedicated worktree/
 ## Amendment by ADR-079
 
 The dedicated worktree/ref surface is a **candidate provisioning surface** until exact managed admission completes. The pre-edit provisioner retains exclusive mutation authority, establishes a conforming native `RefAdmissionBarrier` over the exact candidate ref, revalidates repository/worktree/HEAD/ref/OID topology, commits the authoritative current binding while the barrier is still held, releases the barrier, and only then transfers authoring authority to the producer. `git worktree lock` may be defense-in-depth but is not the correctness primitive because it does not freeze HEAD/switch behavior.
+
+## Clarification by ADR-081 — native exact versions are not an alternate authoring substrate
+
+An ordinary native commit made inside the managed worktree is an exact authoring version. It may be selected as an AuthoringDependency for another repository-local ContributionUnit without invoking the source first, but only after exact source attribution and durable recovery anchoring. This does not create the arbitrary external commit/tree ingress rejected here: both source and consumer remain managed ContributionUnits on the normative worktree substrate.
+
+Native commit creation alone is not a Ruu checkpoint or handoff. A clean current tip becomes a managed checkpoint only through exact frozen-handoff adoption.

@@ -171,3 +171,7 @@ Rejected because worktree isolation, binding identity and observer coverage cann
 ### Let the convergence engine infer all semantic work topology automatically
 
 Rejected because zero-preflight is not permission to guess semantic intent. Authority separation remains normative.
+
+## Amendment by ADR-081 — exact dependency selection remains hidden plumbing
+
+A supported harness may expose/discover exact pending managed authoring commits and explicitly select one stable source ContributionUnit/version for a new consumer before first write. The user does not construct AuthoringDependency records, invoke the source first, or select a later provider stack. The harness submits an authorized internal provisioning demand to the existing fenced ConvergenceEngine; Ruu performs exact source proof, durable OID anchoring, adoption, and mechanical reconciliation before permitting the consumer's first write. This internal demand is not a work-bearing checkpoint invocation and creates no PromotionGroup. Failure never falls back to dirty producer-state capture or ancestry guessing.

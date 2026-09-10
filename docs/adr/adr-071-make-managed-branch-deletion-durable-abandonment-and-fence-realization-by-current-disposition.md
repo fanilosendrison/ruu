@@ -249,3 +249,7 @@ ADR-071 closes 30.44 and 30.45. ADR-074 later closes 30.50 and corrects the nati
 ## Amendment by ADR-076 — binding-disposition idempotency is generation-scoped
 
 Native binding evidence is not a second managed Operation. For one `(repository, work occurrence, binding_generation)`, at most one correctness-critical cessation/rebind preparation may remain unresolved and at most one committed `CONTINUATION | ABANDON` disposition may transition out of that generation. Duplicate delivery of the same active native occurrence is idempotent; a genuinely distinct competing transition must wait/fail/veto until the current preparation is resolved. After `ABORTED`, the same generation may admit a later distinct preparation; after committed disposition, stale deliveries cannot re-dispose the old generation. Optional correlation to a managed Attempt is explanatory only and cannot bypass the current-disposition causal fence.
+
+## Clarification by ADR-081 — dependency consumers inherit no source authority
+
+Current v1 reads `work occurrence` above as the existing ContributionUnit; no separate `work_occurrence_id` exists. If another ContributionUnit has consumed an exact commit from this source, resolved source `ABANDON` or group `CANCEL` does not authorize the consumer to publish that commit. Current target satisfaction is checked first; otherwise the AuthoringDependency becomes exact `RECONCILIATION_REQUIRED` and remains realization-blocking. Already committed/realized history keeps the existing ADR-071 recovery treatment.

@@ -317,3 +317,9 @@ Rejected. Crash/replay-safe systems should tolerate duplicate delivery and recov
 ## Subsequent observer-coverage amendment — ADR-077
 
 ADR-077 subsequently closes backlog 30.53. ADR-076's `trustworthy continuous-coverage interval` is concretized as an attested repository-common coverage epoch for an admitted mutation-engine/adapter profile. Repair opens a new epoch and never retroactively proves a prior gap; direct/uninstrumented managed-ref mutation without the required preparation is an observation-integrity failure rather than reconstructible causal history.
+
+## Clarification by ADR-081 — ContributionUnit identity and dependency adoption
+
+The `work_occurrence_id` examples in this historical ADR are read in current v1 as `contribution_unit_id`; no second WorkOccurrence identity exists. Binding generation remains separate.
+
+AuthoringDependency adoption is a managed ADR-042 Operation because Ruu creates a correctness-critical exact-OID anchor and adopts a semantic source/version relation. The native commit that supplied the OID remains ordinary Git state and does not create another Operation. Duplicate selection/observation/recovery converges on one immutable dependency identity and at most one CAS-adopted source promotion projection.

@@ -159,3 +159,9 @@ The External Control Plane contract now includes one narrow exceptional authorin
 ## Clarification by ADR-078
 
 "External" in **External Control Plane** denotes an architectural authority boundary relative to the convergence engine, not a mandatory packaging or installation boundary. A Ruu distribution may ship coding-harness adapters/provisioning primitives that implement this role for supported harnesses, provided semantic authority remains governed by this contract and all required pre-edit guarantees are established before first managed write. The ordinary supported-harness UX must not require a second control-plane product or explicit start/create-CU/provision preflight.
+
+## Amendment by ADR-081
+
+The contract now assigns explicit pre-edit selection of a repository-local `(source ContributionUnit, exact native commit OID)` dependency to the Development System. Ruu owns exact source/object proof, durable OID anchoring, idempotent adoption, target/same-group/source-handoff reconciliation, and realization blocking. Selection never chooses provider topology and cannot manufacture Git truth or dirty-state history.
+
+`ContributionUnit` is the sole v1 authoring-occurrence identity. Historical `ContributionUnit/work occurrence` wording refers to that object; the active contract removes `work_occurrence_id` as a separate field.

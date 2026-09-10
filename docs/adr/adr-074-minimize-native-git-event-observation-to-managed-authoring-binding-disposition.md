@@ -280,3 +280,7 @@ Rejected. Observation is derived from correctness obligations, not hook availabi
 ## Amendment by ADR-076 — event evidence is replayable; causal history is not reconstructed from state
 
 The event plane does not require exactly-once delivery or actor attribution. Native witnesses/preparations may be replayed or duplicated, while authoritative binding disposition remains exactly-once per current binding generation. State-plane rediscovery may resolve an already-durable preparation when proof is sufficient, but it MUST NOT synthesize a missing terminal-removal or rename-carry preparation from current ref topology, same OID/tree/ancestry, or repeated scans. Best-effort wakeups remain non-semantic and freely coalescible/loss-tolerant.
+
+## Clarification by ADR-081 — native commit observation and canonical identity
+
+Ordinary commit creation and managed authoring ref-tip movement remain exact-state rediscovery. Ruu journals the later semantic AuthoringDependency adoption, not each commit event. Current v1 also canonicalizes historical `ContributionUnit/work occurrence` wording to the existing ContributionUnit identity and removes `work_occurrence_id` as a separate field from the active External Control Plane contract.

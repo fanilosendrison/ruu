@@ -413,3 +413,7 @@ This is adapter-local causal correlation, not a requirement for a backend-provid
 ## Subsequent observer-coverage amendment — ADR-077
 
 ADR-077 subsequently closes backlog 30.53. The ADR-075 capability contract remains controlling for capture strength; ADR-077 defines how that capability is established non-destructively as an attested repository-common observer binding for an admitted mutation-engine/adapter profile, with Git core as the required V1 engine family and coverage epochs for continuous-trust accounting.
+
+## Clarification by ADR-081 — exact authoring dependencies preserve the observation split
+
+Native commit/reset/merge and ordinary tip movement remain exact-state rediscovery even when an exact commit may later be selected as a dependency. Only the semantic dependency adoption is managed state. The adoption operation may use exact native-ref exclusion to prove the source preimage and create its recovery anchor; this does not promote ordinary commit creation into a pre-linearization business-event family.
