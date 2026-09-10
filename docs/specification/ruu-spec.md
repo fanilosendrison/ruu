@@ -2,7 +2,7 @@
 
 # 0. Product intent — governing user experience
 
-This section is normative, ratified by **ADR-070**, and strengthened by **ADR-078**. It states the product outcome that the technical invariants below exist to serve. If a lower-level architectural rule admits several interpretations, the interpretation that preserves this product intent while satisfying the applicable safety invariants is required. If a prior technical clause directly conflicts, ADR-070 supersedes that clause to the minimum extent necessary. A future change to this product promise must explicitly amend ADR-070 and update this section in the same decision.
+This section is normative, ratified by **ADR-070**, and strengthened by **ADR-078** and **ADR-081**. It states the product outcome that the technical invariants below exist to serve. If a lower-level architectural rule admits several interpretations, the interpretation that preserves this product intent while satisfying the applicable safety invariants is required. If a prior technical clause directly conflicts, ADR-070 supersedes that clause to the minimum extent necessary. A future change to this product promise must explicitly amend ADR-070 and update this section in the same decision.
 
 ## 0.1 Product definition: agentic version control built on Git
 
@@ -73,7 +73,9 @@ when the user or agent wants the current block to cross the Git boundary:
   ruu
 ```
 
-Before the first managed write in each repository touched by that coding session, the harness integration MUST automatically cause the required pre-edit managed-authoring state to exist. Depending on current durable state, this includes creating/adopting the appropriate ContributionUnit/ConvergenceUnit bindings, managed ref/worktree, mutation authority, repository-common observer coverage, and opaque coordination identities/handoffs required by the architecture. These mechanisms are internal product plumbing, not user-facing workflow steps.
+Before the first managed write in each repository touched by that coding session, the harness integration MUST automatically cause the required pre-edit managed-authoring state to exist. Depending on current durable state, this includes creating/adopting the appropriate ContributionUnit/ConvergenceUnit bindings, any explicitly selected exact authoring dependencies, managed ref/worktree, mutation authority, repository-common observer coverage, and opaque coordination identities/handoffs required by the architecture. These mechanisms are internal product plumbing, not user-facing workflow steps.
+
+When new work needs an exact native commit from another still-active managed ContributionUnit, the Development System/harness selects the exact source ContributionUnit and commit. The user does not construct an AuthoringDependency or invoke the source first. Ruu adopts and retains that exact relation before consumer authoring; it never substitutes the producer's dirty worktree or follows a later moving source tip.
 
 The **External Control Plane / Development System remains an architectural authority role**, not necessarily a separately installed product. A conforming Ruu distribution MAY implement that role in part through Ruu-supplied integrations for supported coding harnesses. Semantic authority is unchanged: the integration may materialize declared work topology safely, but it MUST NOT make Ruu infer task meaning, semantic completion, grouping, or validation intent that belongs to the Development System.
 
@@ -152,7 +154,7 @@ which repositories the current work cohort touched
 which ConvergenceUnits go together in the new PromotionGroup
 which other session must converge first
 which stale base generation to use
-which dependency/stack topology should exist
+which raw authoring-dependency object or later dependency/stack topology should exist
 which PR/submission shape should be created
 whether another invocation is currently executing
 ```
@@ -316,7 +318,8 @@ The desired system should make it possible for:
 - small trunk-based direct promotions where explicitly allowed;
 - strict provider-submission workflows (for example GitHub PR + CI/review/merge queue) where required;
 - coherent external/fork contributions without forcing internal convergence granularity to equal upstream provider-submission granularity;
-- stacked provider submission refs to appear naturally when exact promotion dependency state is not yet satisfied by the authoritative target, and to be restacked/reprojected under one exact state-transplant contract without rewriting internal contribution-unit/convergence-unit refs;
+- exact native authoring commits to be selected as durable source-attributed dependencies before their producer has a PromotionGroup, without consuming dirty producer state;
+- stacked provider submission refs to appear naturally when an exact authoring dependency later resolves to an unsatisfied promotion dependency, and to be restacked/reprojected under one exact state-transplant contract without rewriting internal contribution-unit/convergence-unit refs;
 - simultaneous invocation demands to coalesce safely behind one recoverable fenced executor;
 - development-quality validation to remain a Development System concern, while each Git transition is governed only by its own exact Git/managed/policy/provider prerequisites and any transition-specific external facts.
 
@@ -343,6 +346,7 @@ Invocation principal
 Work-bearing LogicalInvocation (when new/correction work is handed off)
 ConvergenceDemand / ReconcilerRun
 Contribution unit
+Authoring dependency (when one ContributionUnit explicitly consumes an exact version from another)
 Repository
 Repository promotion policy
 Target repository/ref
@@ -447,6 +451,32 @@ The authoritative `OPEN | CLOSED` declaration belongs to the **External Control 
 Under ADR-038, ContributionUnit identity and convergence continuity are independent of local branch/ref/worktree existence. For convergence purposes the durable fact is the latest authoritative managed checkpoint OID, when one exists. Missing editing artifacts alone create no closure, recreation, remote-deletion, or abandonment intent.
 
 Contribution-unit lifecycle remains separate from upward integration. There is no separate ContributionUnit integration-release/readiness state: every valid authoritative managed checkpoint is advanced toward its bound ConvergenceUnit at the earliest mechanically safe opportunity. An `OPEN` ContributionUnit may deliver multiple integrated checkpoints and continue contributing later before closure.
+
+### 2.1.2 Exact native authoring versions and AuthoringDependency
+
+A native commit on a current managed ContributionUnit lineage is an exact Git version. Its creation is not itself a managed checkpoint, handoff, completion, PromotionGroup, or PromotionUnit event. At an exact frozen work-bearing handoff, Ruu may adopt the clean current managed-ref tip as the latest authoritative managed checkpoint without creating another commit; the handoff adoption, not the earlier native commit, is the managed event.
+
+A repository-local consumer may explicitly depend on an exact commit from another ContributionUnit before the source has any PromotionGroup:
+
+```text
+AuthoringDependency {
+  authoring_dependency_id
+  consumer: (repository_id, contribution_unit_id)
+  source: (repository_id, contribution_unit_id)
+  git_object_format
+  consumed_exact_oid
+  state
+  required recovery-anchor identity
+}
+```
+
+`ContributionUnit` is the sole v1 stable authoring-occurrence identity. Historical `ContributionUnit/work occurrence` wording names the same object; `work_occurrence_id` is not a second domain identity. Source and consumer are distinct ContributionUnits in one repository. Cross-repository semantic coordination remains PromotionGroup-level because a commit in one repository is not a Git base in another.
+
+The Development System explicitly selects source identity plus exact OID. Ruu proves current source binding/lineage and canonical raw-object ancestry, anchors the OID before adoption, and then reconciles the durable relation. OID alone, ancestry alone, names, sessions, processes, task similarity, recency, or dirty worktree state never create the relation.
+
+The immutable consumed OID remains separate from both the source's later current exact state and any later `(PromotionGroup, source repository)` projection that owns realization. An unresolved AuthoringDependency blocks unauthorized realization, not otherwise legal authoring, checkpointing, internal convergence, or unrelated global progress.
+
+`authoring_dependency_id` is SHA-256 over the UTF-8 RFC 8785 JCS encoding of an exact closed object containing `schema="Ruu/authoring-dependency/v1"`, canonical repository ID, canonical consumer/source ContributionUnit IDs, canonical Git object-format name, and lowercase full-width consumed OID. Abbreviated/uppercase OIDs, unknown algorithms/fields, or alternate opaque-ID normalization are non-canonical.
 
 ## 2.2 Convergence unit
 
@@ -721,7 +751,7 @@ Ruu
 
 There is no generic `DevelopmentValidationEvidence` or `DevelopmentValidationDemand` protocol in the current architecture. Development-quality reasoning controls when the external system offers work, changes lifecycle/governance intent, or otherwise establishes facts it owns; `ruu` does not ask why those facts were established.
 
-Each transition is evaluated from only its own mechanically observable Git/managed/provider state plus the minimum authoritative external facts that genuinely belong to another owner. Examples include ContributionUnit lifecycle, ConvergenceUnit membership sealing, PromotionGroup declaration, review-request intent, promotion policy, provider checks/reviews/queue state, and settlement intent.
+Each transition is evaluated from only its own mechanically observable Git/managed/provider state plus the minimum authoritative external facts that genuinely belong to another owner. Examples include ContributionUnit lifecycle, ConvergenceUnit membership sealing, explicit authoring-source selection, work-bearing invocation cohort/promotion binding, review-request intent, promotion policy, provider checks/reviews/queue state, and settlement intent.
 
 For a dirty ContributionUnit checkpoint, ADR-058/059 define the offered whole editing-surface checkpoint and its canonical native-Git identity. ADR-064 binds the Development System's pre-commit readiness decision to that exact Git checkpoint by a frozen mutation-authority handoff rather than by importing test/review evidence. The intended chain is:
 
@@ -1028,9 +1058,11 @@ The convergence engine never creates the repository as a convergence side effect
 Normative rule:
 
 ```text
-1 contribution_unit_id
+1 actively authored contribution_unit_id
 =
-exactly 1 repository_id + 1 isolated worktree + 1 active contribution-unit ref
+exactly 1 repository_id + 1 dedicated current worktree/ref authoring surface
+
+The durable ContributionUnit identity and exact adopted checkpoints/dependencies survive later editing-surface disappearance under the applicable lifecycle and retention rules.
 ```
 
 The following are not valid general identities:
@@ -1056,31 +1088,24 @@ two isolated contribution units
 → explicit Git reconciliation
 ```
 
-## 4.7 Commit/checkpoint does not imply completion
+## 4.7 Native commit, managed checkpoint, and completion are distinct
 
-A commit may represent:
+An ordinary native commit made inside a managed ContributionUnit worktree is an exact Git version. It may be an intermediate, partial, or final authored state, but creation alone is not a Ruu business event.
 
-```text
-checkpoint
-intermediate stable state
-partial useful state
-final state
-```
-
-A **managed commit** represents an exact checkpoint whose ADR-059 Git-state predicate and current transition-local authority/claim prerequisites are satisfied. Development-quality validation is not a generic `ruu` commit prerequisite.
+A **managed checkpoint** exists only after an exact frozen handoff adopts a clean native tip or Ruu materializes/adopts the ADR-059 whole-surface candidate for a dirty surface under current authority, claim, ancestry, and CAS guards. Development-quality validation is not a generic `ruu` checkpoint prerequisite.
 
 Therefore:
 
 ```text
-commit → exact mechanically admissible checkpoint
-
-commit != contribution unit closed
-commit != convergence unit ready
-commit != promotion requested
-commit != semantic completion
+native commit → exact Git version
+native commit alone != managed checkpoint
+managed checkpoint != ContributionUnit CLOSED
+managed checkpoint != ConvergenceUnit READY_INTERNAL
+managed checkpoint != promotion requested
+managed checkpoint != semantic completion
 ```
 
-A contribution unit may remain `OPEN` / `NOT_READY` after a verified commit and receive further work later.
+A ContributionUnit may remain `OPEN` after several native versions or managed checkpoints and receive further work later.
 
 ## 4.8 `ruu` is explicitly invoked when managed state should progress
 
@@ -1154,7 +1179,7 @@ product_feature.status == DONE
 
 for commit collection or internal convergence.
 
-Higher-level semantics may control promotion-unit declarations/readiness, but cannot override Git-safety guards.
+Higher-level semantics control the work-bearing invocation cohort, exact authoring-source selection, lifecycle, and other declared semantic authority. Ruu mechanically derives PromotionGroup membership, repository-local PromotionUnits, and their readiness from those facts; no higher-level actor may override Git-safety guards.
 
 ## 4.13 Multi-repository operation
 
@@ -1179,6 +1204,7 @@ Every global sweep performed to satisfy outstanding convergence demand must oper
 
 ```text
 contribution-unit checkpoint/Git-validation/commit state and its transition-local authority/claim prerequisites
+authoring-dependency adoption, object-retention, resolution, satisfaction, and reconciliation state
 contribution-unit ↔ convergence-unit synchronization/integration state
 convergence-unit readiness/reconciliation state
 promotion-unit state
@@ -1775,7 +1801,10 @@ convergence_unit_id → immutable PromotionTarget(target_repository_id, target_r
 contribution_unit_id → exactly one convergence_unit_id membership for its identity
 contribution_unit_id → authoritative lifecycle OPEN | CLOSED
 contribution_unit_id → latest authoritative managed checkpoint OID, if any
+contribution_unit_id → exact authoring base at admission
 contribution_unit_id ↔ observations of currently present editing ref/worktree/remote-ref surfaces, if any
+AuthoringDependency immutable source/consumer/OID definitions and current lifecycle
+AUTHORING_DEPENDENCY_OID_ANCHOR recovery-resource bindings
 external mutation-access state/handle for present editing surfaces
 exact relevant OIDs
 claims/recovery metadata
@@ -1791,7 +1820,7 @@ When promotion is declared, shared state records:
 promotion_unit_id = content address of immutable canonical PromotionUnitDefinition
 exact ConvergenceUnit-state member set
 current promotion lifecycle
-separate promotion-topology relationship/edges when declared
+separate current promotion-topology relationship/edges derived from adopted dependency provenance and exact predecessor/target state
 submission_id / provider submission identity when applicable
 submission_ref
 current_submission_head
@@ -1875,7 +1904,8 @@ Shared coordination state is authoritative for system relationships such as:
 managed membership
 contribution-unit/convergence-unit identity mappings
 authority/claims
-promotion-unit declarations
+work-bearing invocation and PromotionGroup occurrence/group-local resolution records
+content-addressed PromotionUnit projection records
 policy observations/fingerprints
 submission logical identity/revision tracking
 recovery ownership
@@ -1901,7 +1931,7 @@ Shared metadata never manufactures Git/provider truth.
 
 The complete normative upstream interface is defined in [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](external-control-plane-contract.md) and ADR-039.
 
-The **External Control Plane** is an abstract role, not a required daemon/service/orchestrator or separately installed product. Under ADR-078, a Ruu-supplied integration for a supported coding harness may implement this role and its pre-edit provisioner plumbing automatically while preserving the same authority boundary. It owns the logical/runtime declarations that the convergence engine cannot infer safely, including ContributionUnit creation/binding/lifecycle, ConvergenceUnit creation/membership, pre-edit provisioning (including ADR-056 new-repository bootstrap admission), external mutation transferability, the exact ContributionUnit cohort of each work-bearing logical invocation, and explicit same-group correction/reconciliation authority. Ordinary PromotionGroup ConvergenceUnit membership is then derived mechanically by `ruu`; Promotion dependency/topology is derived under ADR-050 rather than declared by this role.
+The **External Control Plane** is an abstract role, not a required daemon/service/orchestrator or separately installed product. Under ADR-078, a Ruu-supplied integration for a supported coding harness may implement this role and its pre-edit provisioner plumbing automatically while preserving the same authority boundary. It owns the logical/runtime declarations that the convergence engine cannot infer safely, including ContributionUnit creation/binding/lifecycle, ConvergenceUnit creation/membership, pre-edit provisioning (including ADR-056 new-repository bootstrap admission), explicit selection of any exact source ContributionUnit/version required before consumer authoring, external mutation transferability, the exact ContributionUnit cohort of each work-bearing logical invocation, and explicit same-group correction/reconciliation authority. Ordinary PromotionGroup ConvergenceUnit membership is then derived mechanically by `ruu`; after semantic authoring-dependency selection is adopted, Ruu mechanically derives its target satisfaction, source projection, and ADR-050 promotion topology rather than accepting caller-authored stack layout.
 
 `ruu` retains Git/provider mechanics: exact-state observation/revalidation, claims/CAS, Git/convergence validation, transition-local prerequisite evaluation, checkpointing, synchronization/integration, readiness computation, promotion/publication, provider refresh, final integration proof, and recovery of operations it owns.
 
@@ -1926,7 +1956,7 @@ schema_meta
 coordination_domain(requested_generation, processed_generation,
                     run_generation, run_state, run_token)
 repositories + current repository locator bindings
-ContributionUnit / ConvergenceUnit / PromotionUnit managed rows
+ContributionUnit / AuthoringDependency / ConvergenceUnit / PromotionUnit managed rows
 managed obligations + typed resource claims
 policy/submission/provider logical records
 transition-specific external-fact references
@@ -1960,6 +1990,9 @@ contribution-unit lifecycle
 
 latest authoritative managed checkpoint
 = exact OID or absent
+
+exact native authoring versions / AuthoringDependencies
+= native commit facts plus explicitly adopted source identity and consumed OID
 
 external mutation access for an existing editing surface
 = PROTECTED_EXTERNAL
@@ -2354,7 +2387,7 @@ A claim never authorizes blind overwrite.
 
 ADR-041 intentionally serializes **top-level convergence execution ownership**, but this is not a global mutex over every Git/provider resource.
 
-Independent repositories, contribution units, convergence units, promotion units, validation-demand waits, and provider waits should remain parallel inside the authoritative executor whenever their mutable resources do not overlap and capacity/policy permits.
+Independent repositories, contribution units, convergence units, promotion units, authoring-dependency waits, and provider waits should remain parallel inside the authoritative executor whenever their mutable resources do not overlap and capacity/policy permits.
 
 Likely coordination scopes include:
 
@@ -2789,7 +2822,7 @@ READY_INTERNAL(OID)
   ├── explicit semantic/new internal work → ACTIVE + membership OPEN
   ├── explicit External-Control-Plane lineage disposal while not bound to any live PromotionGroup
   │     → ABANDONING → RETIRED after recovery/resource guards
-  └── member of a declared PromotionGroup whose complete current resolution
+  └── member of an invocation-derived PromotionGroup whose complete group-local resolution
       adopts this exact state into one/more valid PromotionUnit obligations
         → PROMOTION_BOUND(OID)
 
@@ -3183,7 +3216,7 @@ A. collect eligible work from contribution units into commits
 B. converge ConvergenceBase ↔ convergence-unit ↔ contribution unit internal state
 C. publish internal refs safely
 D. resolve/revalidate repo promotion policy
-E. advance declared promotion units according to that policy
+E. advance mechanically projected exact PromotionUnits according to that policy
 F. publish/revise submission refs where applicable
 G. create/update/observe submission/review/check/provider/merge-queue state where applicable
 H. observe/establish final target-integration result/proof where required
@@ -3215,7 +3248,7 @@ Conceptual flow:
     semantic conflict → exact-state-bound RECONCILIATION_REQUIRED; authoritative refs unchanged
 11 expose/refresh exact reconciliation and other transition-specific external obligations for the external Development System
 12 evaluate current transition-local prerequisites and internal convergence-unit readiness
-13 evaluate declared promotion units
+13 evaluate PromotionGroups and their mechanically projected exact PromotionUnits
 14 for DIRECT_TARGET_ADVANCE realization:
     refresh/revalidate target+policy
     materialize/revalidate candidate
@@ -3236,31 +3269,43 @@ Conceptual flow:
 
 If required internal topology is missing at convergence time, the convergence engine fails closed/reports the missing pre-edit invariant; it does not retroactively provision the surface. A bundled harness integration/provisioner may repair future authoring before subsequent writes under ADR-078.
 
-If promotion-unit declarations/granularity are missing, `ruu` does not invent them semantically. Internal convergence may still continue.
+If a required work-bearing invocation, PromotionGroup group-local resolution, or exact repository projection is missing/unknown, Ruu does not invent semantic work membership. Internal convergence may still continue.
 
 # 22. Eligibility algorithms
 
-## 22.1 Commit collection
+## 22.1 Managed checkpoint adoption and commit collection
 
-For an offered/transferable dirty ContributionUnit editing surface, `ruu` acquires exclusive mutation authority and reconstructs the exact whole-surface candidate under ADR-058/059.
+For every exact frozen work-bearing handoff, Ruu first observes the current managed ref, worktree, prior checkpoint/admitted base, and canonical ancestry under the current binding/claim/CAS guards.
+
+```text
+clean current managed-ref tip K
++ K is an exact ordinary commit
++ K canonically descends the prior authoritative checkpoint or admitted base
++ exact frozen handoff and all authority/topology guards hold
+→ adopt K as latest authoritative managed checkpoint
+→ create no new commit
+```
+
+For an offered/transferable dirty ContributionUnit editing surface, Ruu acquires exclusive mutation authority and reconstructs the exact whole-surface candidate under ADR-058/059.
 
 ```text
 construct/revalidate canonical checkpoint candidate
 (the caller's staged/unstaged partition is not checkpoint-selection authority)
 
 if structural/observability/authority guards fail:
-    do not commit
+    do not commit or adopt
     localize the exact Git/authority blocker
 
 if candidate tree == parent tree:
-    NOOP
+    adopt/reuse the exact current parent only when the frozen handoff
+    independently satisfies clean-tip adoption guards
 
 otherwise:
     commit exactly that candidate
     record exact authoritative managed checkpoint OID
 ```
 
-`ruu` runs no tests/formatters/generators here and consumes no generic development-validation certificate. The Development System decides when to offer/transfer the dirty surface for Git progression.
+Native commit creation remains exact-state rediscovery. The managed event is clean-tip handoff adoption or dirty-candidate checkpoint adoption. Ruu runs no tests/formatters/generators here and consumes no generic development-validation certificate. The Development System decides when to offer/transfer the surface for Git progression.
 
 ## 22.2 ContributionUnit editing-artifact absence, managed-ref abandonment, and exact-state continuity
 
@@ -3294,7 +3339,8 @@ For each active ConvergenceUnit:
 
 ```text
 refresh ConvergenceBase + convergence-unit ref
-refresh every ContributionUnit lifecycle, latest authoritative checkpoint OID, and any current editing-surface state
+refresh every ContributionUnit lifecycle, latest authoritative checkpoint OID, exact adopted AuthoringDependencies, and any current editing-surface state
+refresh dependency anchors, source handoff/projection attribution, source disposition, and authoritative target satisfaction
 refresh exact transition-specific external prerequisite state
 
 evaluate ConvergenceBase→convergence-unit synchronization
@@ -3452,8 +3498,11 @@ A promotion unit is eligible for mechanical promotion only when:
 ```text
 promotion_unit_id known
 exact source convergence-unit IDs/OIDs declared
-all required source states exact/ready  current
-current promotion dependency/topology known from exact managed base/predecessor/target facts
+all required source states exact/ready/current
+every carried AuthoringDependency is SATISFIED_BY_TARGET,
+  INTERNAL_TO_SAME_GROUP, or resolved to a currently valid promotion projection
+current promotion dependency/topology known from adopted authoring provenance
+  plus exact managed predecessor/target facts
 repo policy current
 target observation current
 no ambiguous source binding
@@ -3461,9 +3510,55 @@ promotion operation claim available
 required semantic/higher-level readiness signal valid if configured
 ```
 
+`RAW_AUTHORING_SOURCE`, `RECONCILIATION_REQUIRED`, an invalidated parent disposition, or more than one independently unsatisfied external predecessor blocks realization only for the affected projection. It does not block candidate materialization, internal convergence, or unrelated obligations.
+
 If ADR-048 materializes a new exact candidate state, DIRECT_TARGET_ADVANCE or provider-submission publication/finalization depends only on the exact promotion/policy/provider prerequisites of that transition.
 
-`ruu` never invents source grouping.
+Ruu never invents source grouping or provider topology.
+
+## 22.8A AuthoringDependency reconciliation
+
+For each adopted AuthoringDependency `(consumer, source, A)`:
+
+```text
+required exact anchor missing/unreachable
+→ UNKNOWN_INCONSISTENT / BLOCKED_MISSING_MANAGED_STATE
+
+fresh authoritative consumer target O contains A under canonical ancestry
+→ adopt SATISFIED_BY_TARGET(exact proof)
+
+same immutable PromotionGroup contains authoritative source and consumer handoffs
++ exact frozen source checkpoint S contained A before downward synchronization
++ exact group-local state incorporates S and the consumer handoff
+→ adopt INTERNAL_TO_SAME_GROUP
+→ no provider dependency edge
+
+first qualifying source handoff accepted after durable dependency-selection TX-A
++ same source ContributionUnit identity
++ exact frozen/adopted source checkpoint S contained A before downward synchronization
++ exact group-local source state K attributable to that handoff incorporates S
++ source and consumer immutable PromotionTargets exactly equal
++ current source/group disposition authorizes the path
+→ CAS-adopt RESOLVED_PROMOTION_PROJECTION(group_id, source_repository_id)
+→ retain A separately from K
+
+source realization path lost before target satisfaction
+→ RECONCILIATION_REQUIRED(SOURCE_REALIZATION_PATH_LOST)
+
+qualifying source handoff exists but immutable PromotionTargets differ
+→ RECONCILIATION_REQUIRED(TARGET_INCOHERENT_AUTHORING_DEPENDENCY)
+→ no retargeting or cross-target stack inference
+
+identity/attribution ambiguous or several candidate groups without one
+source-handoff owner
+→ UNKNOWN_INCONSISTENT
+
+qualifying source handoff accepted after TX-A but before dependency-adoption TX-B
+→ TX-B/recovery may adopt directly as resolved after all exact guards
+→ never strand the dependency solely because anchor/adoption overlapped handoff
+```
+
+For a resolved separate-group dependency, ADR-050 receives immutable owned `(old_base=A, owned_candidate=B)` plus current parent `K`. It never derives source identity from candidate ancestry alone and never mutates an active consumer worktree.
 
 ## 22.9 DIRECT_TARGET_ADVANCE realization
 
@@ -3471,6 +3566,8 @@ Direct promotion requires:
 
 ```text
 target_realization_route = DIRECT_TARGET_ADVANCE
+zero raw or resolved-but-target-unsatisfied external AuthoringDependencies
+zero unsatisfied promotion predecessors
 target ref policy-authorized mutable
 exact authoritative expected target OID B
 exact promotion-unit source binding
@@ -3534,6 +3631,7 @@ Requires:
 ```text
 target_realization_route = PROVIDER_SUBMISSION
 promotion_dependency = NONE | SATISFIED_BY_TARGET
+all AuthoringDependencies terminally target-satisfied or internal to the same group
 valid SAME/CROSS_REPOSITORY publication relation
 exact source binding
 submission identity/ref known or safely creatable
@@ -3569,6 +3667,8 @@ Requires:
 ```text
 target_realization_route = PROVIDER_SUBMISSION
 current promotion_dependency = UNSATISFIED(parent_submission_id,parent_exact_head)
+that predecessor was resolved from durable authoring provenance or another already-authoritative promotion relation
+exactly one external predecessor remains unsatisfied for this submission revision
 provider/policy supports representing the dependency as a stack
 all predecessor identity/head/base requirements current
 exact submission revision ownership
@@ -3671,7 +3771,7 @@ exact submission revision satisfies current publication prerequisites
 
 Cross-repository transport does not weaken exact-state binding, transition-local policy guards, or review-request semantics.
 
-`ruu` does not infer whether several internal convergence units should be one upstream provider submission; that is already encoded in the promotion-unit declaration.
+Ruu does not infer whether several internal ConvergenceUnits belong to one upstream contribution; that membership is encoded by the accepted work-bearing invocation and immutable PromotionGroup, then projected mechanically into the PromotionUnit.
 
 ## 22.14 Unsupported policy/topology
 
@@ -4324,7 +4424,7 @@ Dependency/stack relations connect PromotionUnit refs and are not intrinsic fiel
 
 ---
 ## Invariant 47 — PromotionGroup completeness is explicit; no implicit one-to-one default exists
-A PromotionGroup is one occurrence-bound non-empty immutable closed set of canonical ConvergenceUnit refs derived from an accepted work-bearing invocation. `READY_INTERNAL` alone never manufactures a singleton PromotionUnit; a one-member ordinary invocation mechanically yields a singleton group.
+A PromotionGroup is one occurrence-bound non-empty immutable closed set of canonical ConvergenceUnit refs derived from an accepted work-bearing invocation. `READY_INTERNAL` alone never manufactures a singleton PromotionGroup or PromotionUnit; a one-member ordinary invocation mechanically yields a singleton group and its repository projection.
 
 ---
 ## Invariant 47A — PromotionGroup identity is occurrence-bound and exact-OID-independent
@@ -4491,11 +4591,11 @@ The session that produced the provider submission may be closed/gone, and the se
 Affected existing ConvergenceUnits may be reactivated while the correction session discovers the needed scope, but every new implementation write is performed through a newly provisioned ContributionUnit/writer branch/worktree seeded from the exact group/review state authorized by the correction. A `CLOSED` ContributionUnit never reopens, the provider-facing submission ref is never a coding workspace, and unrelated later live ConvergenceUnit work is not silently absorbed.
 
 ---
-## Invariant 63D — Nonblocking semantic findings are not provider correction demands
+## Invariant 63C1 — Nonblocking semantic findings are not provider correction demands
 Review comments, suggestions, or semantic findings that are not authoritative blocking provider-governance state do not automatically create `ReviewCorrectionDemand`, reopen ConvergenceUnits, or block promotion.
 
 ---
-## Invariant 63E — Deferred findings are external backlog, not dormant submissions
+## Invariant 63C2 — Deferred findings are external backlog, not dormant submissions
 A semantic finding adjudicated `DEFER` may be projected to an external tracker/backlog object and later revalidated by the Development System. `ruu` does not preserve the finding by keeping a provider submission open, and a deferred finding does not block an otherwise authorized current promotion.
 
 ---
@@ -4644,7 +4744,7 @@ Tests/review/security/code-quality execution belongs outside; exact OIDs, ancest
 
 ## Invariant 91 — Development lifecycle facts are explicit and transition-specific
 
-Development-quality success never implicitly closes a ContributionUnit, seals membership, manufactures `READY_INTERNAL`, declares a PromotionGroup, or requests provider review. Those facts remain explicit under their existing owners.
+Development-quality success never implicitly closes a ContributionUnit, seals membership, manufactures `READY_INTERNAL`, supplies a work-bearing invocation cohort/promotion binding, or requests provider review. Those facts remain explicit under their existing owners; Ruu mechanically creates the ordinary PromotionGroup from the accepted cohort.
 
 ## Invariant 92 — ContributionUnit checkpoint mutation still requires exclusive worktree authority
 
@@ -5016,7 +5116,7 @@ A native witness may carry trusted attempt-scoped `originating_attempt_id` corre
 
 ---
 ## Invariant 183 — Binding-disposition exactly-once is generation-scoped
-For one current `(repository, work occurrence, binding_generation)`, at most one correctness-critical cessation/rebind preparation may remain unresolved and at most one committed disposition may transition out of that generation. Duplicate delivery of the same active occurrence is idempotent; a distinct competitor must wait/fail/veto until the current preparation resolves. After abort the generation remains eligible for a later distinct preparation; after committed disposition stale deliveries cannot re-dispose it.
+For one current `(repository_id, contribution_unit_id, binding_generation)`, at most one correctness-critical cessation/rebind preparation may remain unresolved and at most one committed disposition may transition out of that generation. Duplicate delivery of the same active occurrence is idempotent; a distinct competitor must wait/fail/veto until the current preparation resolves. After abort the generation remains eligible for a later distinct preparation; after committed disposition stale deliveries cannot re-dispose it.
 
 ---
 ## Invariant 184 — Exact-state rediscovery never manufactures causal preparation
@@ -5094,11 +5194,71 @@ A positively established provider finalization fact may remain historically true
 ## Invariant 202 — Live lock order is native Git before CoordinationStore
 Any protocol that needs both a live native ref exclusion and a live CoordinationStore write uses `Git/native ref lock → CoordinationStore`. No conforming path holds a live CoordinationStore transaction/mutex/write lock while waiting for the corresponding Git/native ref lock. Durable claims that do not keep a live lock are unaffected.
 
+---
+## Invariant 203 — Dirty authoring state is not an exact dependency version
+A dependency may identify only an exact native commit. Ruu never consumes or implicitly commits another producer's mutable worktree/index/untracked/ignored state.
+
+---
+## Invariant 204 — ContributionUnit is the sole v1 authoring-occurrence identity
+Canonical authoring source identity is `(repository_id, contribution_unit_id)`. Session, process, task, branch, worktree, and a separate `work_occurrence_id` are not competing domain identities.
+
+---
+## Invariant 205 — AuthoringDependency requires semantic selection plus exact Git proof
+The Development System explicitly selects source identity and consumed OID; Ruu independently proves the exact object and source lineage. Ancestry, recency, names, or selection alone never manufacture the relation.
+
+---
+## Invariant 206 — Native commit creation is not checkpoint or completion
+An ordinary managed-ref commit creates an exact Git version. Only exact frozen-handoff adoption makes a clean tip a managed checkpoint; neither event implies lifecycle closure or promotion readiness.
+
+---
+## Invariant 207 — Durable dependency implies durable object reachability
+Before AuthoringDependency adoption, a REQUIRED Ruu recovery anchor must retain the consumed commit. No adopted dependency may depend on reflog grace or an ordinary moving source ref for object survival.
+
+---
+## Invariant 208 — Consumed exact OID never follows the source
+The immutable consumed OID remains distinct from the source's later current exact state and from any stable source promotion projection.
+
+---
+## Invariant 209 — Raw dependency blocks realization, not independent progression
+A raw dependency permits otherwise legal authoring, handoff, checkpointing, convergence, group resolution, and candidate materialization. It blocks only realization that would publish an effect without established authority; unrelated global obligations continue.
+
+---
+## Invariant 210 — Current target containment can satisfy without a fake parent
+Canonical authoritative target containment of the consumed OID may terminally satisfy the dependency. Ruu creates no synthetic PromotionGroup merely to represent that fact.
+
+---
+## Invariant 211 — Promotion compression needs source-handoff attribution
+Mapping to `(PromotionGroup, source repository)` requires the same source ContributionUnit's qualifying causally later handoff and exact group-local attribution plus canonical ancestry. Candidate ancestry alone never chooses a parent.
+
+---
+## Invariant 212 — Source advancement never mutates active consumer authoring
+Later source movement does not change the selected consumed OID or rewrite a producer-owned consumer worktree. Reprojection occurs only at an authorized handoff/promotion boundary.
+
+---
+## Invariant 213 — Same-group dependency creates no stack edge
+A dependency internal to one immutable PromotionGroup/repository projection is handled by ADR-047/048 materialization and never splits that projection or changes closed membership.
+
+---
+## Invariant 214 — Abandonment never transfers publication authority
+If the source loses its realization path before valid target satisfaction, the consumer remains blocked with exact reconciliation work. Source ancestry in the consumer is not authority to publish it.
+
+---
+## Invariant 215 — Clean native tip checkpoint adoption requires exact frozen handoff
+An ordinary native commit remains only exact Git state until a frozen work-bearing handoff, current binding/claim/topology, canonical ancestry, run fence, and managed-state CAS adopt the clean current tip as the authoritative checkpoint without creating another commit.
+
+---
+## Invariant 215A — Multi-predecessor provider topology is not invented
+The record model may retain a finite dependency set, but more than one independently unsatisfied external predecessor remains locally blocked until a separate ratified representation exists or existing semantics reduce the set.
+
+---
+## Invariant 216 — Dependency adoption and reconciliation are idempotent
+Crash, retry, duplicate observation, concurrent compression, and repeated sweeps preserve one immutable dependency identity/OID and at most one authoritative source projection under current run and row-version fences.
+
 # 27. Architectural implications
 
 ## 27.1 Repository/bootstrap and contribution-unit provisioners — outside the convergence engine
 
-For an existing admitted repository, the contribution-unit provisioner owns pre-edit lazy establishment of convergence-unit/contribution-unit/worktree topology, the native reflog required for the managed authoring ref, repository-common observer/protection-filter readiness, the exact `RefAdmissionBarrier`, and the initial external mutation-authority handoff. Candidate worktree/ref creation precedes managed admission; the candidate is not producer-writable until exact binding publication and handoff complete.
+For an existing admitted repository, the contribution-unit provisioner owns pre-edit lazy establishment of convergence-unit/contribution-unit/worktree topology, adoption of any explicitly selected exact AuthoringDependencies and their initial bases/anchors, the native reflog required for the managed authoring ref, repository-common observer/protection-filter readiness, the exact `RefAdmissionBarrier`, and the initial external mutation-authority handoff. Candidate worktree/ref creation precedes managed admission; the candidate is not producer-writable until exact binding publication and handoff complete.
 
 For a brand-new repository, ADR-056 places a Repository Provisioner one step earlier: it executes current External Control Plane creation authority, establishes/adopts the exact `B0` bootstrap target and `RepositoryBootstrapContract`, and only then hands the `REPOSITORY_ADMITTED` repository to ordinary ADR-015/023 contribution-unit provisioning. Provider attachment may be later/lazy.
 
@@ -5106,7 +5266,7 @@ These provisioners run because development needs a safe managed editing surface 
 
 ## 27.2 CoordinationStore
 
-The concrete v1 backend is host-local SQLite under ADR-042. It persists the authoritative managed coordination state, demand/run fence, stable repository identities and current locator bindings, domain entities/obligations/claims, exact policy/submission/provider logical records, evidence references, correctness-critical native binding preparations, and the append-only recoverable-effect journal. ADR-079's repository-common `ManagedRefProtectionFilter` is only conservative acceleration and never a second authoritative binding database.
+The concrete v1 backend is host-local SQLite under ADR-042. It persists the authoritative managed coordination state, demand/run fence, stable repository identities and current locator bindings, AuthoringDependency definitions/lifecycle/anchor references, domain entities/obligations/claims, exact policy/submission/provider logical records, evidence references, correctness-critical native binding preparations, and the append-only recoverable-effect journal. ADR-079's repository-common `ManagedRefProtectionFilter` is only conservative acceleration and never a second authoritative binding database.
 
 At minimum it semantically separates:
 
@@ -5206,6 +5366,12 @@ When a complete group-local exact mapping is adopted, it canonicalizes the repos
 
 There is no implicit singleton/default mapping and no mid-sweep semantic callback to choose group membership. Same PromotionGroup + same repository is not split into several PromotionUnits. Promotion topology is a separate relationship among PromotionUnit refs/obligations and is never synthesized by repository projection. Target is not a group/unit definition field because it is already immutable on each ConvergenceUnit and must be coherent across the projection; mode/policy inputs remain outside the immutable PromotionUnit content address.
 
+## 27.14A AuthoringDependency reconciler
+
+Consumes explicit Development System source/version selections and exact local Git facts. Supported-harness provisioning submits an authorized internal provisioning demand to the existing fenced ConvergenceEngine and waits before first consumer write; this creates no work-bearing checkpoint or PromotionGroup. TX-A durably linearizes the selection and expected source generation, then the reconciler adopts an immutable repository-local dependency only after an operation-owned REQUIRED anchor retains the consumed commit and TX-B revalidates source row/binding generation/continuity/disposition. It then re-evaluates raw dependencies against current target containment, same-group source checkpoints, qualifying source handoffs/group-local exact state, source disposition, and exact canonical ancestry.
+
+Resolution may produce `SATISFIED_BY_TARGET`, `INTERNAL_TO_SAME_GROUP`, or a stable `(PromotionGroup, source repository)` predecessor projection. It retains the consumed OID separately from the parent's current exact state and supplies ADR-050 with the immutable consumer owned anchor. Ambiguity, lost object reachability, source abandonment without realization, and unsupported multi-predecessor publication remain localized blockers.
+
 ## 27.15 Promotion candidate materializer
 
 Materializes/rebuilds the exact repository-local candidate/head from one exact repository-local PromotionUnit and one exact effective promotion base.
@@ -5226,7 +5392,7 @@ Materialization never rewrites internal ConvergenceUnit refs. Native multi-head 
 
 ## 27.16 Direct promotion engine
 
-For `target_realization_route=DIRECT_TARGET_ADVANCE`, consumes an already materialized ADR-048 candidate for the immutable PromotionTarget and, when the DIRECT_TARGET_ADVANCE transition-local prerequisites are satisfied, performs the ADR-052 semantic operation `AdvanceTargetFF(PromotionTarget.ref, expected_old, new)`: one atomic exact-old compare-and-swap whose only successful effect is descendant-only advancement of that already-bound target. It owns no target worktree/merge staging, keeps an attempt-scoped candidate recovery anchor while nonterminal, and adopts success only from authoritative target observation/history.
+For `target_realization_route=DIRECT_TARGET_ADVANCE`, consumes an already materialized ADR-048 candidate for the immutable PromotionTarget and requires every AuthoringDependency/promotion predecessor to be target-satisfied or internal to the same group. When the DIRECT_TARGET_ADVANCE transition-local prerequisites are satisfied, it performs the ADR-052 semantic operation `AdvanceTargetFF(PromotionTarget.ref, expected_old, new)`: one atomic exact-old compare-and-swap whose only successful effect is descendant-only advancement of that already-bound target. It owns no target worktree/merge staging, keeps an attempt-scoped candidate recovery anchor while nonterminal, and adopts success only from authoritative target observation/history.
 
 ## 27.17 Submission revision engine
 
@@ -5264,11 +5430,11 @@ capabilities
 
 It never bypasses target governance.
 
-## 27.20 Stack coordinator
+## 27.20 Dependency and stack coordinator
 
-Maintains explicit promotion-unit dependency stacks and computes which submission revisions require restacking after lower-layer/target/provider movement.
+Consumes already-adopted semantic AuthoringDependencies and already-authoritative promotion relations, then mechanically reconciles them with exact source handoffs, predecessor state, target state, and provider capabilities. It computes which resolved single-predecessor submission revisions require stacking/restacking after lower-layer/target/provider movement.
 
-It never infers stack membership semantically.
+It never invents semantic dependency from ancestry and never accepts caller-authored provider stack layout. Raw or multi-unsatisfied dependencies remain localized realization waits.
 
 ## 27.21 Recovery engine / effect journal consumer
 
@@ -5277,7 +5443,7 @@ Consumes unresolved immutable Operations and their Attempts, re-observes exact c
 It reconstructs at least:
 
 ```text
-commits/checkpoints and recovery refs
+commits/checkpoints, AuthoringDependency adoption/compression, and recovery refs/anchors
 internal merges/conflicts
 pushes
 direct target promotion
@@ -5297,7 +5463,8 @@ Human/Turnlock/`/go`/other systems may invoke `ruu` and may decide semantic inte
 
 ```text
 what work means
-which exact convergence-unit states form a promotion group before exact resolution
+which exact source ContributionUnit/version a consumer semantically requires
+which ContributionUnits form a work-bearing invocation cohort
 semantic completion/readiness requirements
 ```
 
@@ -5443,6 +5610,8 @@ Preconditions:
 ```text
 effective target realization route = DIRECT_TARGET_ADVANCE
 promotion unit exact and ready
+zero raw or resolved-but-target-unsatisfied external AuthoringDependencies
+zero unsatisfied promotion predecessors
 target repository/ref exact and current
 target mutation allowed by current policy
 promotion candidate exact and all transition-local prerequisites satisfied
@@ -5561,7 +5730,7 @@ This rewrite authority never propagates to internal refs or target refs.
 
 ## 28.7 Derived promotion dependency and stacked provider representation
 
-For already-distinct repository-local promotion obligations, current exact base lineage may establish:
+For already-distinct repository-local promotion obligations, a previously adopted AuthoringDependency may resolve through exact source-handoff attribution, or another already-authoritative promotion relation may establish:
 
 ```text
 P1
@@ -5584,7 +5753,8 @@ S3 / PR3
 Rules:
 
 ```text
-dependency derives from exact managed effective-base/predecessor/target facts
+semantic source/version selection is explicit before authoring and never inferred from ancestry
+after adoption, dependency resolution/topology derives from the source's exact pre-sync handed-off checkpoint, equal immutable PromotionTarget, group-local incorporation, and exact effective-base/predecessor/target facts
 caller/user/agent does not request stack shape
 predecessor realized in target → dependency SATISFIED_BY_TARGET / ordinary child promotion
 predecessor revision may make upper submission RESTACK_REQUIRED
@@ -6302,6 +6472,22 @@ ADR-080 separates `LOCAL_GIT`, `REMOTE_GIT`, and optional `PROVIDER` authority. 
 
 Webhook delivery is an unreliable/reorderable transport: it may wake reconciliation and authenticated payloads may add positive provider-scoped historical evidence, but absence proves nothing, delivery identity is not semantic identity, and correctness does not generically depend on receiving a particular webhook. Cross-source composition uses exact identities/revisions rather than wall-clock order. Remote publication artifacts never inherit local managed-binding `CONTINUATION | ABANDON` semantics.
 
+## 30.56 CLOSED BY ADR-081 — exact authoring dependency before promotion
+
+ADR-081 permits one managed ContributionUnit to consume an exact native commit from another before the source has a PromotionGroup. The Development System explicitly selects `(source ContributionUnit, consumed OID)`; Ruu proves exact local Git lineage, anchors the object, adopts an immutable AuthoringDependency, permits otherwise legal consumer progression, and blocks unauthorized realization. Current target containment may satisfy it directly. A later qualifying source handoff may resolve it to `(PromotionGroup, source repository)` while retaining the consumed OID and entering ADR-050 restack semantics. Dirty state, ancestry-only inference, source abandonment authority transfer, and fake same-group/provider topology are forbidden.
+
+## 30.57 OPEN — more than one independently unsatisfied authoring predecessor
+
+The durable record can retain a finite dependency set, but an ordinary Git/provider submission has one base and ADR-050 defines one parent submission relation. The architecture has not ratified whether several unresolved source projections must wait, form a deterministic promotion DAG, use a sequence of provider surfaces, or require semantic consolidation. ADR-048 same-PromotionUnit multi-source materialization does not decide cross-group publication authority.
+
+Until resolved, authoring/checkpointing may continue when one exact containing authoring base exists, but realization with more than one independently unsatisfied external predecessor is locally blocked.
+
+## 30.58 OPEN — late dependency discovery and consumer refoundation
+
+If a consumer has already authored `W` from ordinary base `M` and only then discovers that it requires `source α@A`, no accepted ADR authorizes rewriting its active worktree/ref or choosing merge/rebase/transplant/new-ContributionUnit semantics. ADR-050 applies to provider projection after handoff, not to active authoring authority.
+
+Until resolved, later ancestry never manufactures the dependency. The Development System must surface exact reconciliation/refoundation work or start another already-authorized scope; Ruu performs no implicit rewrite.
+
 # 31. Non-goals / things not to assume
 
 Do not assume:
@@ -6314,6 +6500,9 @@ contribution unit == agent globally
 invocation-principal identity matches an external producer
 CWD == scope
 commit == completion
+native commit == managed checkpoint or handoff
+exact commit OID alone == semantic authoring source identity
+dirty producer worktree == consumable exact version
 integration == contribution unit closure
 zero commits created == nothing to do
 main == universal target ref
@@ -6343,6 +6532,9 @@ infer product semantics from branch names
 infer provider-submission granularity using an LLM
 silently fallback from provider submission to direct target advance
 silently flatten an unsupported stack
+infer an AuthoringDependency from ancestry/recency or snapshot another producer's dirty worktree
+publish an abandoned source effect through its consumer
+release a required dependency OID anchor while any exact obligation needs it
 force-push target
 rebase contribution-unit/convergence-unit refs
 mutate a contribution-unit worktree that is externally protected, unknown, or not exclusively claimed by the current authoritative executor/operation
@@ -6362,6 +6554,7 @@ human / agent / Turnlock / /go / script
   │
   ├── decides semantic work
   ├── may choose/reuse convergence units
+  ├── explicitly selects exact source ContributionUnit/version dependencies before consumer authoring when required
   ├── closes each work-bearing implementation cohort by invoking Ruu with its exact ContributionUnit handoffs
   ├── supplies explicit authority when a later invocation revises an existing PromotionGroup
   └── does not choose stack layout; exact promotion dependency/topology is derived downstream from managed Git/promotion base facts
@@ -6554,6 +6747,7 @@ missing/stale/nonterminal transition-specific external prerequisite
 Git in-progress/conflict
 cleanup/claim
 policy inconsistency
+authoring-dependency adoption/resolution/object-retention/reconciliation obligation
 recovery obligation
 relevant UNKNOWN_INCONSISTENT state
 ```
@@ -6652,7 +6846,11 @@ REQUESTED
 → CONVERGENCE_BASE_RESOLVED
 → PROMOTION_TARGET_BOUND
 → CONVERGENCE_UNIT_RESOLVED
-→ CONTRIBUTION_UNIT_REF_RESOLVED
+→ CONTRIBUTION_UNIT_IDENTITY_RESOLVED
+→ internal provisioning demand obtains the existing fenced executor when dependencies exist
+→ durable selection TX-A + exact anchor + source-generation/disposition revalidation TX-B
+→ AUTHORING_DEPENDENCIES_ADOPTED_OR_NONE
+→ CONTRIBUTION_UNIT_REF_RESOLVED_AT_EXACT_BASE
 → WORKTREE_RESOLVED
 → EXTERNAL_MUTATION_AUTHORITY_ESTABLISHED
 → WRITE_AUTHORIZED
@@ -6822,7 +7020,7 @@ claim CURRENT_EXECUTOR_OPERATION
 
 A clean worktree does not weaken external mutation protection. A Development System that needs to resume semantic authoring before claim acquisition must first revoke transferability and restore external mutation authority; after a current executor has acquired the exclusive claim, external reacquisition waits until that claim/effect has reached a safe release or recovery boundary. Any prior semantic readiness decision is stale after legitimate resumed mutation.
 
-## 33.10 Commit collection
+## 33.10 Managed checkpoint adoption and commit collection
 
 ```text
 editing_surface ABSENT
@@ -6835,8 +7033,14 @@ UNKNOWN topology
 PRESENT_CONFLICT_OR_IN_PROGRESS
 → recover first
 
-PRESENT_CLEAN
-→ no commit
+PRESENT_CLEAN + no frozen work-bearing handoff
+→ no managed checkpoint adoption
+
+PRESENT_CLEAN + exact frozen handoff + current exact tip K
++ K canonically descends prior checkpoint/admitted base
++ current binding/claim/topology/CAS guards hold
+→ adopt K as authoritative managed checkpoint
+→ create no commit
 
 PRESENT_DIRTY + PROTECTED_EXTERNAL
 → protected
@@ -7185,7 +7389,8 @@ definition DEFINED_EXACT
 all exact member ConvergenceUnit states internally ready/bound
 effective policy CURRENT
 target/provider observations current
-separately declared topology dependencies compatible
+all carried AuthoringDependencies resolved/internal/target-satisfied
+current derived topology dependencies compatible
 no conflict/unknown binding/recovery condition
 ```
 
@@ -7208,6 +7413,7 @@ Exact inputs:
 ```text
 promotion_unit_id = immutable exact repository-local source set
 exact_effective_base_oid = B
+raw authoring dependency may supply immutable consumed base B for owned-state materialization but never realization authority
 materialization_contract_fingerprint = V
 ```
 
@@ -7324,6 +7530,8 @@ Guards:
 
 ```text
 policy CURRENT + target_realization_route = DIRECT_TARGET_ADVANCE
+every AuthoringDependency target-satisfied or internal to the same group
+zero unsatisfied promotion predecessors
 target mutation authorized
 exact target T
 exact candidate C
@@ -7464,20 +7672,62 @@ UNKNOWN_INCONSISTENT
 
 Ordinary review/check waits are localized.
 
-## 33.26 Derived promotion-dependency lifecycle
+## 33.26 Authoring and promotion-dependency lifecycle
 
-For repository-local promotion `P`:
+For each exact selected authoring relation:
+
+```text
+authoring_dependency:
+  RAW_AUTHORING_SOURCE(source_contribution_unit_id, consumed_exact_oid)
+  RESOLVED_PROMOTION_PROJECTION(parent_group_id, source_repository_id, consumed_exact_oid)
+  INTERNAL_TO_SAME_GROUP(group_id, source_repository_id, consumed_exact_oid)
+  SATISFIED_BY_TARGET(consumed_exact_oid, proof_ref)
+  RECONCILIATION_REQUIRED(reason, consumed_exact_oid)
+  UNKNOWN_INCONSISTENT
+```
+
+Adoption requires one immutable source/consumer/OID identity plus a reachable REQUIRED anchor. `consumed_exact_oid` never changes. Dirty state is not representable.
+
+Reconciliation precedence is:
+
+```text
+fresh authoritative target contains consumed_exact_oid
+→ SATISFIED_BY_TARGET
+
+same immutable group authoritatively contains source + consumer handoffs
++ source exact frozen checkpoint S contained A before downward synchronization
++ group-local state incorporates S and consumer handoff
+→ INTERNAL_TO_SAME_GROUP
+
+first qualifying handoff of the same source ContributionUnit after durable selection TX-A
++ exact frozen/adopted source checkpoint S contained A before downward synchronization
++ group-local K incorporates S
++ source and consumer immutable PromotionTargets exactly equal
++ source/group disposition authorizes realization
+→ RESOLVED_PROMOTION_PROJECTION while retaining A
+
+source loses realization path before satisfaction
+→ RECONCILIATION_REQUIRED
+
+qualifying source handoff exists but immutable PromotionTargets differ
+→ RECONCILIATION_REQUIRED(TARGET_INCOHERENT_AUTHORING_DEPENDENCY)
+
+ambiguous attribution, cycle, missing object, or contradictory identity
+→ UNKNOWN_INCONSISTENT
+```
+
+For repository-local promotion `P`, the later ADR-050 projection state is:
 
 ```text
 promotion_dependency:
   NONE
-  UNSATISFIED(parent_submission_id, parent_exact_head)
+  UNSATISFIED(parent_submission_id, parent_exact_head, authoring_dependency_id)
   SATISFIED_BY_TARGET
   STALE
   UNKNOWN
 ```
 
-`UNSATISFIED` is derived from exact managed effective-base lineage and current predecessor/target state; it is not caller-authored stack intent. Eligibility for provider exposure requires either `NONE | SATISFIED_BY_TARGET`, or a current supported/authorized representation of the unsatisfied dependency.
+`UNSATISFIED` is derived only after durable semantic provenance identifies the source projection, or from another already-authoritative promotion relation. It is then reconciled from exact effective-base/predecessor/target state; it is not caller-authored stack intent. A valid adopted `SATISFIED_BY_TARGET` proof is terminal historical authority even after later target drift or source abandonment, while every later consumer realization still revalidates its own current route/target/policy/CAS guards. Eligibility for provider exposure requires `NONE | SATISFIED_BY_TARGET`, or exactly one current supported/authorized representation of the unsatisfied dependency. More than one independently unsatisfied predecessor remains locally blocked under open item 30.57.
 
 Predecessor change/merge may produce:
 
@@ -7488,7 +7738,7 @@ RESTACK_BLOCKED
 DEPENDENCY_SATISFIED_BY_TARGET
 ```
 
-Dependency is never inferred from branch/task/session names or arbitrary ancestry detached from recorded exact base lineage.
+Dependency is never inferred from branch/task/session names or arbitrary ancestry detached from adopted source identity and exact base lineage.
 
 ## 33.27 Submission revision/restack lifecycle
 
@@ -7955,7 +8205,10 @@ Recovery handles:
 orphan fine-grained resource claim
 stale/fenced top-level executor generation
 requested_generation > processed_generation after executor loss
-commit exists / metadata stale
+commit exists / managed-checkpoint metadata stale
+authoring-dependency anchor exists / adoption metadata stale
+authoring dependency adopted / source ref advanced, reset, renamed, or deleted
+dependency compression or target-satisfaction observation / metadata stale
 internal merge/conflict in progress
 internal ref advanced / push pending
 push complete / metadata stale
@@ -8011,7 +8264,7 @@ If the process crashes, OS ownership disappears automatically; the next successf
 
 Missing ContributionUnit editing topology routes to the external provisioning requirement, not implicit creation.
 
-Missing PromotionGroup declaration prevents semantic promotion inference/materialization for that logical ship but does not stop unrelated internal convergence.
+Missing work-bearing invocation acceptance or unresolved PromotionGroup group-local state prevents promotion materialization for that logical ship but does not stop unrelated internal convergence.
 
 ## 33.41 Fixed-point stop classes
 
@@ -8021,8 +8274,10 @@ A global sweep may reach its current fixed point only when every obligation enum
 currently protected
 claimed by incompatible internal/recovery operation
 waiting for a transition-specific external prerequisite
+waiting on raw authoring-dependency source handoff, target satisfaction, or semantic reconciliation
+waiting because more than one independently unsatisfied predecessor has no ratified provider representation
 not ready
-waiting for explicit PromotionGroup declaration
+waiting for work-bearing invocation/PromotionGroup resolution
 waiting for exact PromotionUnit member eligibility/topology prerequisites
 conflict-blocked
 policy-blocked/unsupported
@@ -8073,11 +8328,11 @@ A material submission revision that invalidates submission-author evidence canno
 
 # 34. Exhaustive modeled-state consistency audit
 
-The latest finite technical state-space pass is `STATE-SPACE-AUDIT-v45.md`, through ADR-080. It retains the v44 baseline of 16,124 combinations and adds source-domain authority, remote-cache/currentness, provider optionality, webhook evidence, cross-source causality, and remote-artifact semantic-boundary families. ADR-070/078 remain the governing product-intent layer.
+The latest finite technical state-space pass is post-baseline `STATE-SPACE-AUDIT-v46.md`, through ADR-081. It executes 648 new ADR-081 combinations and carries forward 16,380 retained historical combinations for 17,028 cumulative modeled cases. The new families cover exact source/version adoption, dirty-state exclusion, clean native-tip checkpoint adoption, crash-safe dependency anchoring, child-first handoff, source-owned checkpoint compression, source advancement, target satisfaction, abandonment, same-group handling, and competing CAS/retry behavior. ADR-070/078 remain the governing product-intent layer and ADR-081 preserves zero-preflight selection behind supported harness integration.
 
-The executable v45 model adds 256 ADR-080 combinations for **16,380** total. Concrete remote-Git smokes use a bare Git remote with no provider API to demonstrate authoritative direct remote observation, stale local tracking state, exact expected-old remote CAS rejection/success, and remote deletion currentness. Exact dimensions/results are recorded in `STATE-SPACE-AUDIT-v45.md` and `git-remote-observation-smoke-v1.txt`.
+The executable v46 model adds the recorded ADR-081 finite families and invokes a supporting native Git retention smoke. That smoke creates exact source commit `A`, leaves producer-only dirty state outside `A`, anchors `A`, moves the ordinary source ref away, expires reflogs, runs pruning GC, and proves `A` remains an ordinary reachable commit through the Ruu dependency anchor while the dirty bytes never entered its tree. Exact dimensions/results are recorded under `qualification/state-space/post-baseline/v046/`.
 
-The audit does **not** claim that arbitrary Git/provider graphs, semantic test pipelines, tracker backlogs, Development System behavior, or cross-system distributed ordering are finite. It combines static cross-checks of the current architecture with exhaustive finite families for owned/boundary states. Historical reports remain packaged as regression checkpoints for their respective revisions; v45 is the current package-level finite technical pass.
+The audit does **not** claim that arbitrary Git/provider graphs, semantic test pipelines, tracker backlogs, Development System behavior, multi-predecessor provider topology, late authoring refoundation, or cross-system distributed ordering are finite. It combines static cross-checks of the current architecture with exhaustive finite families for owned/boundary states. Historical reports remain immutable regression checkpoints for their respective revisions; v46 is the current active finite technical pass.
 
 The current audit establishes in particular:
 
@@ -8102,8 +8357,8 @@ managed authoring ref removal
 
 Ruu checkpoint boundary
 → consumes frozen mutation handoff
-→ constructs exact canonical whole-surface candidate
-→ commits exactly that candidate
+→ adopts an exact clean native tip without a new commit, or constructs the dirty canonical whole-surface candidate
+→ records exactly that managed checkpoint
 
 promotion exact candidate C + immutable PromotionTarget T
 → one semantic objective RealizePromotion(C,T)
