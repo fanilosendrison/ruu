@@ -1,6 +1,6 @@
 # Ruu — Open Design Backlog
 
-This backlog records design questions raised during the 2026-09-07/08 architecture review and their closure status. Accepted semantics live in the main requirements document, ADRs, and the normative `EXTERNAL-CONTROL-PLANE-CONTRACT.md`. **ADR-070 / §0 Product intent governs how every open item is resolved: a technically coherent solution is not acceptable if it re-exports avoidable multi-session/repository/concurrency orchestration to the user without explicitly amending ADR-070.** ADR-068 closed the preceding item 30.41. A subsequent hostile falsification pass opened 30.42–30.48; ADR-069 closed 30.42 and 30.43, ADR-071 closed 30.44 and 30.45, v38 closed 30.48, ADR-072 closes 30.46, ADR-073 closes 30.47, and ADR-074 closes 30.50 while correcting ADR-071 native managed-binding classification. The native-Git observation-plane investigation is now closed: ADR-074 closes 30.50, ADR-075 closes 30.51, ADR-076 closes 30.52, ADR-077 closes 30.53, ADR-079 closes 30.54, and ADR-080 closes 30.55 plus umbrella 30.49.
+This backlog records design questions raised during the 2026-09-07/08 architecture review and their closure status. Accepted semantics live in the main requirements document, ADRs, and the normative `EXTERNAL-CONTROL-PLANE-CONTRACT.md`. **ADR-070 / §0 Product intent governs how every open item is resolved: a technically coherent solution is not acceptable if it re-exports avoidable multi-session/repository/concurrency orchestration to the user without explicitly amending ADR-070.** ADR-068 closed the preceding item 30.41. A subsequent hostile falsification pass opened 30.42–30.48; ADR-069 closed 30.42 and 30.43, ADR-071 closed 30.44 and 30.45, v38 closed 30.48, ADR-072 closes 30.46, ADR-073 closes 30.47, and ADR-074 closes 30.50 while correcting ADR-071 native managed-binding classification. The native-Git observation-plane investigation is now closed: ADR-074 closes 30.50, ADR-075 closes 30.51, ADR-076 closes 30.52, ADR-077 closes 30.53, ADR-079 closes 30.54, and ADR-080 closes 30.55 plus umbrella 30.49. ADR-081 closes 30.56 for exact authoring dependencies before promotion. The ADR-081 repository-wide hostile audit opens 30.57 and 30.58 as HIGH unratified decisions: multi-unsatisfied-predecessor publication and late consumer refoundation.
 
 ## A. Checkpoint candidate canonical snapshot / identity — closed by ADR-059 (30.27)
 
@@ -232,9 +232,9 @@ After ADR-068, the preceding review backlog had been closed. A subsequent hostil
 
 **PromotionUnit declaration/identity semantics are closed by ADR-045/061:** a PromotionUnit is an immutable non-empty unordered unique exact-state set with content-addressed identity. V1 derives the ID from a domain-separated/versioned canonical encoding using SHA-256. Same exact set is idempotently the same unit; any exact member change produces a different unit. Target remains outside the PromotionUnit content address because it is already immutable on each member ConvergenceUnit; all members of one same-source projection must share that target.
 
-**PromotionGroup pre-resolution/default-mapping semantics are closed by ADR-046:** before convergence demand, the External Control Plane durably declares a closed immutable content-addressed set of canonical ConvergenceUnit refs that must resolve together. `READY_INTERNAL` never implies an implicit singleton; `{CX}` is an explicit singleton PromotionGroup.
+**PromotionGroup pre-resolution/default-mapping semantics are closed by ADR-046 as amended by ADR-069:** a work-bearing `NEW_GROUP` invocation supplies a sealed immutable ContributionUnit handoff cohort. Ruu mechanically derives one occurrence-bound closed PromotionGroup through stable ContributionUnit→ConvergenceUnit bindings. Distinct invocation occurrences remain distinct groups even with equal member sets. `READY_INTERNAL` never implies an implicit singleton.
 
-**Multi-source PromotionGroup projection semantics are closed by ADR-047/061:** the whole group must first resolve to current exact `READY_INTERNAL` states, then `ruu` partitions that complete exact snapshot deterministically by authoritative source repository and verifies one coherent immutable PromotionTarget per same-source partition before materializing/reusing exactly one repository-local PromotionUnit per represented repository. Same group + same repository is never split by target; conflicting targets fail closed. Cross-repository aggregate progress remains at PromotionGroup level.
+**Multi-source PromotionGroup projection semantics are closed by ADR-047/061 as amended by ADR-069:** the whole group first adopts a complete group-local exact state attributable to its originating invocation or authorized same-group revision. Later unrelated live ConvergenceUnit movement does not refresh it. Ruu partitions that exact mapping deterministically by authoritative source repository and verifies one coherent immutable PromotionTarget per same-source partition before materializing/reusing exactly one repository-local PromotionUnit per represented repository. Same group + same repository is never split by target; conflicting targets fail closed. Cross-repository aggregate progress remains at PromotionGroup level.
 
 **Repository-local multi-source candidate/head materialization is closed by ADR-048:** exact materialization uses one exact effective base, ancestry-maximal source reduction, an ancestry-aware versioned canonical pairwise full two-head (`ort`-class) fold, exact-state reuse when ancestry already suffices, and otherwise one deterministic synthetic multi-parent final candidate. Native octopus does not define semantics. Exact base and every original PromotionUnit source must be ancestors of the final candidate; semantic conflicts reuse `RECONCILIATION_REQUIRED`; the exact final candidate may be adopted only when its transition-local exact prerequisites hold; `ruu` never executes the development validation process. Materialization is isolated/recoverable under ADR-042.
 
@@ -368,7 +368,7 @@ A future sandbox-based v2 remains possible only through a new ADR proving equiva
 
 Concrete regressions now distinguish native rename from copy+delete, verify reflog/worktree rename evidence, retain prepared-hook rejection behavior, and check ancestry-overlay hazards.
 
-30.48 remains closed as the verification work item; v39 is the current evidence artifact.
+30.48 remains closed as the verification work item; v39 is the current dedicated regression for the corrected native binding-disposition classifier, while later cumulative state-space evidence continues through active post-baseline v46.
 
 ## 30.49 Native Git observation plane: scope and invariant — CLOSED BY ADR-080 — UMBRELLA
 
@@ -529,3 +529,45 @@ Webhook delivery is an unreliable/reorderable transport. It may wake reconciliat
 Remote publication artifact deletion/rename never inherits the local managed-authoring `CONTINUATION | ABANDON` classifier. Historical provider finalization evidence remains distinct from current remote/target topology.
 
 ADR-080 therefore closes both 30.55 and umbrella 30.49. The native-Git observation-plane cluster 30.50–30.55 is complete.
+
+## 30.56 Exact managed authoring dependency before source promotion — CLOSED BY ADR-081
+
+ADR-081 ratifies an immutable repository-local AuthoringDependency selected explicitly by the Development System:
+
+```text
+consumer ContributionUnit
+→ source ContributionUnit + consumed exact native commit OID
+```
+
+ContributionUnit is the sole v1 authoring-occurrence identity. Ruu independently proves exact source lineage, creates a REQUIRED recovery anchor before adoption, permits otherwise legal consumer authoring/checkpointing/convergence, and blocks only unauthorized realization. Dirty producer state is never a version or an implicit synthetic commit. Native commit creation remains exact-state rediscovery and becomes a managed checkpoint only through later exact frozen-handoff adoption.
+
+A current authoritative target may satisfy the dependency directly. Otherwise a qualifying source handoff accepted after durable selection may resolve it to stable `(PromotionGroup, source repository)` identity only when the source's own frozen pre-sync checkpoint contains the consumed OID, group-local state incorporates that checkpoint, and source/consumer immutable PromotionTargets are exactly equal. This preserves the consumed OID and uses ADR-050 `Restack(old_base, owned_candidate, current_parent)` semantics without laundering source ancestry back through the consumer. Same-group dependencies create no provider edge. Source abandonment without prior realization produces reconciliation and never transfers publication authority.
+
+## 30.57 Multiple independently unsatisfied authoring predecessors — OPEN — HIGH
+
+Minimal counterexample:
+
+```text
+consumer β requires source α@A and source γ@Q
+A and Q are both exact and durably retained
+neither source effect is target-realized
+α and γ later resolve to different PromotionGroups
+```
+
+The durable relation model can retain both obligations, and consumer authoring may proceed only if one already-existing exact base canonically contains both. The current publication model cannot represent the general remaining case: ADR-050 has one `parent_submission_id`, while an ordinary Git/provider submission has one base. ADR-048 composes sources inside one PromotionUnit but does not grant cross-group source publication authority.
+
+Decision required: choose whether publication waits for all but one dependency to become target-satisfied, derives a deterministic promotion DAG/linearization, creates multiple provider surfaces, requires semantic consolidation into another authoritative source, or adopts another exact model. No option is ratified. Until then, realization with more than one independently unsatisfied external predecessor is locally blocked.
+
+## 30.58 Late authoring-dependency discovery and consumer refoundation — OPEN — HIGH
+
+Minimal counterexample:
+
+```text
+consumer β starts from M
+β authors exact work W
+only then the Development System discovers required source α@A
+```
+
+ADR-081's accepted path adopts dependencies before β's first write. Later Git ancestry cannot manufacture semantic selection. ADR-050 restacks a provider projection after managed handoff and grants no mutation authority over β's active worktree. Current ADRs do not choose whether to create a new ContributionUnit from `A`, exact-transplant `M→W` onto `A`, perform an ordinary semantic merge, or retain another explicit refoundation object/freeze protocol.
+
+Decision required: define the authority, exact inputs, conflict state, lifecycle, and retry/retention semantics of late refoundation. Until then, Ruu performs no implicit active-worktree rewrite and exposes the condition for Development System action.

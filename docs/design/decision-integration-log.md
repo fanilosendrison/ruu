@@ -808,3 +808,19 @@ PROVIDER
 ```
 
 Local remote-tracking refs are caches, not remote authority. Bare Git remotes are first-class and provider-free routes require no forge API/webhook. Webhook delivery is non-complete/reorderable transport: authenticated payloads may add positive provider-scoped historical evidence when adapter semantics are demonstrated, but absence never proves non-occurrence, delivery identity is not semantic identity, and cross-source causality is never inferred from wall clocks. Remote publication artifact deletion/rename never invokes local managed-authoring `CONTINUATION | ABANDON`. ADR-080 closes 30.55 and the 30.49 umbrella.
+
+## 2026-11-03 — ADR-081 — exact authoring dependencies before promotion
+
+Accepted to close 30.56. The Development System may explicitly select a stable repository-local source ContributionUnit and exact native commit for a consumer before the source has any Ruu checkpoint or PromotionGroup. ContributionUnit remains the sole v1 authoring-occurrence identity; no separate WorkOccurrence object is introduced.
+
+```text
+source α creates native commit A
+consumer β adopts α@A before first write
+β authors B and may invoke Ruu first
+```
+
+Ruu proves exact source lineage, durably linearizes semantic selection in TX-A, creates a REQUIRED operation-owned recovery anchor before dependency adoption, revalidates source generation/disposition in TX-B, and keeps `A` immutable/reachable through source advancement, reset/amend/ref deletion, restart, and Git GC. A qualifying source handoff between TX-A and TX-B may be adopted directly as resolved rather than stranding a raw dependency. Dirty producer state is never a version and is never silently snapshot-committed. Native commit creation remains exact-state rediscovery; a clean native tip becomes a managed checkpoint only at a frozen work-bearing handoff.
+
+A raw dependency blocks unauthorized realization rather than otherwise legal authoring/checkpointing/convergence. Current target containment may satisfy it without a fake parent. A qualifying handoff accepted after durable selection may CAS-resolve it to `(PromotionGroup, source repository)` only when the source's own frozen pre-sync checkpoint contains `A`, group-local state incorporates that checkpoint, and source/consumer immutable PromotionTargets are exactly equal. This prevents aggregate lineage from laundering `A` back through the consumer. The relation retains consumed `A`; if parent current exact state is `K`, ADR-050 uses `Restack(A,B,K)`. Same-group dependencies create no provider edge. Source abandonment without valid realization creates reconciliation and never transfers authority to the consumer.
+
+The accompanying global hostile audit opens two HIGH decisions rather than inventing semantics: 30.57 for more than one independently unsatisfied predecessor over a one-base provider model, and 30.58 for late dependency discovery/refoundation after consumer authoring has begun.

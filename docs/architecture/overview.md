@@ -2,7 +2,7 @@
 
 > **Status: non-normative architecture map.**
 >
-> This document explains the current architecture through ADR-080 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
+> This document explains the current architecture through ADR-081 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
 
 ## 1. Product in one sentence
 
@@ -12,7 +12,7 @@ Git remains the native object/history substrate and interoperability boundary. `
 
 Provider systems such as GitHub or GitLab are an optional publication/governance layer over that core. They do not define core version identity or convergence truth.
 
-Normative anchors: [ADR-070](../adr/adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md), [ADR-078](../adr/adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md), [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md), specification §0.
+Normative anchors: [ADR-070](../adr/adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md), [ADR-078](../adr/adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md), [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md), [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md), specification §0.
 
 ---
 
@@ -124,6 +124,7 @@ The Development System knows things such as:
 - when ConvergenceUnit membership is still open to new ContributionUnits or may be sealed;
 - when current work is ready to cross a Git boundary;
 - which exact ContributionUnits belong to a work-bearing invocation handoff;
+- which stable source ContributionUnit and exact native commit a new consumer semantically requires before authoring;
 - any semantic correction authority that must be associated with an existing promotion occurrence.
 
 The External Control Plane is an **architectural role**, not necessarily a second product. For supported coding harnesses, Ruu-supplied integration may implement the plumbing automatically while semantic authority remains above the convergence engine.
@@ -139,6 +140,8 @@ The External Control Plane is an **architectural role**, not necessarily a secon
 - derives exact ancestry/fast-forward/divergence facts;
 - localizes irreducible reconciliation obligations;
 - drives all known nonterminal obligations toward a fixed point;
+- adopts and retains explicitly selected exact AuthoringDependencies;
+- reconciles raw dependencies against target state and later source handoffs;
 - derives PromotionGroups from work-bearing invocations;
 - adopts group-local exact states;
 - materializes repository-local PromotionUnits;
@@ -260,11 +263,55 @@ While actively authored in V1, it uses a dedicated Git worktree/ref surface.
 
 Two concurrent producers in the same repository therefore do not share a mutable checkout.
 
-A ContributionUnit is **not a commit**. While `OPEN`, it may produce several authoritative checkpoints over time; those checkpoints may be integrated upward eagerly while the ContributionUnit remains capable of further contribution. Once `CLOSED`, it cannot reopen; later work uses a new ContributionUnit identity, which may still belong to the same ConvergenceUnit if the convergence scope remains the same.
+A ContributionUnit is **not a commit**. While `OPEN`, it may produce several ordinary native commits and several authoritative managed checkpoints over time. Native commits are exact Git versions, but they become managed checkpoints only through exact frozen-handoff adoption. Checkpoints may be integrated upward eagerly while the ContributionUnit remains capable of further contribution. Once `CLOSED`, it cannot reopen; later work uses a new ContributionUnit identity, which may still belong to the same ConvergenceUnit if the convergence scope remains the same.
 
-ContributionUnit identity also survives loss/removal of its editing artifacts after durable checkpoint continuity exists. Branch/worktree existence is not the semantic identity.
+ContributionUnit identity also survives loss/removal of its editing artifacts after durable checkpoint continuity exists. Branch/worktree existence is not the semantic identity. `ContributionUnit` is also the sole v1 stable authoring-occurrence identity; session, process, branch, worktree, and a separate `work_occurrence_id` do not compete with it.
 
-Normative anchors: [ADR-001](../adr/adr-001-isolate-concurrent-work-production-with-git-worktrees.md), [ADR-002](../adr/adr-002-use-repository-local-contribution-units-as-the-isolation-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-038](../adr/adr-038-decouple-contribution-unit-identity-from-editing-artifacts.md), [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md).
+Normative anchors: [ADR-001](../adr/adr-001-isolate-concurrent-work-production-with-git-worktrees.md), [ADR-002](../adr/adr-002-use-repository-local-contribution-units-as-the-isolation-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-038](../adr/adr-038-decouple-contribution-unit-identity-from-editing-artifacts.md), [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md), [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
+
+### 4.4 Exact authoring dependencies before promotion
+
+A consumer ContributionUnit may need an exact native commit from another still-active ContributionUnit before the source has any Ruu checkpoint or PromotionGroup.
+
+```text
+source α: native commit A; authoring may continue
+consumer β: explicitly consumes α@A; authors B; invokes Ruu first
+```
+
+The Development System explicitly selects both **who** and **what**:
+
+```text
+source = (repository_id, contribution_unit_id)
+consumed version = exact commit OID A
+```
+
+Ruu then proves exact source lineage, creates a REQUIRED recovery anchor for `A`, and adopts an immutable AuthoringDependency before consumer authoring. A supported harness submits this as an internal provisioning demand to the existing fenced reconciler and waits before first write; no user-facing preflight or work-bearing checkpoint is created. The source may be dirty, but only commit `A` is consumed. Ruu never snapshots the producer's mutable worktree and never infers dependency from ancestry, names, file overlap, recency, or session order.
+
+The consumer may author, checkpoint, converge, form a PromotionGroup, and materialize exact owned state while the relation remains raw. Realization waits locally because consumer ancestry does not transfer source publication authority.
+
+A raw dependency can later resolve in three ways:
+
+```text
+current authoritative target contains A
+→ SATISFIED_BY_TARGET
+
+source and consumer are already in the same immutable group
+→ INTERNAL_TO_SAME_GROUP
+→ no provider edge
+
+same source ContributionUnit later hands off its own exact pre-sync checkpoint S containing A
++ group-local exact K incorporates S
++ source/consumer PromotionTargets are exactly equal
+→ resolve to stable (source PromotionGroup, repository) projection
+→ retain consumed A
+→ Restack(old_base=A, owned_candidate=B, new_base=K) when needed
+```
+
+Source advancement never changes `A` or mutates an active consumer worktree. Aggregate group ancestry cannot launder `A` back from the consumer when the source's own frozen pre-sync checkpoint omitted it. If the source loses its realization path before `A` is validly target-realized, the consumer remains blocked with exact reconciliation work; it does not inherit authority to publish `A`. An already-adopted valid target-satisfaction proof remains historical authority after later target drift, while every later consumer realization still revalidates current route/policy/CAS guards.
+
+The exact anchor remains retained through source reset/amend/ref deletion and Git GC. Multiple independently unsatisfied predecessors and dependency discovery after consumer authoring has already begun remain explicit open design questions; Ruu invents neither provider topology nor active-worktree refoundation.
+
+Normative anchor: [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
 
 ---
 
@@ -545,11 +592,11 @@ Normative anchors: [ADR-049](../adr/adr-049-separate-stable-submission-identity-
 
 ---
 
-## 11. Stacked publication is derived, not authored topology
+## 11. Authoring dependency becomes derived stacked publication only after resolution
 
 Stacked PRs/submissions are not a primary authoring structure and are not requested merely because several ContributionUnits or ConvergenceUnits exist.
 
-They appear when current exact promotion dependency state requires one provider-facing publication to depend on another result that is not yet satisfied by the authoritative target.
+Before promotion identity exists, the Development System may explicitly select an exact AuthoringDependency. That semantic selection still does not select a stack. A stack appears only after Ruu maps the durable source identity through a qualifying source-owned pre-sync checkpoint and handoff to a stable promotion projection with the same immutable PromotionTarget and current exact promotion state requires one provider-facing publication to depend on another result that is not yet satisfied by the authoritative target.
 
 Conceptually:
 
@@ -639,6 +686,8 @@ Recovery does not guess from process history. It re-observes the authoritative s
 
 The CoordinationStore and append-only effect journal preserve durable workflow knowledge, but persisted historical intent is not unlimited future authority: new realization effects are fenced by current state/disposition/policy prerequisites.
 
+AuthoringDependency adoption uses the same pattern. The consumed commit is anchored before managed adoption; crash before or after anchor creation is recovered from Operation/Attempt plus exact Git state. Compression to a source promotion projection is CAS-guarded and duplicate reconciliation cannot select a second parent.
+
 This is also why observation delivery itself is not required to be exactly once. Semantic adoption is idempotent under logical identity and exact current guards.
 
 Normative anchors: [ADR-005](../adr/adr-005-coordinate-simultaneous-convergers-with-fine-grained-claims-and-cas.md), [ADR-042](../adr/adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md), [ADR-065](../adr/adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md), [ADR-071](../adr/adr-071-make-managed-branch-deletion-durable-abandonment-and-fence-realization-by-current-disposition.md), [ADR-076](../adr/adr-076-separate-native-witness-provenance-from-managed-effect-identity-and-make-semantic-adoption-idempotent.md), [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md).
@@ -653,6 +702,7 @@ Normative anchors: [ADR-005](../adr/adr-005-coordinate-simultaneous-convergers-w
 | ConvergenceBase | repository-local | From which mutable base family does this ConvergenceUnit synchronize? |
 | ConvergenceUnit | repository-local | Into which shared lineage should these contributions converge? |
 | ContributionUnit | repository-local | Which isolated bounded contribution stream is authoring toward that ConvergenceUnit? |
+| AuthoringDependency | repository-local relation | Which stable source ContributionUnit and exact commit did this consumer explicitly adopt before promotion? |
 | Managed worktree/ref | repository-local artifact | Where is active V1 authoring physically isolated? |
 | LogicalInvocation | coordination-domain occurrence | Which frozen new/correction work belongs to this checkpoint occurrence? |
 | ConvergenceDemand | coordination-domain signal | Should the global reconciler re-evaluate progress now? |
@@ -762,7 +812,12 @@ coding session
 Likewise:
 
 ```text
-checkpoint exists
+native commit exists
+≠ managed checkpoint
+≠ handoff
+≠ completion
+
+managed checkpoint exists
 ≠ ContributionUnit CLOSED
 
 ContributionUnit tip integrated
@@ -788,6 +843,15 @@ webhook delivery
 branch/worktree deletion
 ≠ generic semantic cancellation
 
+dirty source worktree
+≠ exact consumable version
+
+exact commit OID
+≠ semantic source identity
+
+source abandonment
+≠ consumer publication authority
+
 CWD
 ≠ invocation cohort
 ≠ global sweep scope
@@ -808,7 +872,8 @@ For a new reader, the shortest path from product intent to detailed mechanics is
 5. **[ADR-036](../adr/adr-036-make-every-invocation-global-over-all-nonterminal-managed-obligations.md), [ADR-041](../adr/adr-041-coalesce-convergence-demands-under-a-single-host-fenced-executor.md), [ADR-042](../adr/adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md), [ADR-069](../adr/adr-069-bind-promotion-groups-to-work-bearing-invocations-and-group-local-exact-state.md)** — invocation and reconciler model.
 6. **[ADR-045](../adr/adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) through [ADR-050](../adr/adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md), plus [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md)** — promotion model and provider projection.
 7. **[ADR-074](../adr/adr-074-minimize-native-git-event-observation-to-managed-authoring-binding-disposition.md) through [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md)** — local/remote/provider observation and native-Git coexistence.
-8. **[`OPEN-DESIGN-BACKLOG.md`](../design/open-design-backlog.md)** only after the current model is understood; it contains design history and remaining open nodes rather than the primary architecture description.
+8. **[ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md)** — exact source-attributed native versions consumed before source promotion.
+9. **[`OPEN-DESIGN-BACKLOG.md`](../design/open-design-backlog.md)** only after the current model is understood; it contains design history and remaining open nodes rather than the primary architecture description.
 
 ---
 
@@ -881,6 +946,9 @@ ConvergenceUnit
 
 ContributionUnit
 = isolated bounded contribution stream into one ConvergenceUnit
+
+AuthoringDependency
+= explicit stable source ContributionUnit + immutable consumed commit, retained before source promotion and reconciled without authority transfer
 
 LogicalInvocation
 = durable occurrence boundary for an exact frozen handoff cohort
