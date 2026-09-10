@@ -35,6 +35,13 @@ class QualificationInfrastructureTests(unittest.TestCase):
             self.root,
             ignore=shutil.ignore_patterns(".git", "__pycache__"),
         )
+        post_baseline = self.root / "qualification/state-space/post-baseline"
+        metadata_paths = post_baseline.glob(
+            "v[0-9][0-9][0-9]/qualification-metadata.json"
+        )
+        existing_versions = [int(path.parent.name[1:]) for path in metadata_paths]
+        self.existing_post_baseline_count = len(existing_versions)
+        self.next_post_baseline_version = max(existing_versions, default=45) + 1
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -153,32 +160,29 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assertIn(expected, completed.stdout + completed.stderr)
 
     def test_missing_post_baseline_version_is_rejected(self) -> None:
-        self.write_post_baseline(47)
-        self.assert_layout_fails("missing v46")
+        missing = self.next_post_baseline_version
+        self.write_post_baseline(missing + 1)
+        self.assert_layout_fails(f"missing v{missing}")
 
     def test_incomplete_post_baseline_qualification_is_rejected(self) -> None:
-        self.write_post_baseline(46, include_report=False)
+        self.write_post_baseline(self.next_post_baseline_version, include_report=False)
         self.assert_layout_fails("artifacts must contain exactly")
 
     def test_duplicate_post_baseline_version_is_rejected(self) -> None:
-        self.write_post_baseline(46)
-        self.write_post_baseline(46, directory_name="v046-duplicate")
-        self.assert_layout_fails("duplicate post-baseline version v46")
+        version = self.next_post_baseline_version
+        self.write_post_baseline(version)
+        self.write_post_baseline(version, directory_name=f"v{version:03d}-duplicate")
+        self.assert_layout_fails(f"duplicate post-baseline version v{version}")
 
     def test_missing_recorded_output_is_rejected(self) -> None:
-        self.write_post_baseline(46, create_output=False)
+        self.write_post_baseline(self.next_post_baseline_version, create_output=False)
         self.assert_layout_fails("missing recorded_output artifact")
 
     def test_unregistered_post_baseline_artifact_is_rejected(self) -> None:
-        directory = (
-            self.root
-            / "qualification"
-            / "state-space"
-            / "post-baseline"
-            / "v046"
-        )
+        version = self.next_post_baseline_version
+        directory = self.root / f"qualification/state-space/post-baseline/v{version:03d}"
         directory.mkdir(parents=True)
-        (directory / "state-space-audit-v46.py").write_text("pass\n")
+        (directory / f"state-space-audit-v{version}.py").write_text("pass\n")
         self.assert_layout_fails("unregistered artifact")
 
     def test_modified_retained_artifact_is_rejected(self) -> None:
@@ -205,26 +209,29 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assert_layout_fails("source differs from snapshot authority")
 
     def test_new_evidence_cannot_use_retained_directory_shape(self) -> None:
-        directory = self.root / "qualification" / "state-space" / "v046"
+        version = self.next_post_baseline_version
+        directory = self.root / "qualification" / "state-space" / f"v{version:03d}"
         directory.mkdir()
-        (directory / "state-space-audit-v46.py").write_text("pass\n")
+        (directory / f"state-space-audit-v{version}.py").write_text("pass\n")
         self.assert_layout_fails("retained discovery: unregistered artifact")
 
     def test_snapshot_backed_claim_for_new_evidence_is_rejected(self) -> None:
-        self.write_post_baseline(46, provenance="RETAINED")
+        self.write_post_baseline(self.next_post_baseline_version, provenance="RETAINED")
         self.assert_layout_fails("provenance must be POST_BASELINE")
 
     def test_post_baseline_artifact_symlink_is_rejected(self) -> None:
-        directory = self.write_post_baseline(46)
-        report = directory / "state-space-audit-v46.md"
+        version = self.next_post_baseline_version
+        directory = self.write_post_baseline(version)
+        report = directory / f"state-space-audit-v{version}.md"
         report.unlink()
-        report.symlink_to("state-space-audit-v46.txt")
+        report.symlink_to(f"state-space-audit-v{version}.txt")
         self.refresh_artifact_hash(directory, "report")
         self.assert_layout_fails("report artifact must not be a symlink")
 
     def test_invalid_utf8_report_is_controlled_failure(self) -> None:
-        directory = self.write_post_baseline(46)
-        report = directory / "state-space-audit-v46.md"
+        version = self.next_post_baseline_version
+        directory = self.write_post_baseline(version)
+        report = directory / f"state-space-audit-v{version}.md"
         report.write_bytes(b"\xff\xfe")
         self.refresh_artifact_hash(directory, "report")
         self.assert_layout_fails("report is not valid UTF-8")
@@ -235,7 +242,7 @@ class QualificationInfrastructureTests(unittest.TestCase):
             / "qualification"
             / "state-space"
             / "post-baseline"
-            / "v046"
+            / f"v{self.next_post_baseline_version:03d}"
         )
         directory.mkdir(parents=True)
         (directory / "qualification-metadata.json").write_text("{\n")
@@ -253,7 +260,12 @@ class QualificationInfrastructureTests(unittest.TestCase):
         pattern = schema["$defs"]["artifact"]["properties"]["path"]["pattern"]
         self.assertIsNone(re.fullmatch(pattern, "../artifact"))
         self.assertIsNone(re.fullmatch(pattern, "fixtures/artifact"))
-        self.assertIsNotNone(re.fullmatch(pattern, "state-space-audit-v46.py"))
+        self.assertIsNotNone(
+            re.fullmatch(
+                pattern,
+                f"state-space-audit-v{self.next_post_baseline_version}.py",
+            )
+        )
 
     def test_malformed_active_lineage_is_controlled_failure(self) -> None:
         lineage = self.root / "qualification" / "lineage" / "lineage-v2.json"
@@ -307,24 +319,27 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assertNotIn("PASS", completed.stdout)
 
     def test_post_baseline_replay_must_match_recorded_output(self) -> None:
+        version = self.next_post_baseline_version
         self.write_post_baseline(
-            46,
-            executable_output="state-space v46: FAIL\n",
-            recorded_output="state-space v46: PASS\n",
+            version,
+            executable_output=f"state-space v{version}: FAIL\n",
+            recorded_output=f"state-space v{version}: PASS\n",
         )
         completed = self.run_tool("replay-post-baseline-qualification.py")
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("RECORDED_OUTPUT_MISMATCH", completed.stdout)
 
     def test_contiguous_post_baseline_qualifications_verify_and_replay(self) -> None:
-        self.write_post_baseline(46)
-        self.write_post_baseline(47)
+        first = self.next_post_baseline_version
+        self.write_post_baseline(first)
+        self.write_post_baseline(first + 1)
         self.generate_manifest()
         verified = self.run_tool("verify-qualification-layout.py")
         self.assertEqual(verified.returncode, 0, verified.stdout + verified.stderr)
         replayed = self.run_tool("replay-post-baseline-qualification.py")
         self.assertEqual(replayed.returncode, 0, replayed.stdout + replayed.stderr)
-        self.assertIn("PASS (2 qualifications)", replayed.stdout)
+        expected = self.existing_post_baseline_count + 2
+        self.assertIn(f"PASS ({expected} qualifications)", replayed.stdout)
 
     def test_historical_latest_is_derived_from_lineage(self) -> None:
         completed = self.run_tool("replay-historical-qualification.py", "latest")

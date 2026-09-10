@@ -27,7 +27,7 @@ The retained paths remain unchanged to preserve existing links and lineage. They
 
 ### Post-baseline evidence
 
-Future state-space qualifications use this separate path:
+State-space qualifications after ADR-080 use this separate path:
 
 ```text
 state-space/post-baseline/vNNN/
@@ -105,7 +105,7 @@ python3 tools/replay-historical-qualification.py 37 \
 
 ## Adding a post-baseline state-space qualification
 
-The first post-baseline version is v46. Every later version is the next integer after the highest registered version; gaps and retained collisions fail verification.
+The first post-baseline version is v46, covering ADR-081 exact authoring dependencies and an exact Git object-retention smoke. Every later version is the next integer after the highest registered version; gaps and retained collisions fail verification.
 
 1. Create `state-space/post-baseline/vNNN/`.
 2. Add `state-space-audit-vN.md`, `state-space-audit-vN.py`, and `state-space-audit-vN.txt`.
@@ -126,11 +126,13 @@ shasum -a 256 qualification/state-space/post-baseline/v046/*
 
 Do not use this command to overwrite retained or previously recorded evidence. A correction to an accepted qualification should normally be represented by the next version.
 
-Replay one post-baseline version:
+Replay the current post-baseline version:
 
 ```bash
 python3 tools/replay-post-baseline-qualification.py 46
 ```
+
+The v46 registration includes one supporting native Git smoke in the same version directory. The primary Python executable runs it, so recorded-output replay covers both the finite state families and the Git reachability assertion.
 
 Replay all registered post-baseline versions:
 

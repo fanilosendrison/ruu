@@ -1,0 +1,18 @@
+ADR-081 dependency adoption family: 64 PASS
+ADR-081 dirty-state exclusion family: 32 PASS
+ADR-081 child-first progression family: 32 PASS
+ADR-081 dependency resolution family: 128 PASS
+ADR-081 source-movement immutability family: 32 PASS
+ADR-081 target-satisfaction history family: 16 PASS
+ADR-081 abandonment authority family: 32 PASS
+ADR-081 anchor crash/GC family: 64 PASS
+ADR-081 concurrent compression family: 64 PASS
+ADR-081 clean native-tip checkpoint family: 32 PASS
+ADR-081 predecessor cardinality family: 24 PASS
+ADR-081 same-group family: 32 PASS
+ADR-081 dependency-cycle family: 64 PASS
+ADR-081 source-attribution laundering family: 32 PASS
+ADR-081 dependency anchor retention smoke: PASS
+new combinations: 648 PASS
+retained v45 baseline: 16380
+v46 cumulative modeled cases: 17028
