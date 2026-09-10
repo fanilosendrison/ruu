@@ -47,6 +47,7 @@ The design backlog records current and closed questions. It is not a substitute 
 3. External Control Plane contract.
 4. ADR-070 and ADR-078 for the governing product experience.
 5. ADR-074 through ADR-080 for the current observation model.
-6. Earlier ADRs when implementation details require their decision history.
+6. ADR-081 for exact authoring dependencies before source promotion.
+7. Earlier ADRs when implementation details require their decision history.
 
 The immutable pre-reorganization package is retained under `qualification/releases/adr-080-flat/` and is not an active editing surface.

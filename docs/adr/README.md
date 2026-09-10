@@ -60,20 +60,20 @@ Architectural decisions remain in chronological order. Filenames and decision nu
 ## ADR-041 through ADR-060
 
 - [ADR-041: Coalesce convergence demands under a single-host fenced executor](adr-041-coalesce-convergence-demands-under-a-single-host-fenced-executor.md) — Accepted
-- [ADR-042: Use a reconciler-driven CoordinationStore with OS-owned runs and an append-only effect journal](adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md) — Accepted
+- [ADR-042: Use a reconciler-driven CoordinationStore with OS-owned runs and an append-only effect journal](adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md) — Accepted — AuthoringDependency recovery anchoring amended by ADR-081
 - [ADR-043: Resolve promotion policy by authoritative constraint composition](adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md) — Accepted; amended by ADR-061
 - [ADR-044: Establish promotion-policy currentness by immediate authoritative revalidation](adr-044-establish-promotion-policy-currentness-by-immediate-authoritative-revalidation.md) — Accepted; amended by ADR-061
 - [ADR-045: Make PromotionUnits immutable content-addressed exact-state sets](adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) — Accepted; amended by ADR-061
-- [ADR-046: Predeclare closed PromotionGroups and resolve them to exact PromotionUnits](adr-046-predeclare-closed-promotion-groups-and-resolve-them-to-exact-promotion-units.md) — Unknown
-- [ADR-047: Project PromotionGroups deterministically into repository-local PromotionUnits](adr-047-project-promotion-groups-deterministically-into-repository-local-promotion-units.md) — Unknown
-- [ADR-048: Materialize repository-local multi-source PromotionUnits by canonical pairwise merging](adr-048-materialize-repository-local-multi-source-promotion-units-by-canonical-pairwise-merging.md) — Unknown
-- [ADR-049 — Separate stable submission identity and refs from internal exact state](adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md) — Unknown
-- [ADR-050 — Derive stacked publication from unsatisfied promotion dependencies and restack by exact-state transplant](adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md) — Unknown
+- [ADR-046: Predeclare closed PromotionGroups and resolve them to exact PromotionUnits](adr-046-predeclare-closed-promotion-groups-and-resolve-them-to-exact-promotion-units.md) — Accepted — ordinary grouping identity/resolution superseded in part by ADR-069
+- [ADR-047: Project PromotionGroups deterministically into repository-local PromotionUnits](adr-047-project-promotion-groups-deterministically-into-repository-local-promotion-units.md) — Accepted — group-local state amended by ADR-069; same-group AuthoringDependency handling clarified by ADR-081
+- [ADR-048: Materialize repository-local multi-source PromotionUnits by canonical pairwise merging](adr-048-materialize-repository-local-multi-source-promotion-units-by-canonical-pairwise-merging.md) — Accepted — raw exact authored-base provenance clarified by ADR-081
+- [ADR-049 — Separate stable submission identity and refs from internal exact state](adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md) — Accepted
+- [ADR-050 — Derive stacked publication from unsatisfied promotion dependencies and restack by exact-state transplant](adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md) — Accepted — pre-promotion AuthoringDependency provenance added by ADR-081
 - [ADR-051 — Normalize provider capabilities as contextual semantic-operation observations](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) — Accepted
 - [ADR-052 — Advance DIRECT targets by atomic exact-old CAS fast-forward](adr-052-advance-direct-targets-by-atomic-exact-old-cas-fast-forward.md) — Accepted; amended by ADR-061
 - [ADR-053 — Turn `CHANGES_REQUESTED` into durable session-independent review-correction work](adr-053-turn-changes-requested-into-durable-session-independent-review-correction-work.md) — Accepted
 - [ADR-054 — Separate PromotionUnit completion, ConvergenceUnit closure, and retirement](adr-054-separate-promotion-unit-completion-convergence-unit-closure-and-retirement.md) — Accepted
-- [ADR-055 — Settle partial cross-repository ships with forward actions and publication episodes](adr-055-settle-partial-cross-repository-ships-with-forward-actions-and-publication-episodes.md) — Unknown
+- [ADR-055 — Settle partial cross-repository ships with forward actions and publication episodes](adr-055-settle-partial-cross-repository-ships-with-forward-actions-and-publication-episodes.md) — Accepted
 - [ADR-056: Bootstrap new repositories before managed authoring and keep provider creation external](adr-056-bootstrap-new-repositories-before-managed-authoring-and-keep-provider-creation-external.md) — Accepted; amended by ADR-061 and clarified by ADR-078
 - [ADR-057 — Externalize development verification and model `ruu` as state-dependent Git progression](adr-057-externalize-development-verification-and-model-ruu-as-state-dependent-git-progression.md) — Accepted — development-verification execution boundary retained; generic validation evidence/demand model superseded by ADR-060
 - [ADR-058 — Preserve native Git equivalence and whole-surface checkpoint intent](adr-058-preserve-native-git-equivalence-and-whole-surface-checkpoint-intent.md) — Accepted
@@ -90,11 +90,11 @@ Architectural decisions remain in chronological order. Filenames and decision nu
 - [ADR-066 — Bind promotion success to route-conformant Candidate→Submission→Result→Target chains](adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md) — Accepted
 - [ADR-067 — Terminalize obsolete unpromoted PromotionUnits by current-resolution supersession](adr-067-terminalize-obsolete-unpromoted-promotion-units-by-current-resolution-supersession.md) — Accepted
 - [ADR-068 — Cancel unrealized PromotionGroups explicitly and keep Git artifact deletion semantically neutral](adr-068-cancel-unrealized-promotion-groups-explicitly-and-keep-git-artifact-deletion-semantically-neutral.md) — Accepted
-- [ADR-069 — Bind PromotionGroups to work-bearing Ruu invocations and group-local exact state](adr-069-bind-promotion-groups-to-work-bearing-invocations-and-group-local-exact-state.md) — Unknown
-- [ADR-070 — Define Ruu as Git-based version control redesigned for agentic development](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) — Unknown
+- [ADR-069 — Bind PromotionGroups to work-bearing Ruu invocations and group-local exact state](adr-069-bind-promotion-groups-to-work-bearing-invocations-and-group-local-exact-state.md) — Accepted — source-handoff dependency compression clarified by ADR-081
+- [ADR-070 — Define Ruu as Git-based version control redesigned for agentic development](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) — Accepted
 - [ADR-071 — Make managed authoring disposition durable and fence realization by current disposition](adr-071-make-managed-branch-deletion-durable-abandonment-and-fence-realization-by-current-disposition.md) — Accepted — native binding-disposition mechanics corrected by ADR-074 and capture strength refined by ADR-075
 - [ADR-072 — Make host run-lock handles non-inheritable across subprocess boundaries](adr-072-make-host-run-lock-handles-non-inheritable-across-subprocess-boundaries.md) — Accepted
-- [ADR-073 — Require Git worktrees as the v1 authoring isolation substrate](adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md) — Accepted — authoring-surface evidence requirement amended by ADR-074; initial handoff/admission clarified by ADR-079
+- [ADR-073 — Require Git worktrees as the v1 authoring isolation substrate](adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md) — Accepted — authoring-surface evidence requirement amended by ADR-074; initial handoff/admission clarified by ADR-079; exact native authoring versions clarified by ADR-081
 - [ADR-074 — Minimize native Git event observation to managed authoring-binding disposition](adr-074-minimize-native-git-event-observation-to-managed-authoring-binding-disposition.md) — Accepted
 - [ADR-075 — Require pre-linearization native-ref witnesses only for managed authoring disposition; rediscover all other Git facts from exact state](adr-075-require-pre-linearization-native-ref-witnesses-and-state-rediscovery-by-observation-class.md) — Accepted
 - [ADR-076 — Separate native witness provenance from managed effect identity and make semantic adoption exactly-once](adr-076-separate-native-witness-provenance-from-managed-effect-identity-and-make-semantic-adoption-idempotent.md) — Accepted
@@ -102,3 +102,7 @@ Architectural decisions remain in chronological order. Filenames and decision nu
 - [ADR-078 — Make zero-preflight coding-harness integration part of the governing product intent](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) — Accepted
 - [ADR-079 — Minimize native Git rejection with conservative protection filtering and exact binding admission](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) — Accepted
 - [ADR-080 — Separate local Git causality, remote Git state, and provider workflow evidence](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) — Accepted
+
+## ADR-081 onward
+
+- [ADR-081 — Manage exact authoring dependencies before promotion](adr-081-manage-exact-authoring-dependencies-before-promotion.md) — Accepted — exact source-attributed native commits, crash-safe retention, raw-to-promotion reconciliation, target satisfaction, and no source-authority transfer
