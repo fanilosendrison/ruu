@@ -278,6 +278,12 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("missing link target", completed.stdout)
 
+    def test_ci_seals_snapshot_before_layout_verification(self) -> None:
+        workflow = (self.root / ".github/workflows/qualification.yml").read_text()
+        seal = workflow.index("chmod -R a-w qualification/releases/adr-080-flat")
+        verify = workflow.index("python3 tools/verify-qualification-layout.py")
+        self.assertLess(seal, verify)
+
     def test_git_smoke_runner_handles_canonical_temporary_paths(self) -> None:
         completed = self.run_tool("replay-git-smokes.py")
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
