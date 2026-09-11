@@ -14,11 +14,12 @@ This file is the operational map for agents working in the Ruu repository. Follo
 ## General guidelines
 
 - Treat this repository as an architecture and qualification corpus. It does not yet contain a production implementation.
-- Read the architecture overview and normative specifications before making an architectural or implementation decision.
+- Read the problem statement, architecture overview, and normative specifications before making an architectural or implementation decision.
 - Preserve native Git semantics and the authority boundaries defined by the Ruu specification.
 - Do not infer new product behavior from summaries, historical reports, or qualification scripts.
 - Keep the repository root limited to system entry points and responsibility-based directories.
 - Use lowercase kebab-case for new files and directories, except recognized system entry points such as `AGENTS.md` and `README.md`.
+- When the user mentions an Issue, Project work, backlog work, or a review finding, apply the shared GitHub Engineering Projects operational protocol, then read `docs/repository-governance/ruu-engineering.md` before acting.
 
 ## Authority order
 
@@ -28,9 +29,12 @@ Use the following precedence when sources appear inconsistent:
 2. `docs/specification/external-control-plane-contract.md`
 3. Accepted ADRs under `docs/adr/`, including later amendments
 4. `docs/architecture/overview.md`
-5. Design history, audits, reports, and recorded outputs
+5. `docs/architecture/problem-statement.md`
+6. Design history, audits, reports, and recorded outputs
 
-The architecture overview is non-normative. Qualification evidence demonstrates properties of a defined baseline but does not create product semantics.
+The architecture overview and problem statement are non-normative. They explain the system and its rationale but do not create product semantics. Qualification evidence demonstrates properties of a defined baseline but does not create product semantics.
+
+Repository-governance documents, GitHub Issues, Project fields, comments, and Pull Requests are also non-normative work-management sources. They may identify required work but never override the authority order above.
 
 Report every inconsistency between authoritative sources. Do not silently choose a convenient interpretation.
 
@@ -38,10 +42,11 @@ Report every inconsistency between authoritative sources. Do not silently choose
 
 Before changing architecture or preparing implementation work, read:
 
-1. `docs/architecture/overview.md`
-2. `docs/specification/ruu-spec.md`
-3. `docs/specification/external-control-plane-contract.md`
-4. The ADRs governing the affected concepts
+1. `docs/architecture/problem-statement.md`
+2. `docs/architecture/overview.md`
+3. `docs/specification/ruu-spec.md`
+4. `docs/specification/external-control-plane-contract.md`
+5. The ADRs governing the affected concepts
 
 For the shortest current decision path, begin with ADR-070 and ADR-078, then read ADR-074 through ADR-080.
 
@@ -57,7 +62,8 @@ ruu/
 │   ├── specification/
 │   ├── adr/
 │   ├── design/
-│   └── history/
+│   ├── history/
+│   └── repository-governance/
 ├── qualification/
 │   ├── README.md
 │   ├── state-space/
@@ -90,9 +96,20 @@ ruu/
 
 ### Design and history
 
-- Keep unresolved and closed design questions under `docs/design/`.
-- Do not treat the design backlog or decision-integration log as normative when a specification or accepted ADR controls.
-- Keep project-wide migration records under `docs/history/`.
+- Keep Ruu design material under `docs/design/` and project-wide migration or retired design records under `docs/history/`.
+- Treat `docs/history/design-backlog-through-adr-081.md` as a closed archive. Never append a finding, question, or work item to it.
+- Do not treat design history or the decision-integration log as normative when a specification or accepted ADR controls.
+
+### Repository governance and work tracking
+
+- Apply the shared GitHub Engineering Projects operational protocol for generic Issue and Project operations; use `docs/repository-governance/ruu-engineering.md` only for the Ruu-specific profile.
+- Keep repository process documentation under `docs/repository-governance/`, separate from Ruu product documentation.
+- Use the private GitHub Project **Ruu Engineering** as the primary durable work tracker.
+- Resolve an unqualified `Issue #N` as `fanilosendrison/ruu#N`, then retrieve the Issue and its live Project fields according to `docs/repository-governance/ruu-engineering.md`.
+- Treat `Ready` items in the Project's `Agent Queue` as the normal autonomous pickup surface. A direct user request may select other work but cannot ratify proposed semantics or bypass unresolved dependencies.
+- Create a `fanilosendrison/ruu` Issue for every validated review finding or other work item that must be deferred, handed off, scheduled, or tracked independently, then add and classify it in Ruu Engineering.
+- Revalidate findings against current content, search for duplicates, and preserve exact provenance, authority boundaries, acceptance criteria, validation requirements, and controlling repository references.
+- Never use an Issue, Project field, comment, or Pull Request as the only record of an accepted semantic decision. Synchronize the governing ADR and every affected normative document.
 
 ## Qualification rules
 
@@ -162,11 +179,13 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
 
 ## Quick navigation
 
+- Product problem and rationale: `docs/architecture/problem-statement.md`
 - Product mental model: `docs/architecture/overview.md`
 - Normative requirements and invariants: `docs/specification/ruu-spec.md`
 - External authority boundary: `docs/specification/external-control-plane-contract.md`
 - Architectural decision history: `docs/adr/README.md`
-- Open and closed design questions: `docs/design/open-design-backlog.md`
+- Ruu Engineering Project profile: `docs/repository-governance/ruu-engineering.md`
+- Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`
 - Immutable ADR-080 package: `qualification/releases/adr-080-flat/`
 
