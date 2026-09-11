@@ -22,7 +22,7 @@ Integrated by ADR-032. Exact PR-author gate remains open.
 
 Decision: independent agent reviews may occur earlier/more often/parallel; exact policy remains open.
 
-Recorded in main §30 and `OPEN-DESIGN-BACKLOG.md` L.
+Recorded in main §30 and the former design-backlog item L, now summarized in the [retired backlog archive](../history/design-backlog-through-adr-081.md).
 
 ## 4. Agents should inherit the cleanest possible codebase
 
@@ -202,7 +202,7 @@ ADR-038 later supersedes the former `ABANDONED` branch: current ContributionUnit
 
 `CHANGES_REQUESTED` may cause a convergence unit to return to `ACTIVE`; implementation changes use a newly provisioned contribution unit rather than reopening a terminal one.
 
-Recorded in ADR-035, main §§2.1, 8, 22, 26, 30, 33, and `OPEN-DESIGN-BACKLOG.md`.
+Recorded in ADR-035, main §§2.1, 8, 22, 26, 30, and 33, and now summarized in the [retired backlog archive](../history/design-backlog-through-adr-081.md).
 
 ## 27. Every invocation is global over all nonterminal managed obligations
 
@@ -657,7 +657,7 @@ Backlog 30.44/30.45 closed. v38 verification closes 30.48. 30.46/30.47 remain op
 
 ### Backlog discovery after ADR-071 — native Git observation plane
 
-The ADR-071 `reference-transaction` abandonment mechanism revealed a broader possible architecture: selected Git-native hooks/transaction points may durably report correctness-relevant ref mutations performed outside the managed executor, while the reconciler remains the sole interpreter of managed semantics. This is recorded as **OPEN-DESIGN-BACKLOG 30.49** only; no general hook-observation architecture is ratified yet. Per review scheduling, 30.49 is deferred until 30.46 and 30.47 are resolved.
+The ADR-071 `reference-transaction` abandonment mechanism revealed a broader possible architecture: selected Git-native hooks/transaction points may durably report correctness-relevant ref mutations performed outside the managed executor, while the reconciler remains the sole interpreter of managed semantics. This was recorded at the time as design-backlog item **30.49** only; no general hook-observation architecture was ratified by that entry. The item is now summarized in the [retired backlog archive](../history/design-backlog-through-adr-081.md). Per review scheduling, 30.49 was deferred until 30.46 and 30.47 were resolved.
 
 
 ## 2026-09-08 — ADR-072 — host run-lock handles are non-inheritable

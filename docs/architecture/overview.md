@@ -873,7 +873,7 @@ For a new reader, the shortest path from product intent to detailed mechanics is
 6. **[ADR-045](../adr/adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) through [ADR-050](../adr/adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md), plus [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md)** — promotion model and provider projection.
 7. **[ADR-074](../adr/adr-074-minimize-native-git-event-observation-to-managed-authoring-binding-disposition.md) through [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md)** — local/remote/provider observation and native-Git coexistence.
 8. **[ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md)** — exact source-attributed native versions consumed before source promotion.
-9. **[`open-design-backlog.md`](../design/open-design-backlog.md)** only after the current model is understood; it preserves design-question/closure history and points to the non-normative [Ruu Engineering project](https://github.com/users/fanilosendrison/projects/3) for current durable engineering follow-ups.
+9. **[Design backlog through ADR-081](../history/design-backlog-through-adr-081.md)** only when historical closure context is needed; current durable engineering work is tracked non-normatively through the [Ruu Engineering profile](../repository-governance/ruu-engineering.md) and Project.
 
 ---
 
