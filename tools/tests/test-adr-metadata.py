@@ -70,7 +70,7 @@ def disable_git_bound_validation(fixture_root: Path) -> None:
 
 
 class AdrMetadataTests(unittest.TestCase):
-    def test_repository_passes_compatibility_mode(self) -> None:
+    def test_repository_passes_full_profile(self) -> None:
         self.assertEqual([], adr_metadata.collect_errors(ROOT))
 
     def test_calendar_schema_and_local_future_date_rule(self) -> None:
@@ -129,6 +129,12 @@ class AdrMetadataTests(unittest.TestCase):
             )
 
             unknown.unlink()
+            profile_path = fixture_root / "docs" / "adr" / "adr-profile.yaml"
+            profile = adr_metadata.load_yaml(profile_path)
+            profile["legacy"]["unstructured"] = ["ADR-081"]
+            profile_path.write_text(
+                adr_metadata.yaml.safe_dump(profile, sort_keys=False), encoding="utf-8"
+            )
             legacy_path = next((fixture_root / "docs" / "adr").glob("adr-081-*.md"))
             legacy_path.unlink()
             errors = adr_metadata.collect_errors(fixture_root)
