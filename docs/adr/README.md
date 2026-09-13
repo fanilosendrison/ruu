@@ -9,9 +9,9 @@ name: "Ruu annotated architectural decision history"
 
 # Ruu annotated architectural decision history
 
-This maintained history records chronological narrative and nuanced qualifications. It is not a generated relationship authority. Canonical structured metadata is governed by [`adr-profile.yaml`](adr-profile.yaml); incoming relations will be derived from source ADRs when the generated projection is enabled.
+This maintained history records chronological narrative and nuanced qualifications. It is not a generated relationship authority. Canonical structured metadata is governed by [`adr-profile.yaml`](adr-profile.yaml); the [generated ADR index](index.md) projects recorded outgoing relations and derives their incoming direction mechanically.
 
-ADR-001 through ADR-081 temporarily remain on the profile's exact unstructured compatibility allowlist pending the semantics-neutral migration authorized by ADR-082. Their existing Markdown or partial frontmatter metadata remains authoritative until migration; afterward, retained Markdown metadata remains historical presentation only.
+ADR-001 through ADR-081 were migrated under ADR-082 with exact H1-to-EOF preservation evidence in [`metadata-migration-evidence.yaml`](metadata-migration-evidence.yaml). All active ADRs now carry canonical structured frontmatter. Retained Markdown metadata remains historical presentation only, and the generated relation graph remains intentionally incomplete while migrated records are `legacy-partial`.
 
 Architectural decisions remain in chronological order. Filenames and decision numbers are stable identities; topic-based navigation should be provided by indexes rather than by moving decisions between directories.
 

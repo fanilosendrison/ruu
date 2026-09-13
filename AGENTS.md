@@ -97,7 +97,7 @@ ruu/
 - Treat accepted ADR identity, name, date, outgoing relations, governed scope, and decision body as immutable.
 - Use a later ADR to amend or supersede an accepted decision; derive incoming relations instead of editing old records.
 - Permit a representation/schema migration only through a later governance ADR and machine-readable body-preservation evidence.
-- Keep `docs/adr/README.md` as the maintained annotated history. Do not hand-edit `docs/adr/index.md` once the profile marks it required.
+- Keep `docs/adr/README.md` as the maintained annotated history. Never hand-edit the required generated projection at `docs/adr/index.md`.
 - Permit non-semantic path or link maintenance only when the immutable source-package version remains preserved.
 
 ### Design and history
@@ -207,7 +207,8 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
 - External authority boundary: `docs/specification/external-control-plane-contract.md`
 - Annotated architectural decision history: `docs/adr/README.md`
 - ADR metadata profile: `docs/adr/adr-profile.yaml`
-- Generated ADR index, once required: `docs/adr/index.md`
+- Generated ADR index: `docs/adr/index.md`
+- ADR metadata migration evidence: `docs/adr/metadata-migration-evidence.yaml`
 - ADR metadata validator and renderer: `tools/adr-metadata.py`
 - Ruu Engineering Project profile: `docs/repository-governance/ruu-engineering.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
