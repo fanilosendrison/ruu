@@ -32,7 +32,9 @@ Use the following precedence when sources appear inconsistent:
 5. `docs/architecture/problem-statement.md`
 6. Design history, audits, reports, and recorded outputs
 
-The architecture overview and problem statement are non-normative. They explain the system and its rationale but do not create product semantics. Qualification evidence demonstrates properties of a defined baseline but does not create product semantics.
+The architecture overview and problem statement are non-normative. They explain the system and its rationale but do not create product semantics. Qualification evidence demonstrates properties of a defined baseline but does not create product semantics. Generated ADR indexes and README files project or explain authoritative records; they do not create product semantics.
+
+For records not present on the exact `legacy.unstructured` allowlist, ADR frontmatter is canonical for identity, lifecycle, explicitly recorded outgoing relations, governed scope, and body integrity. `docs/adr/adr-profile.yaml` and its schemas govern that representation and the temporary compatibility boundary; they do not outrank accepted decision bodies or the specification authority order.
 
 Repository-governance documents, GitHub Issues, Project fields, comments, and Pull Requests are also non-normative work-management sources. They may identify required work but never override the authority order above.
 
@@ -73,7 +75,9 @@ ruu/
 │   ├── lineage/
 │   ├── manifests/
 │   └── releases/
+├── requirements.txt
 └── tools/
+    └── tests/
 ```
 
 ## Documentation rules
@@ -88,10 +92,12 @@ ruu/
 
 ### Architectural decisions
 
-- Keep ADRs chronological under `docs/adr/`.
+- Keep ADRs chronological under `docs/adr/` and follow the pinned contract in `docs/adr/adr-profile.yaml`.
 - Do not reorganize accepted ADRs by topic; use indexes for topic-based navigation.
-- Do not silently rewrite the semantics of an accepted ADR.
-- Use a later ADR to amend or supersede an accepted decision.
+- Treat accepted ADR identity, name, date, outgoing relations, governed scope, and decision body as immutable.
+- Use a later ADR to amend or supersede an accepted decision; derive incoming relations instead of editing old records.
+- Permit a representation/schema migration only through a later governance ADR and machine-readable body-preservation evidence.
+- Keep `docs/adr/README.md` as the maintained annotated history. Do not hand-edit `docs/adr/index.md` once the profile marks it required.
 - Permit non-semantic path or link maintenance only when the immutable source-package version remains preserved.
 
 ### Design and history
@@ -143,6 +149,7 @@ Git smoke replay requires Git 2.28.0 or newer. An older Git installation is an u
 
 ## Tool responsibilities
 
+- `tools/adr-metadata.py` validates active ADR metadata and renders only the generated ADR index; it never rewrites source ADRs or qualification snapshots.
 - `tools/generate-qualification-lineage.py` generates only the retained path-aware lineage from the immutable snapshot.
 - `tools/generate-current-manifest.py` generates the SHA-256 manifest for the active layout.
 - `tools/verify-qualification-layout.py` verifies the snapshot, retained evidence, post-baseline registrations, continuity, permissions, and manifests.
@@ -155,6 +162,19 @@ Do not duplicate these responsibilities in ad hoc scripts.
 
 ## Mandatory validation
 
+Create an isolated Python 3 environment and install the pinned dependencies before validation:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install --requirement requirements.txt
+```
+
+When ADR metadata changes and the profile requires the generated index, regenerate it first:
+
+```bash
+.venv/bin/python tools/adr-metadata.py render
+```
+
 After any intentional change, regenerate active metadata in this order:
 
 ```bash
@@ -166,6 +186,8 @@ Confirm that generation produced no uncommitted difference, then run:
 
 ```bash
 git diff --exit-code
+.venv/bin/python tools/tests/test-adr-metadata.py
+.venv/bin/python tools/adr-metadata.py check
 python3 tools/verify-qualification-layout.py
 python3 tools/verify-markdown-links.py
 python3 tools/tests/test-qualification-infrastructure.py
@@ -183,7 +205,10 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
 - Product mental model: `docs/architecture/overview.md`
 - Normative requirements and invariants: `docs/specification/ruu-spec.md`
 - External authority boundary: `docs/specification/external-control-plane-contract.md`
-- Architectural decision history: `docs/adr/README.md`
+- Annotated architectural decision history: `docs/adr/README.md`
+- ADR metadata profile: `docs/adr/adr-profile.yaml`
+- Generated ADR index, once required: `docs/adr/index.md`
+- ADR metadata validator and renderer: `tools/adr-metadata.py`
 - Ruu Engineering Project profile: `docs/repository-governance/ruu-engineering.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`

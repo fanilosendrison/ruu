@@ -4,10 +4,14 @@ kind: "KnowledgeAsset"
 asset_type: "readme"
 domain: "ruu-architecture-decisions"
 severity: "guideline"
-name: "Ruu architectural decision index"
+name: "Ruu annotated architectural decision history"
 ---
 
-# Ruu architectural decision index
+# Ruu annotated architectural decision history
+
+This maintained history records chronological narrative and nuanced qualifications. It is not a generated relationship authority. Canonical structured metadata is governed by [`adr-profile.yaml`](adr-profile.yaml); incoming relations will be derived from source ADRs when the generated projection is enabled.
+
+ADR-001 through ADR-081 temporarily remain on the profile's exact unstructured compatibility allowlist pending the semantics-neutral migration authorized by ADR-082. Their existing Markdown or partial frontmatter metadata remains authoritative until migration; afterward, retained Markdown metadata remains historical presentation only.
 
 Architectural decisions remain in chronological order. Filenames and decision numbers are stable identities; topic-based navigation should be provided by indexes rather than by moving decisions between directories.
 
@@ -106,3 +110,4 @@ Architectural decisions remain in chronological order. Filenames and decision nu
 ## ADR-081 onward
 
 - [ADR-081 — Manage exact authoring dependencies before promotion](adr-081-manage-exact-authoring-dependencies-before-promotion.md) — Accepted — exact source-attributed native commits, crash-safe retention, raw-to-promotion reconciliation, target satisfaction, and no source-authority transfer
+- [ADR-082 — Adopt validated OKF Architecture Decision Record metadata](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) — Accepted — pin the generalized OKF ADR profile, authorize an active-corpus payload-preserving migration, preserve immutable qualification snapshots, and separate generated projections from this annotated history
