@@ -1,0 +1,137 @@
+profile_version: "0.1.0"
+canonical_schema:
+  id: "urn:fanilosendrison:okf:architecture-decision-record:0.1.0"
+  repository: "https://github.com/fanilosendrison/dotagents.git"
+  source_path: "conventions/architecture-decision-record.schema.json"
+  source_commit: "0c196eedd10700d893f933aafb06795c208cc344"
+  sha256: "55c9ff189e686cb1d545d0cbcfc9527a72dd1e1185c5ba595a3a1da7f3aa8c57"
+  vendored_path: "docs/adr/schemas/architecture-decision-record.schema.json"
+local_overlay:
+  id: "urn:fanilosendrison:ruu:architecture-decision-record:0.1.0"
+  sha256: "871b9a1ef31e09c9f48835b1b82f3a167c2a27e23853f6ac3a2fe073957da6c8"
+  path: "docs/adr/schemas/ruu-architecture-decision-record.schema.json"
+repository:
+  display_name: "Ruu"
+  domain: "ruu"
+  adr_directory: "docs/adr"
+  filename_pattern: '^adr-(?P<number>[0-9]{3})-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)\.md$'
+  id_pattern: '^ADR-[0-9]{3}$'
+  id_width: 3
+  h1_separators:
+    - ": "
+    - " — "
+  preferred_h1_separator: " — "
+  preferred_h1_from: 82
+  require_contiguous_ids: true
+  retain_allocated_ids: true
+  reject_future_dates: true
+  non_adr_markdown:
+    - "README.md"
+    - "index.md"
+legacy:
+  unstructured:
+    - "ADR-001"
+    - "ADR-002"
+    - "ADR-003"
+    - "ADR-004"
+    - "ADR-005"
+    - "ADR-006"
+    - "ADR-007"
+    - "ADR-008"
+    - "ADR-009"
+    - "ADR-010"
+    - "ADR-011"
+    - "ADR-012"
+    - "ADR-013"
+    - "ADR-014"
+    - "ADR-015"
+    - "ADR-016"
+    - "ADR-017"
+    - "ADR-018"
+    - "ADR-019"
+    - "ADR-020"
+    - "ADR-021"
+    - "ADR-022"
+    - "ADR-023"
+    - "ADR-024"
+    - "ADR-025"
+    - "ADR-026"
+    - "ADR-027"
+    - "ADR-028"
+    - "ADR-029"
+    - "ADR-030"
+    - "ADR-031"
+    - "ADR-032"
+    - "ADR-033"
+    - "ADR-034"
+    - "ADR-035"
+    - "ADR-036"
+    - "ADR-037"
+    - "ADR-038"
+    - "ADR-039"
+    - "ADR-040"
+    - "ADR-041"
+    - "ADR-042"
+    - "ADR-043"
+    - "ADR-044"
+    - "ADR-045"
+    - "ADR-046"
+    - "ADR-047"
+    - "ADR-048"
+    - "ADR-049"
+    - "ADR-050"
+    - "ADR-051"
+    - "ADR-052"
+    - "ADR-053"
+    - "ADR-054"
+    - "ADR-055"
+    - "ADR-056"
+    - "ADR-057"
+    - "ADR-058"
+    - "ADR-059"
+    - "ADR-060"
+    - "ADR-061"
+    - "ADR-062"
+    - "ADR-063"
+    - "ADR-064"
+    - "ADR-065"
+    - "ADR-066"
+    - "ADR-067"
+    - "ADR-068"
+    - "ADR-069"
+    - "ADR-070"
+    - "ADR-071"
+    - "ADR-072"
+    - "ADR-073"
+    - "ADR-074"
+    - "ADR-075"
+    - "ADR-076"
+    - "ADR-077"
+    - "ADR-078"
+    - "ADR-079"
+    - "ADR-080"
+    - "ADR-081"
+  null_dates: []
+generated_index:
+  path: "docs/adr/index.md"
+  required: false
+migration_evidence:
+  path: "docs/adr/metadata-migration-evidence.yaml"
+  required: false
+  baseline_commit: null
+  ids: []
+lifecycle:
+  transitions:
+    proposed:
+      - "accepted"
+      - "rejected"
+    accepted:
+      - "deprecated"
+      - "superseded"
+    rejected: []
+    deprecated:
+      - "superseded"
+    superseded: []
+commands:
+  check: ".venv/bin/python tools/adr-metadata.py check"
+  render: ".venv/bin/python tools/adr-metadata.py render"
