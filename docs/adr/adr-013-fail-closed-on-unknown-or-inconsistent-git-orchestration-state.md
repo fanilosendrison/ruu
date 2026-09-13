@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Fail closed on unknown or inconsistent Git/orchestration state"
+id: "ADR-013"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "34c5646a7a09fb355914b26395866e17c4dec4785f2b2bc3d94aa6e5b826f945"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-013: Fail closed on unknown or inconsistent Git/orchestration state
 
 - **Status:** Accepted — extended by ADR-022, ADR-023, ADR-026, ADR-027, ADR-028, ADR-029, ADR-030, ADR-032, ADR-036, ADR-038, and ADR-040

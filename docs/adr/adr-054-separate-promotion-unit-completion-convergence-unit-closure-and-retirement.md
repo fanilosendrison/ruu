@@ -1,3 +1,31 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate PromotionUnit completion, ConvergenceUnit closure, and retirement"
+id: "ADR-054"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "d32ab4a8246c399e89763137c9311e17936846c86454a35ff791954d677d9e0a"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-014"
+    - "ADR-021"
+    - "ADR-039"
+    - "ADR-042"
+    - "ADR-046"
+    - "ADR-049"
+    - "ADR-053"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-054 — Separate PromotionUnit completion, ConvergenceUnit closure, and retirement
 
 - **Status:** Accepted

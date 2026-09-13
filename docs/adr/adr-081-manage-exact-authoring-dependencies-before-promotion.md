@@ -1,12 +1,22 @@
 ---
 okf_version: "1.0"
+adr_profile_version: "0.1.0"
 kind: "KnowledgeAsset"
 asset_type: "architecture-decision-record"
 domain: "ruu"
-severity: "normative"
+severity: "strict"
 name: "Manage exact authoring dependencies before promotion"
+id: "ADR-081"
 status: "accepted"
 date: "2026-09-10"
+decision_body_sha256: "ab0b526f53002544e76b9bc6ba4fbb6282a6e90ce190eb312678d022795d72b7"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
 ---
 
 # ADR-081 — Manage exact authoring dependencies before promotion

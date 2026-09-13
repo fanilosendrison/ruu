@@ -1,3 +1,29 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate stable submission identity and refs from internal exact state"
+id: "ADR-049"
+status: "accepted"
+date: null
+decision_body_sha256: "d3d562afdb9d959974f5a8283a478a004d52640e4422ea8799cc75a4d3299425"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-021"
+    - "ADR-028"
+    - "ADR-045"
+    - "ADR-047"
+    - "ADR-048"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-049 — Separate stable submission identity and refs from internal exact state
 
 **Status:** Accepted  

@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bind integration/promotion readiness and validation evidence to exact Git state"
+id: "ADR-010"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "6c50028fcd91643c3c973b6028eb79231d0a5470c049ae3763dd87d295a77693"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-010: Bind integration/promotion readiness and validation evidence to exact Git state
 
 - **Status:** Accepted — broader exact-state binding retained; generic development-validation amendments superseded by ADR-060

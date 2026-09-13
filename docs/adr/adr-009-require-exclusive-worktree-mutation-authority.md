@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Require exclusive contribution-unit-worktree mutation authority"
+id: "ADR-009"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "db3d2808eb20bc0a388538d5e4dd32b4e89cf36862b46b4746e750fd60cd47cd"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-009: Require exclusive contribution-unit-worktree mutation authority
 
 - **Status:** Accepted — authorization model amended by ADR-024, ADR-033, ADR-034, ADR-038, ADR-040, and ADR-041; bounded contribution-unit lifecycle clarified by ADR-035

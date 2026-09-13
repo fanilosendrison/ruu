@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Check both directions of every hierarchy edge on every invocation and converge to a fixed point"
+id: "ADR-007"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "238c4545bd3c7d7513fd91f1f62884755e6a54fa0c95dbeb7b06b11eff5012f2"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-007: Check both directions of every hierarchy edge on every invocation and converge to a fixed point
 
 - **Status:** Accepted — amended by ADR-021, ADR-025, ADR-029, ADR-030, ADR-033, ADR-036, and ADR-057

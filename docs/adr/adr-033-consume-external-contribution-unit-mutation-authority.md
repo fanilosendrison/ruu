@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Consume an external contribution-unit mutation-authority contract; do not own producer/runtime liveness"
+id: "ADR-033"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "66480a67c57b41e317a4ff2beffd6af5fd20c1b96edce0cc8fccdc8cd19650c8"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-033: Consume an external contribution-unit mutation-authority contract; do not own producer/runtime liveness
 
 - **Status:** Accepted — terminology/cardinality/lifecycle clarified by ADR-034/ADR-035; external boundary consolidated by ADR-039; candidate-boundary semantics clarified by ADR-040; invocation-relative authority superseded by ADR-041

@@ -1,3 +1,25 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make host run-lock handles non-inheritable across subprocess boundaries"
+id: "ADR-072"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "7c4cc388d0d0f083b96e05a1a54f1c129d260b9f9f8875e853a8e3a8d5701092"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-042"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-072 — Make host run-lock handles non-inheritable across subprocess boundaries
 
 - **Status:** Accepted

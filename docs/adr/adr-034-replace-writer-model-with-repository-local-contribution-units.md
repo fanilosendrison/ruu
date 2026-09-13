@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Replace the Git-level writer model with repository-local contribution units"
+id: "ADR-034"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "ac5b8563a70cf7a431c28497f8a4a51ad6fcce36c7d3838fdb8ca8b761a34c20"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-034: Replace the Git-level writer model with repository-local contribution units
 
 - **Status:** Accepted — object identity/artifact semantics amended by ADR-038 core decision — current object name/lifecycle superseded by ADR-035

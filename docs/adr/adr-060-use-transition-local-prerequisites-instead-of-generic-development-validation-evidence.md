@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use transition-local prerequisites instead of generic development-validation evidence"
+id: "ADR-060"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "0b9016938a97fe74527447b647f3a4d52acd2daa41d247e3952c47bf8a984249"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-060 — Use transition-local prerequisites instead of generic development-validation evidence
 
 - **Status:** Accepted

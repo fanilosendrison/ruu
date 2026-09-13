@@ -1,3 +1,38 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make promotion route-independent and treat provider submissions as projections"
+id: "ADR-062"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "71cd209b6da509edc5b90f9f3022dcc355c2cfb30b3195fe42598db236453afc"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-018"
+    - "ADR-021"
+    - "ADR-026"
+    - "ADR-027"
+    - "ADR-032"
+    - "ADR-043"
+    - "ADR-044"
+    - "ADR-049"
+    - "ADR-050"
+    - "ADR-051"
+    - "ADR-052"
+    - "ADR-053"
+    - "ADR-055"
+    - "ADR-061"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-062 — Make promotion route-independent and treat provider submissions as projections
 
 - **Status:** Accepted

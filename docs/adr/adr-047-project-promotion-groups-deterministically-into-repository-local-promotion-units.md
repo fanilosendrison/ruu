@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Project PromotionGroups deterministically into repository-local PromotionUnits"
+id: "ADR-047"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "bd581fbbe54dfa429be1eb650c61955f3b61349cf116b991250e11c6461f66d6"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-047: Project PromotionGroups deterministically into repository-local PromotionUnits
 
 ## Status

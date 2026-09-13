@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Predeclare closed PromotionGroups and resolve them to exact PromotionUnits"
+id: "ADR-046"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "7fe6fa809e3d15f0f3d05f83580a19890be1c5ff157fe2b6b34399415c25227c"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-046: Predeclare closed PromotionGroups and resolve them to exact PromotionUnits
 
 ## Status

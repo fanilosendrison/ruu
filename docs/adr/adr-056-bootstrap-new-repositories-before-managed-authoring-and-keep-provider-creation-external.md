@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bootstrap new repositories before managed authoring and keep provider creation external"
+id: "ADR-056"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "71c6f9b5a0e3dfd1bac69f1a9469af635dae683b4a218ee4f0b5cf3b4e93ed51"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-056: Bootstrap new repositories before managed authoring and keep provider creation external
 
 - **Status:** Accepted; amended by ADR-061 and clarified by ADR-078

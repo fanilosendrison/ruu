@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bind full-verification evidence to exact state and reuse it when still valid"
+id: "ADR-030"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "88a468263eb45e9e5bcf4709e3f20641f66ee7a404ae95976ba11b4bccbc9e9b"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-030: Bind full-verification evidence to exact state and reuse it when still valid
 
 - **Status:** Accepted historically — generic development-validation evidence semantics superseded by ADR-060; broader exact-state binding retained

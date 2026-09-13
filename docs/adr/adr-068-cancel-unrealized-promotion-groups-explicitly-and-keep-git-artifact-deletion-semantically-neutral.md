@@ -1,3 +1,29 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Cancel unrealized PromotionGroups explicitly and keep Git artifact deletion semantically neutral"
+id: "ADR-068"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "948b4a47849766fb16cf6942efdbd0f6e9947dd47dce3ce7138c7bbffb2545fe"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-038"
+    - "ADR-046"
+    - "ADR-054"
+    - "ADR-055"
+    - "ADR-067"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-068 — Cancel unrealized PromotionGroups explicitly and keep Git artifact deletion semantically neutral
 
 - **Status:** Accepted

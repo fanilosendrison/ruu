@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Preserve internal convergence OIDs while allowing policy-authorized submission rewrites"
+id: "ADR-028"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "7dc95e193ad0128d6796df1943bf2391c9ddbf363f23317c9846ad26de696a1a"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-028: Preserve internal convergence OIDs while allowing policy-authorized submission rewrites
 
 - **Status:** Accepted — amended by ADR-029, ADR-030, ADR-032, ADR-038, ADR-049, and ADR-050

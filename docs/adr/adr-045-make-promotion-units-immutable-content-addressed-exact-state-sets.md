@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make PromotionUnits immutable content-addressed exact-state sets"
+id: "ADR-045"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "70a1efc584517c932de68ebba30e38198a5fe49d49b4b1792debfccf5223921d"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-045: Make PromotionUnits immutable content-addressed exact-state sets
 
 - **Status:** Accepted; amended by ADR-061

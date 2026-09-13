@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Require full verification before authoritative adoption of managed state-producing results"
+id: "ADR-029"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "e2368cd504b59f935f54ff6c1faaa0e03b2987d056f942ce6c18c498a044aa43"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-029: Require full verification before authoritative adoption of managed state-producing results
 
 - **Status:** Accepted historically — universal development-validation prerequisite superseded by ADR-060

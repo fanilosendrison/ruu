@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Canonicalize whole-surface checkpoints with native Git tree construction"
+id: "ADR-059"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "5f96eb34821be7e75cf129c525aba2c93c55e09bfbde5a4b7c2e5e78ab75f100"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-059 — Canonicalize whole-surface checkpoints with native Git tree construction
 
 - **Status:** Accepted

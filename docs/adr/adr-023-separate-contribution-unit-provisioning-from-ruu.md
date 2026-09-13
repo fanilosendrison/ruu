@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate pre-edit contribution-unit provisioning from `ruu`"
+id: "ADR-023"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "0453aa509f60f1725dac1c3fd4c71084eae0dead4788d82c0107d992dc199cda"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-023: Separate pre-edit contribution-unit provisioning from `ruu`
 
 - **Status:** Accepted — terminology/lifecycle clarified by ADR-034/ADR-035/ADR-038; external boundary consolidated by ADR-039; brand-new repository bootstrap clarified by ADR-056; amended by ADR-061, ADR-078 and ADR-079

@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use an append-only, no-rebase V1 reconciliation strategy"
+id: "ADR-016"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "25a5ae5033be4c1c234c8c40cd30c3facaeb8acb98d30b205498ffb26a9ba3ae"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-016: Use an append-only, no-rebase V1 reconciliation strategy
 
 - **Status:** Accepted for internal refs — promotion portions superseded/amended by ADR-018, ADR-026, and ADR-028

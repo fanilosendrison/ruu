@@ -1,3 +1,33 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate local Git causality, remote Git state, and provider workflow evidence"
+id: "ADR-080"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "cf38b43b4f246406e6e75d896d7be39e5aab69d09eec3aac669e673f783eeacb"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-042"
+    - "ADR-051"
+    - "ADR-052"
+    - "ADR-065"
+    - "ADR-066"
+    - "ADR-074"
+    - "ADR-075"
+    - "ADR-077"
+    - "ADR-079"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-080 — Separate local Git causality, remote Git state, and provider workflow evidence
 
 - **Status:** Accepted

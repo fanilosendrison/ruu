@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Freeze the exact PR head during external governance and localize PR waits"
+id: "ADR-021"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "e5bf81a6424719dc66eb1274a72b87dc03917997b2f94b49842ed39f6b3d06dc"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-021: Freeze the exact PR head during external governance and localize PR waits
 
 - **Status:** Accepted — amended by ADR-026, ADR-028, and ADR-032

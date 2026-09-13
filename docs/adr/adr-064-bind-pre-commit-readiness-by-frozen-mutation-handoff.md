@@ -1,3 +1,29 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bind pre-commit semantic readiness by frozen mutation handoff, not validation evidence"
+id: "ADR-064"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "9336efe89c24849d3821c3d3ca74809cbf61caf9d2f9864022e140d7af53f906"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-033"
+    - "ADR-057"
+    - "ADR-058"
+    - "ADR-059"
+    - "ADR-060"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-064 — Bind pre-commit semantic readiness by frozen mutation handoff, not validation evidence
 
 - **Status:** Accepted

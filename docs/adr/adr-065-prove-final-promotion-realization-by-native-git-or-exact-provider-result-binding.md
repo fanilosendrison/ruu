@@ -1,3 +1,32 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Prove final promotion realization by native Git ancestry or exact provider-result binding"
+id: "ADR-065"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "271bc8b04f3f8094f1f797fc04ccf572b6e89915d8ebbf3e7bf10d3cc1da89a2"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-029"
+    - "ADR-042"
+    - "ADR-051"
+    - "ADR-052"
+    - "ADR-054"
+    - "ADR-055"
+    - "ADR-057"
+    - "ADR-062"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-065 — Prove final promotion realization by native Git ancestry or exact provider-result binding
 
 - **Status:** Accepted — final proof semantics corrected/superseded in part by ADR-066

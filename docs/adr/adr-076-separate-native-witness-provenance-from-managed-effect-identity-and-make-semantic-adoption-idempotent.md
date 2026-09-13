@@ -1,3 +1,28 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate native witness provenance from managed effect identity and make semantic adoption exactly-once"
+id: "ADR-076"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "159b8fb5f77038d7b519afa8b08dea02e36081a394e1308e36a7d0d0be78ca5a"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-042"
+    - "ADR-071"
+    - "ADR-074"
+    - "ADR-075"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-076 — Separate native witness provenance from managed effect identity and make semantic adoption exactly-once
 
 - **Status:** Accepted

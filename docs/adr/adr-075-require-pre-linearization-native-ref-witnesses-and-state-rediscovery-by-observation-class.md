@@ -1,3 +1,29 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Require pre-linearization native-ref witnesses only for managed authoring disposition; rediscover all other Git facts from exact state"
+id: "ADR-075"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "817a34b92aeb3ce793ca21eb965661fc9da601ede54736e26ec93f184ef70b3c"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-023"
+    - "ADR-039"
+    - "ADR-071"
+    - "ADR-073"
+    - "ADR-074"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-075 — Require pre-linearization native-ref witnesses only for managed authoring disposition; rediscover all other Git facts from exact state
 
 - **Status:** Accepted

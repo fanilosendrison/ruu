@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Derive fast-forward/merge selection mechanically from exact Git ancestry"
+id: "ADR-017"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "3fa4e47c5478fdae007cf9b936faeb6181f1bfb670d2212e5874e2d70ffeb375"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-017: Derive fast-forward/merge selection mechanically from exact Git ancestry
 
 - **Status:** Accepted — scope clarified by ADR-018, ADR-025, ADR-026, and ADR-028

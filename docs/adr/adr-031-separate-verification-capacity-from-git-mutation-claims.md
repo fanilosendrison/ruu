@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate verification execution capacity from Git mutation claims"
+id: "ADR-031"
+status: "superseded"
+date: "2026-09-04"
+decision_body_sha256: "ff6b009754120ca4492523403b59408d9ac44beba6af41eac53ebe085f9859dd"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-031: Separate verification execution capacity from Git mutation claims
 
 - **Status:** Superseded as a Ruu component by ADR-057

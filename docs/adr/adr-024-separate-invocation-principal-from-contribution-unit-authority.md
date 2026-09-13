@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate invocation principal from contribution-unit mutation authority"
+id: "ADR-024"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "09e6081bbf280b08ad7cf4ab8bd15c198b81fd2ff2dd717c573df155205f95ea"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-024: Separate invocation principal from contribution-unit mutation authority
 
 - **Status:** Accepted — delegation mechanics superseded by ADR-033/ADR-041; terminology clarified by ADR-034; bounded contribution-unit lifecycle clarified by ADR-035

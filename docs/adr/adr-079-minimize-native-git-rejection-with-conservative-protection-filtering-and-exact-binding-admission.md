@@ -1,3 +1,34 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Minimize native Git rejection with conservative protection filtering and exact binding admission"
+id: "ADR-079"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "449fb5b6992e6a711ba1fad8e5ba4dfb21f87b481e7b71b53c29e64cdfbb0c23"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-023"
+    - "ADR-039"
+    - "ADR-042"
+    - "ADR-064"
+    - "ADR-073"
+    - "ADR-074"
+    - "ADR-075"
+    - "ADR-076"
+    - "ADR-077"
+    - "ADR-078"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-079 — Minimize native Git rejection with conservative protection filtering and exact binding admission
 
 - **Status:** Accepted

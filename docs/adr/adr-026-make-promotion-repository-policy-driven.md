@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make promotion repository-policy-driven instead of universally PR-mediated"
+id: "ADR-026"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "46acd771792650d64435bad108f649e81c52fef1c2b1b5fc0ef35fe1932c1da2"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-026: Make promotion repository-policy-driven instead of universally PR-mediated
 
 - **Status:** Accepted — amended by ADR-029, ADR-032, and ADR-043; amended by ADR-061

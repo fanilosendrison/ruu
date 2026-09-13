@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Formalize the external control-plane boundary as a normative contract"
+id: "ADR-039"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "dd92ed8b861b5da09c003b2a796a3eecfc502806696774af0e41edd324dbb5da"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-039: Formalize the external control-plane boundary as a normative contract
 
 - **Status:** Accepted — external diagnostic/interfaces amended by ADR-040, ADR-043, ADR-055, ADR-056, and ADR-057; amended by ADR-061 and clarified by ADR-078

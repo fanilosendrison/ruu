@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Keep `contribution-unit→convergence-unit` integration internal and PR-free"
+id: "ADR-019"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "c8515df1eca8ee4cb39bdc9477ea773a0886fe37d5abd3ebe9ee4c5612df232b"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-019: Keep `contribution-unit→convergence-unit` integration internal and PR-free
 
 - **Status:** Accepted — terminology clarified by ADR-025/027/034/035, verification by ADR-029/030, eager integration by ADR-037

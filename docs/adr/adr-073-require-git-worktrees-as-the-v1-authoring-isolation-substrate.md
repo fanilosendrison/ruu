@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Require Git worktrees as the v1 authoring isolation substrate"
+id: "ADR-073"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "935ff7a7ff4f80ba672c99edb5a32e8ba60ab1feaf5f087f03cb7b9166a91749"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-073 — Require Git worktrees as the v1 authoring isolation substrate
 
 - **Status:** Accepted — authoring-surface evidence requirement amended by ADR-074; initial handoff/admission clarified by ADR-079

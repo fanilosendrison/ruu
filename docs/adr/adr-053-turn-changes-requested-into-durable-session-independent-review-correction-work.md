@@ -1,3 +1,28 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Turn `CHANGES_REQUESTED` into durable session-independent review-correction work"
+id: "ADR-053"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "5a73107acedca967370629eca1db7e391a57640c4bbd5079930bbcc1504dbfc1"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-021"
+    - "ADR-039"
+    - "ADR-046"
+    - "ADR-049"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-053 — Turn `CHANGES_REQUESTED` into durable session-independent review-correction work
 
 - **Status:** Accepted

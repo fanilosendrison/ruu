@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Preserve native Git equivalence and whole-surface checkpoint intent"
+id: "ADR-058"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "5e26101b792c343e45cd58ed07af09ec569804d8f227bbcd21f00923fd73d5ed"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-058 — Preserve native Git equivalence and whole-surface checkpoint intent
 
 - **Status:** Accepted

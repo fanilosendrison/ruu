@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Provision the repository-local convergence-unit ref before the first contribution unit"
+id: "ADR-015"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "eb1bfd75e001981428bd2b9e5fb27fffadd4f2ce565a555b9dfc428d2656ba85"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-015: Provision the repository-local convergence-unit ref before the first contribution unit
 
 - **Status:** Accepted — provisioning ownership clarified by ADR-023, terminology by ADR-025/034, authority boundary by ADR-033, brand-new repository bootstrap clarified by ADR-056; amended by ADR-061

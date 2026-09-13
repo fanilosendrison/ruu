@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use an atomic convergence-unit readiness/promotion barrier"
+id: "ADR-011"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "979d81dd111a0c068180c68a2741640ad0968b6747181f44343618a6b1397690"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-011: Use an atomic convergence-unit readiness/promotion barrier
 
 - **Status:** Accepted — transition semantics amended by ADR-018, ADR-025, ADR-026, ADR-027, ADR-034, ADR-035, and ADR-037

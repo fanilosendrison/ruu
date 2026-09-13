@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Publish internal refs at stable boundaries when direct push is enabled"
+id: "ADR-020"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "d9dd5d135e0e995dbf22fa459eb841a71183065ec7a5f1a05eb987c4d88c1d99"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-020: Publish internal refs at stable boundaries when direct push is enabled
 
 - **Status:** Accepted — amended by ADR-021, ADR-026, ADR-027, ADR-028, ADR-029, and ADR-030

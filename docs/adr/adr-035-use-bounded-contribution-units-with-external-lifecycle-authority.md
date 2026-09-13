@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use bounded contribution units with external lifecycle authority"
+id: "ADR-035"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "eeae82c1cff4c00e866f5cd934ae851dde329c7dd3a59e269886771a860b0198"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-035: Use bounded contribution units with external lifecycle authority
 
 - **Status:** Accepted — integration/readiness semantics amended by ADR-037; abandonment/removal semantics superseded by ADR-038; external boundary consolidated by ADR-039

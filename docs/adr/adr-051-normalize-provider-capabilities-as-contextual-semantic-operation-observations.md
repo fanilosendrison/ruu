@@ -1,3 +1,28 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Normalize provider capabilities as contextual semantic-operation observations"
+id: "ADR-051"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "34e6909d58035374ca5c43b2804bc273236e09b8d173bc17dd925545ffaa26de"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-026"
+    - "ADR-043"
+    - "ADR-044"
+    - "ADR-050"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-051 — Normalize provider capabilities as contextual semantic-operation observations
 
 - **Status:** Accepted

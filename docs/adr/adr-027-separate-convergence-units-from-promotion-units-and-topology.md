@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Separate convergence units from promotion/submission units and promotion topology"
+id: "ADR-027"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "008490ecc8a6a2cec15b62a910a16350b6382218d7eb2db9edc1ea03215bce52"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-027: Separate convergence units from promotion/submission units and promotion topology
 
 - **Status:** Accepted — amended by ADR-029, ADR-030, ADR-032, ADR-037, ADR-039, ADR-045, ADR-046, ADR-047, ADR-049, and ADR-050

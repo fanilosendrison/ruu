@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use repository-local contribution units as the isolation unit"
+id: "ADR-002"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "2269982c4aea3ac72ba2146f1416267572361cc9b4e9da318311a1accf431cce"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-002: Use repository-local contribution units as the isolation unit
 
 - **Status:** Accepted — clarified by ADR-022, ADR-023, ADR-033, ADR-034, ADR-035, and ADR-038

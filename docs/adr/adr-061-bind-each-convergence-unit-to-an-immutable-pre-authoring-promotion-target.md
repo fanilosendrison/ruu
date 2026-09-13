@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bind each ConvergenceUnit to an immutable pre-authoring PromotionTarget"
+id: "ADR-061"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "d06fe81a0e41b330e4a789b4413721066fe2acddb4d516a72c7c45dbbc32316d"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-061 — Bind each ConvergenceUnit to an immutable pre-authoring PromotionTarget
 
 - **Status:** Accepted

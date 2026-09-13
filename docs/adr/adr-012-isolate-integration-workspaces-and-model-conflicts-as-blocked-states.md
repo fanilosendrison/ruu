@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Isolate feature/main integration workspaces and model conflicts as recoverable blocked states"
+id: "ADR-012"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "1912eb19b0384d311a32f36297ebb3ebfe3e8cf9936a881ef44e3b70909e926b"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-012: Isolate feature/main integration workspaces and model conflicts as recoverable blocked states
 
 - **Status:** Accepted — amended by ADR-027, ADR-029, ADR-030, ADR-038, and ADR-040

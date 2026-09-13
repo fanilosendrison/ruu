@@ -1,3 +1,30 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Derive stacked publication from unsatisfied promotion dependencies and restack by exact-state transplant"
+id: "ADR-050"
+status: "accepted"
+date: null
+decision_body_sha256: "995bfc87ec1bd1d0506192508ee4afd0d99bff2d5a9c8320792f53c3ed7e739d"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-027"
+    - "ADR-028"
+    - "ADR-039"
+    - "ADR-047"
+    - "ADR-048"
+    - "ADR-049"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-050 — Derive stacked publication from unsatisfied promotion dependencies and restack by exact-state transplant
 
 **Status:** Accepted  

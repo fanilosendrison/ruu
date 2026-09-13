@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Resolve promotion policy by authoritative constraint composition"
+id: "ADR-043"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "76ff2ac39568375abfe55fa0d63a4831fb47b5d606a6f8adcd98230760a46fcf"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-043: Resolve promotion policy by authoritative constraint composition
 
 - **Status:** Accepted; amended by ADR-061

@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Represent cross-repository promotion as non-atomic, recoverable partial progress"
+id: "ADR-014"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "6712f45ef0adea549ef213bf0cd7d403c75689b68cf2f0e57c80009e8fea0dd6"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-014: Represent cross-repository promotion as non-atomic, recoverable partial progress
 
 - **Status:** Accepted — amended by ADR-018, ADR-026, and ADR-027

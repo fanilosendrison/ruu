@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Coalesce convergence demands under a single-host fenced executor"
+id: "ADR-041"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "b27a6226f2fab2eaceec0a16e3968edb3e2f6d9b2477f3e8571b0af542c0f9c6"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-041: Coalesce convergence demands under a single-host fenced executor
 
 - **Status:** Accepted

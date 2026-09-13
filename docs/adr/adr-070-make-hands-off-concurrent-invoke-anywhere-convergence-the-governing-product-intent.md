@@ -1,3 +1,37 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Define Ruu as Git-based version control redesigned for agentic development"
+id: "ADR-070"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "16e94271f4c9af60d161427021411371a9b693d76f89fb92df4f297a7ab549da"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms:
+    - "ADR-004"
+    - "ADR-005"
+    - "ADR-009"
+    - "ADR-022"
+    - "ADR-024"
+    - "ADR-033"
+    - "ADR-036"
+    - "ADR-041"
+    - "ADR-042"
+    - "ADR-058"
+    - "ADR-064"
+    - "ADR-069"
+governs:
+  - "interpretation of ADR-001 through ADR-069 and the consolidated specification"
+---
+
 # ADR-070 — Define Ruu as Git-based version control redesigned for agentic development
 
 **Status:** Accepted — 2026-09-07  

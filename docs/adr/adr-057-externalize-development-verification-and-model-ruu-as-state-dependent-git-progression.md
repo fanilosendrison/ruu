@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Externalize development verification and model `ruu` as state-dependent Git progression"
+id: "ADR-057"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "da291db28d2c424712a7504b2c23d1ce9677f40be7f4d56a42e16e929bfd4e71"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-057 — Externalize development verification and model `ruu` as state-dependent Git progression
 
 - **Status:** Accepted — development-verification execution boundary retained; generic validation evidence/demand model superseded by ADR-060

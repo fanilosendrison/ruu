@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Emit exact reconciliation obligations and attribute candidate mutations by authorized ContributionUnit boundary"
+id: "ADR-040"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "b8597b52e5990daca58fce0620ecc298760ff0c1629eea497182a633344c4e49"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-040: Emit exact reconciliation obligations and attribute candidate mutations by authorized ContributionUnit boundary
 
 - **Status:** Accepted

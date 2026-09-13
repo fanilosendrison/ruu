@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Coordinate simultaneous `ruu` invocations with fine-grained claims and expected-ref checks"
+id: "ADR-005"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "e140137ecf574c332a6f13ddc12d95a80b5918e3832c356f53d270acd14e2da8"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-005: Coordinate simultaneous `ruu` invocations with fine-grained claims and expected-ref checks
 
 - **Status:** Accepted — top-level simultaneous-converger arbitration superseded by ADR-041; resource-claim/CAS core retained

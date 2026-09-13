@@ -1,3 +1,31 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bind promotion success to route-conformant Candidate→Submission→Result→Target chains"
+id: "ADR-066"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "37f1f181d6348710f7d27b75ee939d235a5e9cadcfb1570e04d0ba3b8e5f59f8"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-042"
+    - "ADR-050"
+    - "ADR-052"
+    - "ADR-054"
+    - "ADR-055"
+    - "ADR-062"
+    - "ADR-065"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-066 — Bind promotion success to route-conformant Candidate→Submission→Result→Target chains
 
 - **Status:** Accepted

@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Keep managed repository discovery/registry and a derived active-convergence index"
+id: "ADR-022"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "eb6611c77e145a445f1582797fcae4e362a0127fc9b991616d6c9974b8b35d25"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-022: Keep managed repository discovery/registry and a derived active-convergence index
 
 - **Status:** Accepted — ownership/provisioning amended by ADR-023, terminology/policy amended by ADR-025–ADR-027, verification responsibility amended by ADR-031, invocation-scope authority superseded by ADR-036, and brand-new repository admission clarified by ADR-056

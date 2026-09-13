@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use a reconciler-driven CoordinationStore with OS-owned runs and an append-only effect journal"
+id: "ADR-042"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "bbecd1aaef6854ec46b129623839cc86303230757a51a319fa0409a91869addd"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-042: Use a reconciler-driven CoordinationStore with OS-owned runs and an append-only effect journal
 
 - **Status:** Accepted

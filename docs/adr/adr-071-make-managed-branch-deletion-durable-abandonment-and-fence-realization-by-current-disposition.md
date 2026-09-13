@@ -1,3 +1,30 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make managed authoring disposition durable and fence realization by current disposition"
+id: "ADR-071"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "e22f78d89759ef3b412daa44ccce881f75a26b85d9b052c423563f56b95916a7"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-038"
+    - "ADR-042"
+    - "ADR-055"
+    - "ADR-066"
+    - "ADR-068"
+    - "ADR-070"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-071 — Make managed authoring disposition durable and fence realization by current disposition
 
 - **Status:** Accepted — native binding-disposition mechanics corrected by ADR-074 and capture strength refined by ADR-075

@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Base commit collection on contribution-unit eligibility, not task completion"
+id: "ADR-003"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "2b75eef9a7988b22f715c469c0588eaacca3bbbce83723b3565ca587a2d4403b"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-003: Base commit collection on contribution-unit eligibility, not task completion
 
 - **Status:** Accepted — amended by ADR-024, ADR-029, ADR-033, ADR-034, ADR-035, and ADR-041

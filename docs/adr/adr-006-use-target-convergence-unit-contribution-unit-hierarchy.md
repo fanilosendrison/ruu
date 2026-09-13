@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Use the internal hierarchy `target/base → convergence unit → contribution unit`"
+id: "ADR-006"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "66296686c63450994ce3fef6134db65b79442232c4168f574975ac995283dcfd"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-006: Use the internal hierarchy `target/base → convergence unit → contribution unit`
 
 - **Status:** Accepted — terminology/current abstraction clarified by ADR-025 and ADR-034; bounded contribution-unit lifecycle clarified by ADR-035; eager integration/sealed readiness amended by ADR-037; amended by ADR-061

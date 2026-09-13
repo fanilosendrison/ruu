@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Track ContributionUnit obligations explicitly until exact terminal resolution"
+id: "ADR-008"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "960a3aed3307dadb0915f9ec212c6fe9148bfe226ed3d3b90a92de02a93218fd"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-008: Track ContributionUnit obligations explicitly until exact terminal resolution
 
 - **Status:** Accepted — terminology/lifecycle clarified by ADR-025, ADR-034, ADR-035, and ADR-038; readiness/ref semantics amended by ADR-037/ADR-038

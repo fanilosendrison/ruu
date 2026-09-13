@@ -1,3 +1,38 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Bind PromotionGroups to work-bearing Ruu invocations and group-local exact state"
+id: "ADR-069"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "041ebe2b7b045c239a693d7f70c97bb940f72c7beae02c544ddabfe812cba3bd"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-010"
+    - "ADR-011"
+    - "ADR-015"
+    - "ADR-023"
+    - "ADR-037"
+    - "ADR-039"
+    - "ADR-041"
+    - "ADR-046"
+    - "ADR-047"
+    - "ADR-050"
+    - "ADR-053"
+    - "ADR-054"
+    - "ADR-064"
+    - "ADR-067"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-069 — Bind PromotionGroups to work-bearing Ruu invocations and group-local exact state
 
 **Status:** Accepted — 2026-09-07  

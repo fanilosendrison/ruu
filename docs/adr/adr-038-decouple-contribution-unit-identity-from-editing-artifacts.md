@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Decouple ContributionUnit identity from editing artifacts and remove abandonment semantics"
+id: "ADR-038"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "52965b287d9716ff806a4017a83a3c9ccc606425d9f427355c37bc8e3f4b7120"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-038: Decouple ContributionUnit identity from editing artifacts and remove abandonment semantics
 
 - **Status:** Accepted — conflict/attribution follow-up resolved by ADR-040 — external boundary consolidated by ADR-039

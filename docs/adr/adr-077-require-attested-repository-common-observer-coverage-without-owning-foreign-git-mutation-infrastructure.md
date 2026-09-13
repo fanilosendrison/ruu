@@ -1,3 +1,29 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Require attested repository-common observer coverage without owning foreign Git mutation infrastructure"
+id: "ADR-077"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "074e6a574a898c04e2f75f0a6149042ff04ff503f2bc92a41e6fa1756ff2c8fb"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-070"
+    - "ADR-073"
+    - "ADR-074"
+    - "ADR-075"
+    - "ADR-076"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-077 — Require attested repository-common observer coverage without owning foreign Git mutation infrastructure
 
 - **Status:** Accepted

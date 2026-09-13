@@ -1,3 +1,35 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Settle partial cross-repository ships with forward actions and publication episodes"
+id: "ADR-055"
+status: "accepted"
+date: null
+decision_body_sha256: "86ae3e69dd423636f5b0ecec99a22002ae717984de39a2d79200035250dd4329"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-014"
+    - "ADR-022"
+    - "ADR-024"
+    - "ADR-026"
+    - "ADR-032"
+    - "ADR-036"
+    - "ADR-039"
+    - "ADR-042"
+    - "ADR-049"
+    - "ADR-053"
+    - "ADR-054"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-055 — Settle partial cross-repository ships with forward actions and publication episodes
 
 **Status:** Accepted  

@@ -1,3 +1,29 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Keep review findings and backlog outside `ruu`"
+id: "ADR-063"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "a79ce535d547ceced25cb708556b57ec3d51f90af09d941aa53e382ff1f84288"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-032"
+    - "ADR-053"
+    - "ADR-055"
+    - "ADR-057"
+    - "ADR-060"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-063 — Keep review findings and backlog outside `ruu`
 
 - **Status:** Accepted

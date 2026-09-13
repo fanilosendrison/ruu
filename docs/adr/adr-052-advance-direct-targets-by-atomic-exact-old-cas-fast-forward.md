@@ -1,3 +1,30 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Advance DIRECT targets by atomic exact-old CAS fast-forward"
+id: "ADR-052"
+status: "accepted"
+date: "2026-09-06"
+decision_body_sha256: "5c95383a23436da81b5f5c1f6a3ff866086a81147da62fab61bbaab97793fa9a"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-026"
+    - "ADR-041"
+    - "ADR-042"
+    - "ADR-044"
+    - "ADR-048"
+    - "ADR-051"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-052 — Advance DIRECT targets by atomic exact-old CAS fast-forward
 
 - **Status:** Accepted; amended by ADR-061

@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Model PR review request as publication intent, not as a Ruu business-readiness state"
+id: "ADR-032"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "6cca04eedb6ea46dcca628acf2d2afe5d2c3d28ed6bd21d03b27144fd45f4fa6"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-032: Model PR review request as publication intent, not as a Ruu business-readiness state
 
 - **Status:** Accepted

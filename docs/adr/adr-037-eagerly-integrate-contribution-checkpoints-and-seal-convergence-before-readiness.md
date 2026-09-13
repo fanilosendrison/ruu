@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Eagerly integrate contribution checkpoints and seal convergence membership before internal readiness"
+id: "ADR-037"
+status: "accepted"
+date: "2026-09-05"
+decision_body_sha256: "c7660041ca9626e377bfd8b56fbc36934c0a0bec8e2e5276f5fa342d667f70f1"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-037: Eagerly integrate contribution checkpoints and seal convergence membership before internal readiness
 
 - **Status:** Accepted — artifact/lifecycle semantics amended by ADR-038

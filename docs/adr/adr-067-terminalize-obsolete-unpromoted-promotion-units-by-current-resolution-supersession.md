@@ -1,3 +1,32 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Terminalize obsolete unpromoted PromotionUnits by current-resolution supersession"
+id: "ADR-067"
+status: "accepted"
+date: "2026-09-07"
+decision_body_sha256: "fa475b6f41ff60e8c5685bddafbf5416c15c4c174073d445b9618e320f7a7643"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends:
+    - "ADR-036"
+    - "ADR-042"
+    - "ADR-045"
+    - "ADR-046"
+    - "ADR-047"
+    - "ADR-049"
+    - "ADR-054"
+    - "ADR-055"
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-067 — Terminalize obsolete unpromoted PromotionUnits by current-resolution supersession
 
 - **Status:** Accepted

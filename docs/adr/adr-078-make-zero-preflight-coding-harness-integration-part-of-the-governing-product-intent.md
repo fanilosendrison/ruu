@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make zero-preflight coding-harness integration part of the governing product intent"
+id: "ADR-078"
+status: "accepted"
+date: "2026-09-08"
+decision_body_sha256: "e9baab86e60137fdb9dfd1bb5cb138f89d917fdd21549251daf915e1a3372f80"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-078 — Make zero-preflight coding-harness integration part of the governing product intent
 
 - **Status:** Accepted

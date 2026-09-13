@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Isolate concurrent work production with Git worktrees"
+id: "ADR-001"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "d486d1c2d98021df27a80ddce8dfa906e4d86a7c7a680b9cd56cd662e9e35734"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-001: Isolate concurrent work production with Git worktrees
 
 - **Status:** Accepted — terminology clarified by ADR-034; bounded contribution-unit lifecycle clarified by ADR-035

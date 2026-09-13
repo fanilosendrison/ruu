@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Require PR-mediated promotion to protected main"
+id: "ADR-018"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "e611bdf18d2c769fbaceaa60ea1efb7cb5b84a56ccd53cffe1c257841d363dc3"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-018: Require PR-mediated promotion to protected main
 
 - **Status:** Accepted as strict PR-policy case — universal PR requirement superseded by ADR-026; publication intent amended by ADR-032

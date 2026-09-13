@@ -1,3 +1,24 @@
+---
+okf_version: "1.0"
+adr_profile_version: "0.1.0"
+kind: "KnowledgeAsset"
+asset_type: "architecture-decision-record"
+domain: "ruu"
+severity: "strict"
+name: "Make convergence scope independent of CWD and support multi-repository work"
+id: "ADR-004"
+status: "accepted"
+date: "2026-09-04"
+decision_body_sha256: "f06a2f046a5b66c41968b7cc1c5a6705f65d469aa254aaa1236c560c3c958fa5"
+relation_completeness: "legacy-partial"
+relations:
+  clarifies: []
+  amends: []
+  supersedes: []
+  confirms: []
+governs: []
+---
+
 # ADR-004: Make convergence scope independent of CWD and support multi-repository work
 
 - **Status:** Accepted — clarified by ADR-022, ADR-023, and ADR-034; bounded contribution-unit lifecycle clarified by ADR-035
