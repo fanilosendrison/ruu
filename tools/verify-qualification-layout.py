@@ -73,7 +73,7 @@ def discover_active_manifest_files() -> set[str]:
     for path in ROOT.rglob("*"):
         if not path.is_file() and not path.is_symlink():
             continue
-        if release_root in path.parents or ".git" in path.parts:
+        if release_root in path.parents or ".git" in path.parts or ".venv" in path.parts:
             continue
         if path == CURRENT_MANIFEST or path.name == ".DS_Store":
             continue

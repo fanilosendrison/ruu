@@ -33,7 +33,7 @@ class QualificationInfrastructureTests(unittest.TestCase):
         shutil.copytree(
             REPOSITORY,
             self.root,
-            ignore=shutil.ignore_patterns(".git", "__pycache__"),
+            ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__"),
         )
         post_baseline = self.root / "qualification/state-space/post-baseline"
         metadata_paths = post_baseline.glob(
@@ -274,6 +274,30 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("lineage: invalid JSON", completed.stdout)
         self.assertNotIn("Traceback", completed.stdout + completed.stderr)
+
+    def test_local_virtual_environments_are_excluded_from_active_manifest(self) -> None:
+        markers = [
+            self.root / ".venv" / "bin" / "root-environment-specific",
+            self.root
+            / "tools"
+            / "fixtures"
+            / ".venv"
+            / "bin"
+            / "nested-environment-specific",
+        ]
+        for marker in markers:
+            marker.parent.mkdir(parents=True)
+            marker.write_text("must not enter the active manifest\n")
+
+        self.generate_manifest()
+
+        manifest = (
+            self.root / "qualification" / "manifests" / "current.sha256"
+        ).read_text()
+        self.assertNotIn(".venv/", manifest)
+        self.assertNotIn("environment-specific", manifest)
+        completed = self.run_tool("verify-qualification-layout.py")
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
 
     def test_stale_active_manifest_is_rejected(self) -> None:
         self.generate_manifest()

@@ -19,7 +19,7 @@ EXCLUDED_FILES = {
 
 
 def is_excluded(path: Path) -> bool:
-    if path in EXCLUDED_FILES or "__pycache__" in path.parts:
+    if path in EXCLUDED_FILES or ".venv" in path.parts or "__pycache__" in path.parts:
         return True
     return any(directory == path or directory in path.parents for directory in EXCLUDED_DIRECTORIES)
 
