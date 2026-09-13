@@ -84,7 +84,7 @@ a05c1f6a88f8961e2003fd36f5c109724f2ed492c072ef0d5ed0b16cdb1230c5  docs/adr/adr-0
 8a6ddfd37a24d30c36fa8a4cc04eca9bf860f8e2f4ec7f1bac0a3996ff8db111  docs/adr/adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md
 2b54178ec94c38fb49b67a57acfb56879a66a2d77d2d080bab647e9ae8fd23de  docs/adr/adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md
 c6335870c54662ce834d06a798e5f0c2a498d7a00630473600249530ee72f12d  docs/adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md
-61cdecc33928d3577dad5bc1f26055eef96a4e561369edccf6452a0987bfe4da  docs/adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md
+fae598be4db2a65ccd8e0f15028dc48c6bad29c57131d0f6b2a93ae70475b295  docs/adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md
 53f5eebc4f74071ebf7f4f07296fe52794a507ec53f5aefbb79f1845e2b7c4d6  docs/architecture/overview.md
 a24dba1d9a9bec7e7857f9400f39f677a367f994e8bdbb0bb1372d996ea20031  docs/architecture/problem-statement.md
 07cb7bb28c4e50e25300c7df8e0851ce697fe436608eba57c7255e44ba082930  docs/design/decision-integration-log.md

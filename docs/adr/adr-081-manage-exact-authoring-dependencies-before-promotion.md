@@ -6,11 +6,12 @@ domain: "ruu"
 severity: "normative"
 name: "Manage exact authoring dependencies before promotion"
 status: "accepted"
+date: "2026-09-10"
 ---
 
 # ADR-081 — Manage exact authoring dependencies before promotion
 
-- **Status:** Accepted — 2026-11-03
+- **Status:** Accepted — 2026-09-10
 - **Decision order:** 081
 - **Closes:** backlog 30.56
 - **Engineering follow-ups:** [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1) and [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2)
