@@ -19,6 +19,11 @@ This file is the operational map for agents working in the Ruu repository. Follo
 - Do not infer new product behavior from summaries, historical reports, or qualification scripts.
 - Keep the repository root limited to system entry points and responsibility-based directories.
 - Use lowercase kebab-case for new files and directories, except recognized system entry points such as `AGENTS.md` and `README.md`.
+- Apply the shared `engineering-discovery-classification` skill, then read
+  `docs/repository-governance/ruu-discovery-classification.md`, before
+  incorporating any material discovery into normative, architectural,
+  qualification, implementation, integration, or repository-governance
+  artifacts.
 - When the user mentions an Issue, Project work, backlog work, or a review finding, apply the shared GitHub Engineering Projects operational protocol, then read `docs/repository-governance/ruu-engineering.md` before acting.
 
 ## Authority order
@@ -36,7 +41,7 @@ The architecture overview and problem statement are non-normative. They explain 
 
 For records not present on the exact `legacy.unstructured` allowlist, ADR frontmatter is canonical for identity, lifecycle, explicitly recorded outgoing relations, governed scope, and body integrity. `docs/adr/adr-profile.yaml` and its schemas govern that representation and the temporary compatibility boundary; they do not outrank accepted decision bodies or the specification authority order.
 
-Repository-governance documents, GitHub Issues, Project fields, comments, and Pull Requests are also non-normative work-management sources. They may identify required work but never override the authority order above.
+Repository-governance documents, GitHub Issues, Project fields, comments, and Pull Requests are also non-normative work-management sources. They may identify required work but never override the authority order above. The discovery-classification profile binds the shared procedural protocol to Ruu sources; it creates no product semantics, accepted decision, or qualification evidence.
 
 Report every inconsistency between authoritative sources. Do not silently choose a convenient interpretation.
 
@@ -109,6 +114,10 @@ ruu/
 ### Repository governance and work tracking
 
 - Apply the shared GitHub Engineering Projects operational protocol for generic Issue and Project operations; use `docs/repository-governance/ruu-engineering.md` only for the Ruu-specific profile.
+- Classify material engineering discoveries with the shared
+  `engineering-discovery-classification` skill and
+  `docs/repository-governance/ruu-discovery-classification.md`. Load only the
+  action contexts required by the exact discovery.
 - Keep repository process documentation under `docs/repository-governance/`, separate from Ruu product documentation.
 - Use the private GitHub Project **Ruu Engineering** as the primary durable work tracker.
 - Resolve an unqualified `Issue #N` as `fanilosendrison/ruu#N`, then retrieve the Issue and its live Project fields according to `docs/repository-governance/ruu-engineering.md`.
@@ -211,6 +220,8 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
 - ADR metadata migration evidence: `docs/adr/metadata-migration-evidence.yaml`
 - ADR metadata validator and renderer: `tools/adr-metadata.py`
 - Ruu Engineering Project profile: `docs/repository-governance/ruu-engineering.md`
+- Discovery classification profile:
+  `docs/repository-governance/ruu-discovery-classification.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`
 - Immutable ADR-080 package: `qualification/releases/adr-080-flat/`
