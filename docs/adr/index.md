@@ -101,6 +101,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) | Separate local Git causality, remote Git state, and provider workflow evidence | accepted | 2026-09-08 | legacy-partial | — |
 | [ADR-081](adr-081-manage-exact-authoring-dependencies-before-promotion.md) | Manage exact authoring dependencies before promotion | accepted | 2026-09-10 | legacy-partial | — |
 | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | Adopt validated OKF Architecture Decision Record metadata | accepted | 2026-09-13 | complete | Architecture Decision Record metadata, lifecycle, integrity, and generated projections<br>Semantics-preserving migration of active Ruu Architecture Decision Records<br>Repository-local validation of the adopted OKF ADR profile |
+| [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | Allow shared governance implementation without transferring repository authority | accepted | 2026-09-22 | complete | Ownership boundary between repository authority and shared governance implementation<br>Use of proto-ring as a reusable governance implementation provider<br>Immutable pinning and local bindings for shared governance tooling |
 
 ## Recorded outgoing relations
 
@@ -270,6 +271,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) | amends | [ADR-075](adr-075-require-pre-linearization-native-ref-witnesses-and-state-rediscovery-by-observation-class.md) |
 | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) | amends | [ADR-077](adr-077-require-attested-repository-common-observer-coverage-without-owning-foreign-git-mutation-infrastructure.md) |
 | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) | amends | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) |
+| [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | amends | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) |
 
 ## Derived incoming relations
 
@@ -439,3 +441,4 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-077](adr-077-require-attested-repository-common-observer-coverage-without-owning-foreign-git-mutation-infrastructure.md) | amended by | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) |
 | [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) | amended by | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) |
 | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) | amended by | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) |
+| [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | amended by | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
