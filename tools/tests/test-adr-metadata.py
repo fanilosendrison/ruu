@@ -117,14 +117,24 @@ class AdrMetadataTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             fixture_root = copy_adr_fixture(temporary)
             disable_git_bound_validation(fixture_root)
-            unknown = fixture_root / "docs" / "adr" / "adr-083-unlisted-record.md"
+            adr_directory = fixture_root / "docs" / "adr"
+            existing_numbers = [
+                int(path.name.split("-", 2)[1])
+                for path in adr_directory.glob("adr-[0-9][0-9][0-9]-*.md")
+            ]
+            unknown_number = max(existing_numbers) + 1
+            unknown_id = f"ADR-{unknown_number:03d}"
+            unknown = adr_directory / f"adr-{unknown_number:03d}-unlisted-record.md"
             unknown.write_text(
-                "# ADR-083 — Unlisted record\n\n## Context\n\nLegacy body.\n",
+                f"# {unknown_id} — Unlisted record\n\n## Context\n\nLegacy body.\n",
                 encoding="utf-8",
             )
             errors = adr_metadata.collect_errors(fixture_root)
             self.assertTrue(
-                any("ADR-083 is unstructured but not allowlisted" in error for error in errors),
+                any(
+                    f"{unknown_id} is unstructured but not allowlisted" in error
+                    for error in errors
+                ),
                 errors,
             )
 
