@@ -33,49 +33,8 @@ jobs:
       - name: Require supported Git
         run: python3 tools/replay-git-smokes.py --check-version
 
-      - name: Validate maintained Python and JSON
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -m py_compile tools/*.py tools/qualification/*.py tools/tests/*.py
-          python3 -m json.tool qualification/lineage/lineage-v2.schema.json >/dev/null
-          python3 -m json.tool qualification/state-space/post-baseline/qualification-metadata-v1.schema.json >/dev/null
-          for schema in docs/adr/schemas/*.json; do
-            python3 -m json.tool "$schema" >/dev/null
-          done
-
-      - name: Test ADR metadata tooling
-        run: python3 tools/tests/test-adr-metadata.py
-
-      - name: Check ADR metadata
-        run: python3 tools/adr-metadata.py check
-
-      - name: Regenerate retained lineage
-        run: python3 tools/generate-qualification-lineage.py
-
-      - name: Regenerate active manifest
-        run: python3 tools/generate-current-manifest.py
-
-      - name: Require committed generated artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          git diff --exit-code
-          status="$(git status --porcelain --untracked-files=all)"
-          if [[ -n "$status" ]]; then
-            printf '%s\n' "$status"
-            printf '%s\n' "Generated artifacts are not fully committed." >&2
-            exit 1
-          fi
-
-      - name: Verify qualification layout
-        run: python3 tools/verify-qualification-layout.py
-
-      - name: Verify Markdown links
-        run: python3 tools/verify-markdown-links.py
-
-      - name: Test qualification infrastructure
-        run: python3 tools/tests/test-qualification-infrastructure.py
+      - name: Check Repository Integrity
+        run: python3 tools/check-repository-integrity.py
 
       - name: Replay latest retained state-space checkpoint
         run: python3 tools/replay-historical-qualification.py latest
@@ -85,6 +44,3 @@ jobs:
 
       - name: Replay Git smoke suites
         run: python3 tools/replay-git-smokes.py
-
-      - name: Check patch whitespace
-        run: git diff --check
