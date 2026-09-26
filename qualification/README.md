@@ -153,22 +153,38 @@ python3 tools/replay-git-smokes.py
 
 The runner canonicalizes temporary-path output so retained path comparisons remain valid on systems where temporary directories have equivalent aliased paths.
 
+## Repository Integrity and Qualification
+
+Ruu Repository Integrity evaluates current repository coherence through the
+immutably pinned proto-ring substrate. Ruu owns the ordered obligation profile
+in `tools/check-repository-integrity.py`, including the shared whitespace
+binding in `tools/check-git-whitespace.py`.
+
+Qualification remains a separate Ruu-owned evidence layer. The top-level
+qualification sequence requires Repository Integrity for the current repository
+state before it replays historical, post-baseline, and Git-smoke evidence.
+
 ## Local validation and CI
 
-Run the same sequence used by GitHub Actions:
+Regenerate active metadata before observational validation:
+
+```bash
+python3 tools/generate-qualification-lineage.py
+python3 tools/generate-current-manifest.py
+```
+
+Then run the same integrity and replay sequence used by GitHub Actions:
 
 ```bash
 python3 tools/replay-git-smokes.py --check-version
-python3 tools/generate-qualification-lineage.py
-python3 tools/generate-current-manifest.py
-git diff --exit-code
-python3 tools/verify-qualification-layout.py
-python3 tools/verify-markdown-links.py
-python3 tools/tests/test-qualification-infrastructure.py
+python3 tools/check-repository-integrity.py
 python3 tools/replay-historical-qualification.py latest
 python3 tools/replay-post-baseline-qualification.py
 python3 tools/replay-git-smokes.py
-git diff --check
 ```
 
-The GitHub Actions workflow runs on every push and pull request. It pins action revisions and the Python patch version, regenerates retained lineage before the active manifest, then rejects any tracked or untracked difference before running verification and replay. Generation therefore cannot hide stale committed metadata.
+The GitHub Actions workflow runs on every push and pull request. It pins action
+revisions, the Python patch version, and the exact proto-ring provider commit.
+Repository Integrity fails closed if a required projection is stale or if an
+obligation mutates the governed current state. Qualification replay remains
+responsible for the claims associated with Ruu evidence.

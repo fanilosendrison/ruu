@@ -158,6 +158,8 @@ Git smoke replay requires Git 2.28.0 or newer. An older Git installation is an u
 
 ## Tool responsibilities
 
+- `tools/check-repository-integrity.py` owns Ruu's ordered current-state validation membership and binds it to the pinned proto-ring Repository Integrity substrate; it does not own qualification replay.
+- `tools/check-git-whitespace.py` binds Ruu's whitespace obligation to the pinned `proto_ring.git_whitespace` mechanism; it contains no independent whitespace policy.
 - `tools/adr-metadata.py` validates active ADR metadata and renders only the generated ADR index; it never rewrites source ADRs or qualification snapshots.
 - `tools/generate-qualification-lineage.py` generates only the retained path-aware lineage from the immutable snapshot.
 - `tools/generate-current-manifest.py` generates the SHA-256 manifest for the active layout.
@@ -191,20 +193,21 @@ python3 tools/generate-qualification-lineage.py
 python3 tools/generate-current-manifest.py
 ```
 
-Confirm that generation produced no uncommitted difference, then run:
+Repository Integrity is observational. Regeneration is preparation, not part of
+a passing integrity verdict. Confirm that the generated artifacts are current,
+then run Repository Integrity followed by the distinct qualification replays:
 
 ```bash
-git diff --exit-code
-.venv/bin/python tools/tests/test-adr-metadata.py
-.venv/bin/python tools/adr-metadata.py check
-python3 tools/verify-qualification-layout.py
-python3 tools/verify-markdown-links.py
-python3 tools/tests/test-qualification-infrastructure.py
+.venv/bin/python tools/check-repository-integrity.py
 python3 tools/replay-historical-qualification.py latest
 python3 tools/replay-post-baseline-qualification.py
 python3 tools/replay-git-smokes.py
-git diff --check
 ```
+
+The Ruu-owned profile invoked by `tools/check-repository-integrity.py` includes
+maintained source syntax, ADR validation, generated-artifact currentness,
+qualification layout, Markdown links, and the shared proto-ring whitespace
+mechanism. The qualification replay commands remain Ruu-owned evidence checks.
 
 The Git smoke command must fail as unsupported when Git is older than 2.28.0. The GitHub Actions qualification workflow runs the same sequence. Do not declare work complete when a change-caused validation failure remains unresolved.
 
