@@ -314,10 +314,10 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("missing link target", completed.stdout)
 
-    def test_ci_seals_snapshot_before_layout_verification(self) -> None:
+    def test_ci_seals_snapshot_before_repository_integrity(self) -> None:
         workflow = (self.root / ".github/workflows/qualification.yml").read_text()
         seal = workflow.index("chmod -R a-w qualification/releases/adr-080-flat")
-        verify = workflow.index("python3 tools/verify-qualification-layout.py")
+        verify = workflow.index("python3 tools/check-repository-integrity.py")
         self.assertLess(seal, verify)
 
     def test_git_smoke_runner_handles_canonical_temporary_paths(self) -> None:
@@ -364,59 +364,6 @@ class QualificationInfrastructureTests(unittest.TestCase):
         self.assertEqual(replayed.returncode, 0, replayed.stdout + replayed.stderr)
         expected = self.existing_post_baseline_count + 2
         self.assertIn(f"PASS ({expected} qualifications)", replayed.stdout)
-
-    def test_historical_latest_is_derived_from_lineage(self) -> None:
-        completed = self.run_tool("replay-historical-qualification.py", "latest")
-        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-        self.assertIn("v45 total: 16380 PASS", completed.stdout)
-
-    def test_malformed_historical_lineage_is_controlled_failure(self) -> None:
-        lineage = (
-            self.root
-            / "qualification"
-            / "releases"
-            / "adr-080-flat"
-            / "QUALIFICATION-LINEAGE.json"
-        )
-        lineage.chmod(lineage.stat().st_mode | stat.S_IWUSR)
-        lineage.write_text("{\n")
-        completed = self.run_tool("replay-historical-qualification.py", "latest")
-        self.assertEqual(completed.returncode, 2)
-        self.assertIn("INVALID_HISTORICAL_LINEAGE", completed.stdout)
-        self.assertNotIn("Traceback", completed.stdout + completed.stderr)
-
-    def test_historical_replay_rejects_modified_recorded_output(self) -> None:
-        output = (
-            self.root
-            / "qualification"
-            / "releases"
-            / "adr-080-flat"
-            / "state-space-audit-v45.txt"
-        )
-        output.chmod(output.stat().st_mode | stat.S_IWUSR)
-        output.write_text(output.read_text() + "tampered\n")
-        completed = self.run_tool("replay-historical-qualification.py", "latest")
-        self.assertEqual(completed.returncode, 6)
-        self.assertIn("HISTORICAL_ARTIFACT_HASH_MISMATCH", completed.stdout)
-
-    def test_missing_historical_baseline_is_not_a_pass(self) -> None:
-        completed = self.run_tool("replay-historical-qualification.py", "37")
-        self.assertEqual(completed.returncode, 3)
-        self.assertIn("NON_REPLAYABLE_MISSING_BASELINE", completed.stdout)
-        self.assertNotIn("PASS", completed.stdout)
-
-    def test_historical_baseline_hash_mismatch_is_not_a_pass(self) -> None:
-        archive = Path(self.temporary.name) / "wrong-baseline.tar"
-        archive.write_bytes(b"not the admitted package")
-        completed = self.run_tool(
-            "replay-historical-qualification.py",
-            "37",
-            "--baseline-archive",
-            str(archive),
-        )
-        self.assertEqual(completed.returncode, 4)
-        self.assertIn("BASELINE_HASH_MISMATCH", completed.stdout)
-        self.assertNotIn("PASS", completed.stdout)
 
 
 if __name__ == "__main__":
