@@ -15,7 +15,7 @@ from unittest import mock
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-PROVIDER_COMMIT = "f7d07f23c8c3969166142049dd91c78ed4bc80fa"
+PROVIDER_COMMIT = "2a15655bcb88fcab13822a99a41360e48f1740af"
 
 
 def load_tool(name: str):
