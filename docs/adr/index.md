@@ -103,6 +103,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | Adopt validated OKF Architecture Decision Record metadata | accepted | 2026-09-13 | complete | Architecture Decision Record metadata, lifecycle, integrity, and generated projections<br>Semantics-preserving migration of active Ruu Architecture Decision Records<br>Repository-local validation of the adopted OKF ADR profile |
 | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | Allow shared governance implementation without transferring repository authority | accepted | 2026-09-22 | complete | Ownership boundary between repository authority and shared governance implementation<br>Use of proto-ring as a reusable governance implementation provider<br>Immutable pinning and local bindings for shared governance tooling |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | Replace mandatory linked worktrees with ContributionUnit Authoring Surfaces | accepted | 2026-09-27 | complete | ContributionUnit authoring-surface contract<br>Pre-edit managed-authoring isolation substrate<br>Managed authoring ref and authoring-surface binding<br>Authoring-surface mutation authority and frozen handoff<br>Exact checkpoint capture from active authoring surfaces<br>Supported-harness zero-preflight provisioning boundary |
+| [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | Require proto-ring for applicable generic repository governance | accepted | 2026-09-27 | complete | Mandatory use of proto-ring for applicable generic repository governance<br>Classification boundary between generic and Ruu-specific repository governance<br>Immutable local adoption of the proto-ring Shared Governance Provider contract |
 
 ## Recorded outgoing relations
 
@@ -294,6 +295,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | confirms | [ADR-076](adr-076-separate-native-witness-provenance-from-managed-effect-identity-and-make-semantic-adoption-idempotent.md) |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | confirms | [ADR-077](adr-077-require-attested-repository-common-observer-coverage-without-owning-foreign-git-mutation-infrastructure.md) |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | supersedes | [ADR-073](adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md) |
+| [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | amends | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
 
 ## Derived incoming relations
 
@@ -485,3 +487,4 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-081](adr-081-manage-exact-authoring-dependencies-before-promotion.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | amended by | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
+| [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | amended by | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) |
