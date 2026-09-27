@@ -24,6 +24,8 @@ This file is the operational map for agents working in the Ruu repository. Follo
   incorporating any material discovery into normative, architectural,
   qualification, implementation, integration, or repository-governance
   artifacts.
+- Apply `docs/repository-governance/ruu-projection-integrity.md` whenever a
+  change adds or modifies mechanically derivable mutable repository state.
 - When the user mentions an Issue, Project work, backlog work, or a review finding, apply the shared GitHub Engineering Projects operational protocol, then read `docs/repository-governance/ruu-engineering.md` before acting.
 
 ## Authority order
@@ -160,6 +162,7 @@ Git smoke replay requires Git 2.28.0 or newer. An older Git installation is an u
 
 - `tools/check-repository-integrity.py` owns Ruu's ordered current-state validation membership and binds it to the pinned proto-ring Repository Integrity substrate; it does not own qualification replay.
 - `tools/check-git-whitespace.py` binds Ruu's whitespace obligation to the pinned `proto_ring.git_whitespace` mechanism; it contains no independent whitespace policy.
+- `tools/tests/test-projection-integrity.py` guards the immutable shared Projection Integrity binding and validates the derivable fields in Ruu's maintained ADR history directly against canonical ADR frontmatter.
 - `tools/adr-metadata.py` validates active ADR metadata and renders only the generated ADR index; it never rewrites source ADRs or qualification snapshots.
 - `tools/generate-qualification-lineage.py` generates only the retained path-aware lineage from the immutable snapshot.
 - `tools/generate-current-manifest.py` generates the SHA-256 manifest for the active layout.
@@ -225,6 +228,8 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
 - Ruu Engineering Project profile: `docs/repository-governance/ruu-engineering.md`
 - Discovery classification profile:
   `docs/repository-governance/ruu-discovery-classification.md`
+- Projection Integrity binding:
+  `docs/repository-governance/ruu-projection-integrity.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`
 - Immutable ADR-080 package: `qualification/releases/adr-080-flat/`
