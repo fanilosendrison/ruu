@@ -75,7 +75,7 @@ For example:
 
 ```text
 dedicated Git worktrees
-    = a concrete Ruu V1 mechanism
+    = one concrete Ruu V1 realization of that guarantee
 
 isolated mutable authoring surfaces
     = the underlying guarantee
@@ -294,7 +294,7 @@ The guarantee cannot:
 
 > **One active producer must not have its mutable editing state silently changed by another producer or by background convergence.**
 
-Ruu V1 realizes this through dedicated managed Git worktrees and mutation authority.
+Ruu realizes this through a conforming repository-local ContributionUnit Authoring Surface, its current managed authoring ref, and mutation authority. A dedicated linked Git worktree is one conforming realization, not the mandatory isolation substrate; an already-isolated repository instance may use its private primary working tree after ordinary Ruu pre-edit admission. Ruu does not mandate or own the outer isolation mechanism.
 
 ### 6.2 Isolation requires exact identity
 
@@ -499,7 +499,7 @@ The strongest defensible claim is **not** that every Ruu mechanism is inevitable
 
 Some current Ruu choices are deliberately opinionated implementation or architecture decisions, including:
 
-- Git worktrees as the V1 isolated authoring substrate;
+- the concrete realization of the isolated authoring surface (for example dedicated Git worktrees);
 - ContributionUnit and ConvergenceUnit as first-class semantic identities;
 - append-only/no-rebase behavior for internal managed history;
 - particular managed-ref observation requirements;
@@ -1420,6 +1420,7 @@ This document is explanatory. The current architecture is defined by the normati
 - [ADR-057 — externalize development verification and model Ruu as Git progression](../adr/adr-057-externalize-development-verification-and-model-ruu-as-state-dependent-git-progression.md);
 - [ADR-064 — bind pre-commit readiness by frozen mutation handoff](../adr/adr-064-bind-pre-commit-readiness-by-frozen-mutation-handoff.md);
 - [ADR-070 — governing hands-off concurrent product intent](../adr/adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md);
-- [ADR-073 — Git worktrees as the V1 authoring isolation substrate](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md);
+- [ADR-073 — Git worktrees as the V1 authoring isolation substrate](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md) — historical; its mandatory-substrate mandate is superseded by ADR-084;
 - [ADR-078 — zero-preflight coding-harness integration](../adr/adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md);
-- [ADR-080 — separate local Git causality, remote Git state, and provider workflow evidence](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md).
+- [ADR-080 — separate local Git causality, remote Git state, and provider workflow evidence](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md);
+- [ADR-084 — replace mandatory linked worktrees with ContributionUnit Authoring Surfaces](../adr/adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md).

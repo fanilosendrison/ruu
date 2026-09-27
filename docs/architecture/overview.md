@@ -2,7 +2,7 @@
 
 > **Status: non-normative architecture map.**
 >
-> This document explains the current architecture through ADR-081 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
+> This document explains the current architecture through ADR-084 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
 
 ## 1. Product in one sentence
 
@@ -48,7 +48,7 @@ The architecture has two very different temporal phases:
               ▼              ▼              ▼
        ContributionUnit ContributionUnit ContributionUnit
               │              │              │
-           worktree        worktree        worktree
+          Surface A      Surface B      Surface C
               │              │              │
           authoring       authoring       authoring
               │              │              │
@@ -101,7 +101,7 @@ ConvergenceUnit
     BEFORE
 ContributionUnit
     BEFORE
-managed worktree / first managed write
+conforming ContributionUnit Authoring Surface / first managed write
 ```
 
 A ConvergenceUnit is therefore **not created by merging ContributionUnits**. It is the already-established repository-local convergence scope to which ContributionUnits are attached and into which their checkpoints converge.
@@ -197,7 +197,7 @@ resolve repository identity
 → resolve PromotionTarget(target_repository_id, target_ref)
 → create/reuse ConvergenceUnit with immutable target binding
 → create ContributionUnit bound to that ConvergenceUnit
-→ create/adopt managed ref + dedicated worktree
+→ establish/adopt managed authoring ref + conforming ContributionUnit Authoring Surface
 → establish mutation/observer/binding guarantees
 → authorize first managed write
 ```
@@ -250,7 +250,7 @@ exactly 1 convergence_unit_id membership
 stable logical identity independent of editing-artifact lifetime
 ```
 
-While actively authored in V1, it uses a dedicated Git worktree/ref surface.
+While actively authored in V1, it uses a conforming ContributionUnit Authoring Surface with its current managed authoring ref.
 
 ```text
                     ConvergenceUnit X
@@ -258,16 +258,18 @@ While actively authored in V1, it uses a dedicated Git worktree/ref surface.
                     /              \
               CU-agent-A        CU-agent-B
                   │                 │
-             worktree A        worktree B
+        Authoring Surface A Authoring Surface B
 ```
 
-Two concurrent producers in the same repository therefore do not share a mutable checkout.
+Two concurrent producers in the same repository therefore do not share a mutable authoring surface.
+
+The surface contract is realization-neutral. A dedicated linked Git worktree remains one conforming realization; an already-isolated repository instance may use its private primary working tree after normal Ruu pre-edit admission, without creating an extra linked worktree merely for isolation. The outer isolation mechanism (VM, container, sandbox, copy-on-write workspace, or comparable environment facility) is outside the Ruu model and is neither selected nor owned by Ruu.
 
 A ContributionUnit is **not a commit**. While `OPEN`, it may produce several ordinary native commits and several authoritative managed checkpoints over time. Native commits are exact Git versions, but they become managed checkpoints only through exact frozen-handoff adoption. Checkpoints may be integrated upward eagerly while the ContributionUnit remains capable of further contribution. Once `CLOSED`, it cannot reopen; later work uses a new ContributionUnit identity, which may still belong to the same ConvergenceUnit if the convergence scope remains the same.
 
 ContributionUnit identity also survives loss/removal of its editing artifacts after durable checkpoint continuity exists. Branch/worktree existence is not the semantic identity. `ContributionUnit` is also the sole v1 stable authoring-occurrence identity; session, process, branch, worktree, and a separate `work_occurrence_id` do not compete with it.
 
-Normative anchors: [ADR-001](../adr/adr-001-isolate-concurrent-work-production-with-git-worktrees.md), [ADR-002](../adr/adr-002-use-repository-local-contribution-units-as-the-isolation-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-038](../adr/adr-038-decouple-contribution-unit-identity-from-editing-artifacts.md), [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md), [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
+Normative anchors: [ADR-001](../adr/adr-001-isolate-concurrent-work-production-with-git-worktrees.md), [ADR-002](../adr/adr-002-use-repository-local-contribution-units-as-the-isolation-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-038](../adr/adr-038-decouple-contribution-unit-identity-from-editing-artifacts.md), [ADR-084](../adr/adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) (superseding [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md), retained as history), [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
 
 ### 4.4 Exact authoring dependencies before promotion
 
@@ -285,7 +287,7 @@ source = (repository_id, contribution_unit_id)
 consumed version = exact commit OID A
 ```
 
-Ruu then proves exact source lineage, creates a REQUIRED recovery anchor for `A`, and adopts an immutable AuthoringDependency before consumer authoring. A supported harness submits this as an internal provisioning demand to the existing fenced reconciler and waits before first write; no user-facing preflight or work-bearing checkpoint is created. The source may be dirty, but only commit `A` is consumed. Ruu never snapshots the producer's mutable worktree and never infers dependency from ancestry, names, file overlap, recency, or session order.
+Ruu then proves exact source lineage, creates a REQUIRED recovery anchor for `A`, and adopts an immutable AuthoringDependency before consumer authoring. A supported harness submits this as an internal provisioning demand to the existing fenced reconciler and waits before first write; no user-facing preflight or work-bearing checkpoint is created. The source may be dirty, but only commit `A` is consumed. Ruu never snapshots the producer's mutable authoring surface and never infers dependency from ancestry, names, file overlap, recency, or session order.
 
 The consumer may author, checkpoint, converge, form a PromotionGroup, and materialize exact owned state while the relation remains raw. Realization waits locally because consumer ancestry does not transfer source publication authority.
 
@@ -307,9 +309,9 @@ same source ContributionUnit later hands off its own exact pre-sync checkpoint S
 → Restack(old_base=A, owned_candidate=B, new_base=K) when needed
 ```
 
-Source advancement never changes `A` or mutates an active consumer worktree. Aggregate group ancestry cannot launder `A` back from the consumer when the source's own frozen pre-sync checkpoint omitted it. If the source loses its realization path before `A` is validly target-realized, the consumer remains blocked with exact reconciliation work; it does not inherit authority to publish `A`. An already-adopted valid target-satisfaction proof remains historical authority after later target drift, while every later consumer realization still revalidates current route/policy/CAS guards.
+Source advancement never changes `A` or mutates an active consumer authoring surface. Aggregate group ancestry cannot launder `A` back from the consumer when the source's own frozen pre-sync checkpoint omitted it. If the source loses its realization path before `A` is validly target-realized, the consumer remains blocked with exact reconciliation work; it does not inherit authority to publish `A`. An already-adopted valid target-satisfaction proof remains historical authority after later target drift, while every later consumer realization still revalidates current route/policy/CAS guards.
 
-The exact anchor remains retained through source reset/amend/ref deletion and Git GC. Multiple independently unsatisfied predecessors and dependency discovery after consumer authoring has already begun remain HIGH engineering follow-ups in the GitHub Project **Ruu Engineering** ([#1](https://github.com/fanilosendrison/ruu/issues/1), [#2](https://github.com/fanilosendrison/ruu/issues/2)); project state is non-normative, and Ruu invents neither provider topology nor active-worktree refoundation.
+The exact anchor remains retained through source reset/amend/ref deletion and Git GC. Multiple independently unsatisfied predecessors and dependency discovery after consumer authoring has already begun remain HIGH engineering follow-ups in the GitHub Project **Ruu Engineering** ([#1](https://github.com/fanilosendrison/ruu/issues/1), [#2](https://github.com/fanilosendrison/ruu/issues/2)); project state is non-normative, and Ruu invents neither provider topology nor active authoring-surface refoundation.
 
 Normative anchor: [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
 
@@ -703,7 +705,7 @@ Normative anchors: [ADR-005](../adr/adr-005-coordinate-simultaneous-convergers-w
 | ConvergenceUnit | repository-local | Into which shared lineage should these contributions converge? |
 | ContributionUnit | repository-local | Which isolated bounded contribution stream is authoring toward that ConvergenceUnit? |
 | AuthoringDependency | repository-local relation | Which stable source ContributionUnit and exact commit did this consumer explicitly adopt before promotion? |
-| Managed worktree/ref | repository-local artifact | Where is active V1 authoring physically isolated? |
+| ContributionUnit Authoring Surface | repository-local artifact | Which mutable Git authoring surface is V1 authoring bound to for one ContributionUnit? |
 | LogicalInvocation | coordination-domain occurrence | Which frozen new/correction work belongs to this checkpoint occurrence? |
 | ConvergenceDemand | coordination-domain signal | Should the global reconciler re-evaluate progress now? |
 | ReconcilerRun / host executor | host/coordination execution | Which fenced process currently performs reconciliation? |
@@ -731,7 +733,7 @@ repository admitted/resolved
 → immutable PromotionTarget resolved
 → appropriate ConvergenceUnit created/reused
 → new ContributionUnit attached
-→ dedicated managed worktree/ref prepared
+→ conforming ContributionUnit Authoring Surface + managed authoring ref prepared
 → observer/binding/mutation authority established
 → first managed write authorized
 ```
@@ -748,7 +750,7 @@ No cross-repository ContributionUnit exists; cross-repository semantic work is r
 
 ### During authoring
 
-The agent edits normally inside the isolated worktrees. Other sessions may simultaneously have different ContributionUnits in the same repositories and may even target the same ConvergenceUnits.
+The agent edits normally inside the isolated ContributionUnit Authoring Surfaces. Other sessions may simultaneously have different ContributionUnits in the same repositories and may even target the same ConvergenceUnits.
 
 Valid exact checkpoints can be integrated toward their ConvergenceUnits as soon as mechanically safe; ContributionUnits do not need to be closed merely to contribute an intermediate checkpoint.
 
@@ -843,7 +845,7 @@ webhook delivery
 branch/worktree deletion
 ≠ generic semantic cancellation
 
-dirty source worktree
+dirty source authoring surface
 ≠ exact consumable version
 
 exact commit OID
@@ -868,7 +870,7 @@ For a new reader, the shortest path from product intent to detailed mechanics is
 1. **[`RUU-SPEC.md`](../specification/ruu-spec.md)** — normative consolidated model.
 2. **[`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md)** — authority boundary with the Development System.
 3. **[ADR-070](../adr/adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md)** and **[ADR-078](../adr/adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md)** — governing product experience.
-4. **[ADR-015](../adr/adr-015-provision-repository-local-convergence-unit-ref-before-first-contribution-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-037](../adr/adr-037-eagerly-integrate-contribution-checkpoints-and-seal-convergence-before-readiness.md), [ADR-061](../adr/adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md), [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md)** — pre-edit topology and authoring lifecycle.
+4. **[ADR-015](../adr/adr-015-provision-repository-local-convergence-unit-ref-before-first-contribution-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-037](../adr/adr-037-eagerly-integrate-contribution-checkpoints-and-seal-convergence-before-readiness.md), [ADR-061](../adr/adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md), [ADR-084](../adr/adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md)** — pre-edit topology, authoring surface, and authoring lifecycle. ADR-073 remains the historical decision that this one supersedes on the mandatory substrate.
 5. **[ADR-036](../adr/adr-036-make-every-invocation-global-over-all-nonterminal-managed-obligations.md), [ADR-041](../adr/adr-041-coalesce-convergence-demands-under-a-single-host-fenced-executor.md), [ADR-042](../adr/adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md), [ADR-069](../adr/adr-069-bind-promotion-groups-to-work-bearing-invocations-and-group-local-exact-state.md)** — invocation and reconciler model.
 6. **[ADR-045](../adr/adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) through [ADR-050](../adr/adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md), plus [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md)** — promotion model and provider projection.
 7. **[ADR-074](../adr/adr-074-minimize-native-git-event-observation-to-managed-authoring-binding-disposition.md) through [ADR-080](../adr/adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md)** — local/remote/provider observation and native-Git coexistence.
@@ -897,7 +899,7 @@ If only one picture is retained, use this one:
                  /         |         \
                CU-A       CU-B       CU-C
                 │          │          │
-             worktree   worktree   worktree
+            Surface A  Surface B  Surface C
                 │          │          │
                 └──── authoring ──────┘
                            │
