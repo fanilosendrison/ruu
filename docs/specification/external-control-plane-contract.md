@@ -63,7 +63,7 @@ contribution_unit_id
 → exactly one convergence_unit_id for this identity
 ```
 
-`ruu` does not infer ContributionUnit identity from actor/session/process/model, branch name, worktree path, CWD, task, or invocation principal.
+`ruu` does not infer ContributionUnit identity from actor/session/process/model, branch name, authoring-surface locator, CWD, task, or invocation principal.
 
 A different convergence scope requires a new `contribution_unit_id`; an existing ContributionUnit is not rebound to another ConvergenceUnit.
 
@@ -92,7 +92,7 @@ CLOSED
 
 `CLOSED → OPEN` is forbidden for the same ContributionUnit identity.
 
-The lifecycle MUST NOT be inferred from agent/runtime state, turn completion, waiting for user input, clean/dirty state, commit, verification, integration, branch/worktree presence, or producer inactivity.
+The lifecycle MUST NOT be inferred from agent/runtime state, turn completion, waiting for user input, clean/dirty state, commit, verification, integration, branch/authoring-surface presence, or producer inactivity.
 
 ### 2.3 ConvergenceUnit creation, grouping, and contribution membership
 
@@ -143,12 +143,12 @@ ConvergenceBase identity/ref resolution
 immutable ConvergenceUnit PromotionTarget resolution/binding
 convergence-unit identity/ref establishment
 contribution-unit identity/ref establishment
-isolated worktree provisioning
+conforming ContributionUnit Authoring Surface establishment/admission
 attested repository-common native-ref observation coverage for the admitted mutation-engine/backend/adapter profile
 write authorization / external mutation-authority mechanism
 ```
 
-ADR-073 makes the v1 substrate requirement explicit: every actively authored managed ContributionUnit MUST have its own dedicated Git worktree/ref surface before its first managed write. V1 does not define an alternative direct authoring contract that bypasses this topology by supplying arbitrary prebuilt commits, trees, or external sandbox/filesystem snapshots. Ordinary native Git activity inside the managed worktree remains supported. A future sandbox substrate requires a separate ADR proving equivalent isolation/base/freeze/exact-capture guarantees.
+ADR-084 makes the v1 authoring-surface requirement explicit: before its first managed write, every actively authored managed ContributionUnit MUST have a conforming ContributionUnit Authoring Surface and its current managed authoring ref. The substrate contract is realization-neutral: a dedicated linked Git worktree/ref surface is one conforming realization, and a private primary working tree of an already externally isolated repository instance is another after ordinary Ruu pre-edit admission. V1 does not define an alternative direct authoring contract that bypasses this admitted surface by supplying arbitrary prebuilt commits, trees, or external sandbox/filesystem snapshots. Ordinary native Git activity inside the admitted surface remains supported. Neither the outer isolation mechanism (VM, container, sandbox, process/filesystem isolation, or another environment mechanism) nor a required external product is selected or owned by Ruu.
 
 Repository identity and repository location are distinct under ADR-042. The External Control Plane may explicitly relocate the current host-local locator bound to an existing opaque `repository_id`; relocation MUST NOT mint a new repository identity merely because the path changed, and a locator MUST NOT be authoritatively bound to multiple repository identities in the same coordination domain. `ruu` records such locator changes through exact expected-state/CAS semantics and still revalidates the Git facts found at the declared locator.
 
@@ -193,7 +193,7 @@ current RepositoryCreationPolicy authorizes creation
 → REPOSITORY_ADMITTED
 ```
 
-V1 MUST NOT hand an unborn/null target to ordinary managed authoring. After admission, ADR-015/023 create the ConvergenceUnit/ContributionUnit/worktree exactly as for any existing repository.
+V1 MUST NOT hand an unborn/null target to ordinary managed authoring. After admission, ADR-015/023 establish the ConvergenceUnit/ContributionUnit authoring surface exactly as for any existing repository.
 
 The creation policy is external/pre-repository and may authorize/resolve local locator, provider/account/organization/namespace, canonical name, visibility, repository bootstrap/configured target ref, bootstrap profile, governance requirements, and eager-vs-lazy provider attachment. That repository-bootstrap target establishes a non-null admitted Git base; ADR-061 separately requires each ConvergenceUnit's immutable PromotionTarget to be bound before managed authoring. Agent suggestions are non-authoritative. If provider creation is authorized and visibility alone remains genuinely underdetermined, the built-in safe default is `PRIVATE`; `PUBLIC` is never inferred. Missing authority for provider/account/organization/namespace blocks rather than guesses.
 
@@ -222,7 +222,7 @@ AuthoringBindingRecovery {
 
 This declaration is authoritative only for the **logical recovery decision** that the same existing managed occurrence continues on a new editing surface or is authoritatively abandoned. It does not manufacture Git truth and MUST NOT claim that a particular Git command (for example `git branch -m`) occurred.
 
-`ruu` adopts `REBIND` only after fresh exact observation proves that the declared repository/ref/worktree state is real and compatible, mutation authority is current, and no conflicting binding exists. Expected-old/binding-generation mismatch or contradictory Git state fails closed.
+`ruu` adopts `REBIND` only after fresh exact observation proves that the declared repository/ref/authoring-surface state is real and compatible, mutation authority is current, and no conflicting binding exists. `REBIND` denotes continuation of the same ContributionUnit on another conforming authoring-surface/ref binding; it is not necessarily a new worktree. Expected-old/binding-generation mismatch or contradictory Git state fails closed.
 
 A stale recovery declaration cannot resurrect already-abandoned work. This recovery path is exceptional and does not replace ordinary native Git rename/deletion semantics.
 
@@ -248,20 +248,20 @@ Coverage is tracked through trustworthy epochs. A later repair/re-attestation do
 
 ADR-079 closes 30.54 by making failure handling proportional to the exact managed risk rather than to observer availability in general.
 
-The pre-edit provisioning/harness integration MUST treat a newly created branch/worktree as a **candidate authoring surface**, not yet as managed producer-owned work. Before the first managed write it ensures:
+The pre-edit provisioning/harness integration MUST treat a newly created branch/surface as a **candidate authoring surface**, not yet as managed producer-owned work. Before the first managed write it ensures:
 
 ```text
 repository-common observation coverage ACTIVE
 → conservative ManagedRefProtectionFilter protection established or negative fast-path durably disabled/degraded-safe
 → exact RefAdmissionBarrier acquired for the candidate ref
-→ candidate worktree/ref topology revalidated while provisioning retains exclusive mutation authority
+→ candidate repository/surface/HEAD/ref/OID topology revalidated while provisioning retains exclusive mutation authority
 → authoritative current binding committed while the barrier remains held
 → barrier released
 → initial authoring authority handed to the producer
 → first managed write permitted
 ```
 
-`RefAdmissionBarrier` is a native-ref adapter capability: exact candidate-ref preimage is verified under exclusion with conforming native mutation until authoritative binding publication commits. Candidate branch/worktree creation alone does not create a managed binding. A Ruu-supplied harness integration performs these steps invisibly under ADR-078; the user does not orchestrate them.
+`RefAdmissionBarrier` is a native-ref adapter capability: exact candidate-ref preimage is verified under exclusion with conforming native mutation until authoritative binding publication commits. Candidate branch/authoring-surface creation alone does not create a managed binding. A Ruu-supplied harness integration performs these steps invisibly under ADR-078; the user does not orchestrate them.
 
 The repository-common `ManagedRefProtectionFilter` is conservative acceleration only. A trustworthy negative answer may skip authoritative lookup. Positive/stale entries merely cause extra lookup. Missing/corrupt/untrusted filter state disables negative acceleration; it is not treated as empty and is not by itself a native-observation coverage gap. Binding identity/generation/currentness remains authoritative only in the CoordinationStore.
 
@@ -292,7 +292,7 @@ Filter degradation, critical persistence failure, and actual observer coverage l
 
 The live lock order for admission/observation is native Git/ref exclusion before a short authoritative CoordinationStore transaction. The External Control Plane/provisioner MUST NOT keep a live CoordinationStore transaction/mutex/write lock while waiting to acquire the corresponding Git/native ref lock.
 
-`git worktree lock` may be used as defense-in-depth but does not substitute for the pre-handoff authority boundary or exact worktree/HEAD topology revalidation.
+`git worktree lock` may be used as defense-in-depth for a worktree-backed realization but does not substitute for the pre-handoff authority boundary or exact authoring-surface/HEAD topology revalidation.
 
 ### 2.4E Exact authoring-dependency selection and pre-edit adoption
 
@@ -349,7 +349,7 @@ transferable
 → mutation may proceed
 ```
 
-While transferability remains current, the External Control Plane MUST prevent external mutation of the editing surface. If semantic authoring must resume before `ruu` obtains the claim, it MUST first revoke transferability / restore external mutation authority and only then permit writes; any prior semantic checkpoint-readiness decision is thereby stale. While `ruu` holds the exclusive worktree claim, the External Control Plane MUST prevent external reacquisition/mutation until the claim/effect reaches a safe release/recovery boundary.
+While transferability remains current, the External Control Plane MUST prevent external mutation of the editing surface. If semantic authoring must resume before `ruu` obtains the claim, it MUST first revoke transferability / restore external mutation authority and only then permit writes; any prior semantic checkpoint-readiness decision is thereby stale. While `ruu` holds the exclusive authoring-surface claim, the External Control Plane MUST prevent external reacquisition/mutation until the claim/effect reaches a safe release/recovery boundary.
 
 A convergence trigger is not an authority token. If a caller or upstream workflow changes ContributionUnit mutation authority, that authority change MUST become durably authoritative through the External Control Plane separately from signaling `ruu` convergence demand. Concurrent triggers may therefore be coalesced without losing or merging authority semantics.
 
@@ -557,7 +557,7 @@ ADR-080 keeps observation authority source-scoped. The External Control Plane MU
 
 ```text
 LOCAL_GIT
-→ local repository/worktree/ref/object truth
+→ local repository/authoring-surface/ref/object truth
 → managed authoring-binding causal observation only on the admitted local mutation surface
 
 REMOTE_GIT
@@ -579,7 +579,7 @@ When `ruu` consumes External Control Plane state, it may rely on the following d
 
 ```text
 managed repository admission/reactivation is durable before managed writes; ACTIVE_CONVERGENCE_SET is non-authoritative derived acceleration only
-v1 active ContributionUnit authoring is provisioned on one dedicated Git worktree/ref surface before first managed write; no direct arbitrary commit/tree/snapshot authoring substrate bypasses that topology
+active ContributionUnit authoring is provisioned on one conforming ContributionUnit Authoring Surface with its managed authoring ref before first managed write; linked Git worktrees are one realization, not the mandatory substrate, and no direct arbitrary commit/tree/snapshot authoring substrate bypasses the admitted surface
 ContributionUnit identity is opaque, stable, and the sole v1 authoring-occurrence identity; work_occurrence_id is not a second domain key
 an AuthoringDependency exists only from explicit pre-edit Development System selection of stable source ContributionUnit + exact commit OID, followed by Ruu exact Git proof and durable anchor adoption; no selection means no inferred dependency
 ordinary native commit creation is exact Git state, not managed checkpoint/handoff/completion; a clean tip becomes a managed checkpoint only through exact frozen-handoff adoption
@@ -704,7 +704,8 @@ This contract consolidates the external boundary established across:
 - ADR-063 — semantic findings/backlog boundary;
 - ADR-064 — frozen pre-commit mutation handoff and exact checkpoint identity bridge;
 - ADR-071 — transactional managed-authoring-ref abandonment ingress and current-disposition causal authorization fencing;
-- ADR-073 — dedicated Git worktree/ref surface as the normative v1 active-authoring substrate;
+- ADR-073 — historically required dedicated Git worktree/ref surface as the v1 active-authoring substrate; its mandatory-substrate decision is superseded by ADR-084;
+- ADR-084 — conforming ContributionUnit Authoring Surface with realization-neutral isolation, current managed authoring ref, and unchanged binding/observation/authority/handoff guarantees;
 - ADR-079 — minimal native observation rejection, conservative protection filtering, and exact initial binding admission;
 - ADR-080 — source-scoped local Git / remote Git / optional provider observation authority;
 - ADR-081 — explicit exact authoring-source selection, durable OID retention, pre-promotion dependency reconciliation, and no authority transfer;

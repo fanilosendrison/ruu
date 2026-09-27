@@ -73,9 +73,9 @@ when the user or agent wants the current block to cross the Git boundary:
   ruu
 ```
 
-Before the first managed write in each repository touched by that coding session, the harness integration MUST automatically cause the required pre-edit managed-authoring state to exist. Depending on current durable state, this includes creating/adopting the appropriate ContributionUnit/ConvergenceUnit bindings, any explicitly selected exact authoring dependencies, managed ref/worktree, mutation authority, repository-common observer coverage, and opaque coordination identities/handoffs required by the architecture. These mechanisms are internal product plumbing, not user-facing workflow steps.
+Before the first managed write in each repository touched by that coding session, the harness integration MUST automatically cause the required pre-edit managed-authoring state to exist. Depending on current durable state, this includes creating/adopting the appropriate ContributionUnit/ConvergenceUnit bindings, any explicitly selected exact authoring dependencies, managed authoring ref + conforming ContributionUnit Authoring Surface, mutation authority, repository-common observer coverage, and opaque coordination identities/handoffs required by the architecture. These mechanisms are internal product plumbing, not user-facing workflow steps.
 
-When new work needs an exact native commit from another still-active managed ContributionUnit, the Development System/harness selects the exact source ContributionUnit and commit. The user does not construct an AuthoringDependency or invoke the source first. Ruu adopts and retains that exact relation before consumer authoring; it never substitutes the producer's dirty worktree or follows a later moving source tip.
+When new work needs an exact native commit from another still-active managed ContributionUnit, the Development System/harness selects the exact source ContributionUnit and commit. The user does not construct an AuthoringDependency or invoke the source first. Ruu adopts and retains that exact relation before consumer authoring; it never substitutes the producer's dirty authoring surface or follows a later moving source tip.
 
 The **External Control Plane / Development System remains an architectural authority role**, not necessarily a separately installed product. A conforming Ruu distribution MAY implement that role in part through Ruu-supplied integrations for supported coding harnesses. Semantic authority is unchanged: the integration may materialize declared work topology safely, but it MUST NOT make Ruu infer task meaning, semantic completion, grouping, or validation intent that belongs to the Development System.
 
@@ -184,7 +184,7 @@ If they are genuinely semantically incompatible, `ruu` does **not** guess. It em
 
 ## 0.7 "Keep everything updated" does not authorize surprise mutation of active sessions
 
-The hands-off experience must not be implemented by secretly rebasing or rewriting a producer-owned active worktree behind the producer's back.
+The hands-off experience must not be implemented by secretly rebasing or rewriting a producer-owned active ContributionUnit Authoring Surface behind the producer's back.
 
 While a Development System owns mutation authority over an active ContributionUnit, ADR-009/033/064 remain controlling: `ruu` does not mutate that editing surface without the explicit frozen handoff/claim boundary.
 
@@ -196,7 +196,7 @@ Concurrency is handled by **isolation plus reconciliation at exact controlled bo
 
 Users and agents may still create/delete branches and worktrees, make ordinary commits, inspect refs, and perform legitimate Git operations. Those actions retain their native meaning unless an explicit managed authority boundary says otherwise. `ruu` observes, adopts, reconciles, or reports resulting state according to the exact-state rules.
 
-ADR-071/074/075 make one deliberate product-level specialization: when a branch/ref is already registered as the **current managed authoring ref** for live managed work, any native mutation capable of terminating or replacing that binding is a correctness-critical **binding-disposition transition**. A conforming native-ref adapter must expose a vetoable/equivalently causally serialized pre-linearization point and durably normalize the native evidence before the binding change may commit. The core derives `TERMINAL_REMOVAL_PREPARED | RENAME_CARRY_PREPARED | UNKNOWN`; `UNKNOWN` cannot silently linearize. Proven native rename/rebind means `CONTINUATION`; positively proven terminal removal means `ABANDON`. OID/ancestry similarity never substitutes for continuity proof. Unmanaged branch deletion and worktree deletion remain ordinary artifact operations with no cancellation meaning.
+ADR-071/074/075 make one deliberate product-level specialization: when a branch/ref is already registered as the **current managed authoring ref** for live managed work, any native mutation capable of terminating or replacing that binding is a correctness-critical **binding-disposition transition**. A conforming native-ref adapter must expose a vetoable/equivalently causally serialized pre-linearization point and durably normalize the native evidence before the binding change may commit. The core derives `TERMINAL_REMOVAL_PREPARED | RENAME_CARRY_PREPARED | UNKNOWN`; `UNKNOWN` cannot silently linearize. Proven native rename/rebind means `CONTINUATION`; positively proven terminal removal means `ABANDON`. OID/ancestry similarity never substitutes for continuity proof. Unmanaged branch deletion and worktree deletion remain ordinary artifact operations with no cancellation meaning; a worktree deletion is worktree-specific only when the current realization actually uses a worktree, and neither event is a managed-binding disposition unless it terminates or replaces the currently bound managed authoring ref.
 
 ADR-079 additionally constrains failure behavior: only native transactions whose cessation/replacement candidates cannot be proven safe or whose required current-binding preparation cannot be made crash-durable may be vetoed for observation correctness. Ordinary non-cessation ref/tip movement remains fail-open to exact-state rediscovery; outcome callbacks and advisory wakeup/log/telemetry persistence never become a reason to retroactively reject Git. A repository-common conservative `ManagedRefProtectionFilter` may accelerate the negative case but never replaces the authoritative managed binding state.
 
@@ -353,8 +353,8 @@ Target repository/ref
 Convergence unit
 Convergence-unit ref
 Contribution-unit ref
-Contribution-unit worktree
-Contribution-unit mutation-access contract / worktree claim
+ContributionUnit Authoring Surface
+ContributionUnit mutation-access contract / authoring-surface claim
 Promotion unit
 Promotion topology
 Submission ref (PROVIDER_SUBMISSION route)
@@ -394,12 +394,12 @@ exactly 1 convergence_unit_id membership for this contribution-unit identity
 stable logical identity independent of editing-artifact presence
 
 while externally provisioned for active editing:
-  isolated Git worktree/ref surfaces may exist
+  a conforming ContributionUnit Authoring Surface with its managed authoring ref may exist
 ```
 
 Higher-level work spanning three repositories therefore uses three distinct repository-local contribution units. `ruu` does not need to know whether those units came from the same agent, session, task, or orchestrator run.
 
-Two concurrent producers operating in the same repository still require distinct contribution units/worktrees. A `contribution_unit_id` is not reassigned to another convergence unit; a different convergence scope requires a new contribution unit.
+Two concurrent producers operating in the same repository still require distinct contribution units/authoring surfaces. A `contribution_unit_id` is not reassigned to another convergence unit; a different convergence scope requires a new contribution unit.
 
 ### 2.1.1 Contribution-unit lifecycle and exact-state continuity
 
@@ -428,12 +428,12 @@ agent waiting for user
 agent turn finished
 conversation waiting for user
 checkpoint committed
-worktree clean
+authoring surface clean
 development-quality validation PASS
 current contribution integrated
 contribution-unit tip equal convergence-unit tip
 local contribution branch/ref absent
-worktree absent
+authoring surface absent
 remote contribution ref absent/present
 ```
 
@@ -472,7 +472,7 @@ AuthoringDependency {
 
 `ContributionUnit` is the sole v1 stable authoring-occurrence identity. Historical `ContributionUnit/work occurrence` wording names the same object; `work_occurrence_id` is not a second domain identity. Source and consumer are distinct ContributionUnits in one repository. Cross-repository semantic coordination remains PromotionGroup-level because a commit in one repository is not a Git base in another.
 
-The Development System explicitly selects source identity plus exact OID. Ruu proves current source binding/lineage and canonical raw-object ancestry, anchors the OID before adoption, and then reconciles the durable relation. OID alone, ancestry alone, names, sessions, processes, task similarity, recency, or dirty worktree state never create the relation.
+The Development System explicitly selects source identity plus exact OID. Ruu proves current source binding/lineage and canonical raw-object ancestry, anchors the OID before adoption, and then reconciles the durable relation. OID alone, ancestry alone, names, sessions, processes, task similarity, recency, or dirty authoring-surface state never create the relation.
 
 The immutable consumed OID remains separate from both the source's later current exact state and any later `(PromotionGroup, source repository)` projection that owns realization. An unresolved AuthoringDependency blocks unauthorized realization, not otherwise legal authoring, checkpointing, internal convergence, or unrelated global progress.
 
@@ -701,7 +701,7 @@ automation
 another authorized orchestrator
 ```
 
-The ability to invoke `ruu` does not grant authority over ContributionUnit worktrees. ADR-041/ADR-069 distinguish two invocation forms:
+The ability to invoke `ruu` does not grant authority over ContributionUnit authoring surfaces. ADR-041/ADR-069 distinguish two invocation forms:
 
 ```text
 demand-only invocation
@@ -712,7 +712,7 @@ work-bearing logical invocation
 → independently raises the same coalescible convergence demand
 ```
 
-The **demand signal** carries no caller-local work scope, Git snapshot, or worktree authority and may be coalesced with other demands. The durable logical invocation receipt is not coalesced: retry of the same `invocation_id` resolves to the same immutable invocation definition, while a later genuine work-bearing invocation has a distinct identity. Neither kind of invocation owns a reconciler run or narrows the ADR-036 global sweep.
+The **demand signal** carries no caller-local work scope, Git snapshot, or authoring-surface authority and may be coalesced with other demands. The durable logical invocation receipt is not coalesced: retry of the same `invocation_id` resolves to the same immutable invocation definition, while a later genuine work-bearing invocation has a distinct identity. Neither kind of invocation owns a reconciler run or narrows the ADR-036 global sweep.
 
 ContributionUnit identity and external mutation authority are supplied by the External Control Plane. `ruu` treats `contribution_unit_id` as opaque and does not infer identity or mutation authority from process/session/model/principal/branch/path/CWD. For a work-bearing invocation, the External Control Plane/Development System explicitly supplies the closed set of ContributionUnit handoffs being checkpointed; `ruu` then derives PromotionGroup membership mechanically through their existing ConvergenceUnit bindings.
 
@@ -725,7 +725,7 @@ TRANSFERABLE_GENERAL
 UNKNOWN
 ```
 
-Only a transferable state plus a race-safe exclusive worktree claim held by the current authoritative executor/operation can authorize contribution-unit-worktree mutation.
+Only a transferable state plus a race-safe exclusive authoring-surface claim held by the current authoritative executor/operation can authorize ContributionUnit Authoring Surface mutation.
 
 Under ADR-064, transferability at a checkpoint boundary is also a **frozen mutation handoff**. Once the Development System has decided that the current observable editing surface may be checkpointed and durably publishes `TRANSFERABLE_TO_RUU` or `TRANSFERABLE_GENERAL`, no external writer retains the right to mutate that surface while the handoff remains current. Resuming semantic authoring requires legitimate revocation/reacquisition of external mutation authority before any new write; if `ruu` already owns the exclusive claim, reacquisition waits for a safe release/recovery boundary.
 
@@ -759,7 +759,7 @@ For a dirty ContributionUnit checkpoint, ADR-058/059 define the offered whole ed
 Development System validates/decides on current surface S
 → no further external mutation
 → durable transferable handoff
-→ exclusive Ruu worktree claim
+→ exclusive Ruu authoring-surface claim
 → canonical ADR-059 candidate (P,T)
 → same-claim revalidation
 → ordinary commit K with parent(K)=P and tree(K)=T
@@ -915,7 +915,7 @@ The eventual commit can then land on `fix-example`.
 
 Git technically permits branch creation after uncommitted edits already exist.
 
-However, the managed Git control plane must **not rely on that capability for normal work produced in a contribution unit**. The pre-edit provisioner must create the isolated contribution-unit worktree/ref from the convergence-unit ref **before the first write** in that repository, because branch creation after editing cannot retroactively provide edit-time isolation.
+However, the managed Git control plane must **not rely on that capability for normal work produced in a contribution unit**. The pre-edit provisioner must establish the isolated contribution-unit authoring surface/ref from the convergence-unit ref **before the first write** in that repository, because branch creation after editing cannot retroactively provide edit-time isolation.
 
 ---
 
@@ -951,11 +951,11 @@ Multiple external producers in different sessions must be able to work in the sa
 
 ## 4.2 Concurrent editing of the same logical file
 
-Two concurrent contribution units may contain changes to the same logical path only through physically isolated worktrees.
+Two concurrent contribution units may contain changes to the same logical path only through physically isolated ContributionUnit Authoring Surfaces.
 
 ```text
-Contribution unit A → worktree-A/src/foo.ts
-Contribution unit B → worktree-B/src/foo.ts
+Contribution unit A → authoring-surface A/src/foo.ts
+Contribution unit B → authoring-surface B/src/foo.ts
 ```
 
 Reconciliation occurs later through Git, not through concurrent writes to one checkout.
@@ -1007,11 +1007,11 @@ repository identity
 → immutable PromotionTarget(target_repository_id, target_ref)
 → convergence_unit_id/ref bound to that PromotionTarget
 → candidate contribution_unit_id/ref
-→ candidate isolated worktree
+→ candidate ContributionUnit Authoring Surface
 → repository-common native observation coverage ACTIVE
 → conservative managed-ref protection established (or degraded-safe negative fast-path disabled)
 → exact RefAdmissionBarrier acquired for the candidate ref
-→ exact candidate worktree/ref topology revalidated while producer still lacks authoring authority
+→ exact candidate repository/surface/HEAD/ref/OID topology revalidated while producer still lacks authoring authority
 → authoritative current binding committed while the RefAdmissionBarrier is held
 → barrier released
 → contribution-unit mutation-authority handoff to the producer
@@ -1019,7 +1019,9 @@ repository identity
 → first managed write
 ```
 
-Creating the candidate branch/worktree does **not** itself make it managed. Until authoritative binding publication and the initial authority handoff complete, it is an ordinary provisioning artifact unavailable to a conforming coding producer. The binding becomes current while the native ref admission barrier is still held; the producer receives authoring authority only after exact topology revalidation and barrier release. A crash before current-binding publication leaves no managed binding; a crash after publication leaves an already-protected current binding that provisioning recovery may later hand off or retire.
+Creating the candidate branch/authoring surface does **not** itself make it managed. Until authoritative binding publication and the initial authority handoff complete, it is an ordinary provisioning artifact unavailable to a conforming coding producer. The binding becomes current while the native ref admission barrier is still held; the producer receives authoring authority only after exact topology revalidation and barrier release. A crash before current-binding publication leaves no managed binding; a crash after publication leaves an already-protected current binding that provisioning recovery may later hand off or retire.
+
+The candidate ContributionUnit Authoring Surface may be realized as a dedicated linked Git worktree or as the private primary working tree of an already externally isolated repository instance. The isolation mechanism itself is not normative; both realizations remain subject to the same pre-edit admission and binding guarantees.
 
 The selected native-ref adapter must provide `RefAdmissionBarrier` as a capability: it verifies the exact candidate-ref preimage under exclusion with every conforming native mutation of that ref and holds that exclusion through authoritative binding publication. The current Git-core/files candidate realizes an existing-ref barrier with a prepared exact no-op ref transaction (`old_oid == new_oid`) and aborts it after publication. That concrete mechanism is adapter evidence, not the permanent core abstraction; exact no-op ref updates have no managed event semantics.
 
@@ -1053,14 +1055,16 @@ agent/session requests new repository
 
 The convergence engine never creates the repository as a convergence side effect. A Ruu distribution may bundle a Repository Provisioner acting under External Control Plane authority; V1 still admits no unborn/null target into the managed model. Local repository creation and provider-repository creation are distinct; provider attachment may be deferred until a provider-sensitive operation actually requires it.
 
-## 4.5 Worktree cardinality
+## 4.5 Authoring-surface cardinality
 
 Normative rule:
 
 ```text
 1 actively authored contribution_unit_id
 =
-exactly 1 repository_id + 1 dedicated current worktree/ref authoring surface
+exactly 1 repository_id
++ 1 conforming ContributionUnit Authoring Surface
++ 1 current managed authoring ref/binding
 
 The durable ContributionUnit identity and exact adopted checkpoints/dependencies survive later editing-surface disappearance under the applicable lifecycle and retention rules.
 ```
@@ -1068,9 +1072,9 @@ The durable ContributionUnit identity and exact adopted checkpoints/dependencies
 The following are not valid general identities:
 
 ```text
-1 Pi session = 1 worktree
-1 agent = 1 worktree
-1 task = 1 worktree
+1 Pi session = 1 ContributionUnit Authoring Surface
+1 agent = 1 ContributionUnit Authoring Surface
+1 task = 1 ContributionUnit Authoring Surface
 ```
 
 ## 4.6 No edit-time collisions
@@ -1090,7 +1094,7 @@ two isolated contribution units
 
 ## 4.7 Native commit, managed checkpoint, and completion are distinct
 
-An ordinary native commit made inside a managed ContributionUnit worktree is an exact Git version. It may be an intermediate, partial, or final authored state, but creation alone is not a Ruu business event.
+An ordinary native commit made inside a managed ContributionUnit Authoring Surface is an exact Git version. It may be an intermediate, partial, or final authored state, but creation alone is not a Ruu business event.
 
 A **managed checkpoint** exists only after an exact frozen handoff adopts a clean native tip or Ruu materializes/adopts the ADR-059 whole-surface candidate for a dirty surface under current authority, claim, ancestry, and CAS guards. Development-quality validation is not a generic `ruu` checkpoint prerequisite.
 
@@ -1132,7 +1136,7 @@ This is **intent to progress**, not an authoritative caller-local stage command.
 
 The same invocation can therefore have different effects depending on where the managed process currently is. The immediate invocation reason never narrows the global fixed-point sweep.
 
-## 4.9 Contribution-unit-worktree mutation requires durable external transferability plus an exclusive claim
+## 4.9 ContributionUnit authoring-surface mutation requires durable external transferability plus an exclusive claim
 
 For each repository-local contribution unit, `ruu` consumes external mutation-access state:
 
@@ -1152,7 +1156,7 @@ UNKNOWN
 → fail closed
 ```
 
-Transferability never substitutes for the exclusive worktree claim. `ruu` does not infer these states from process/session/heartbeat/liveness signals or from the convergence trigger.
+Transferability never substitutes for the exclusive authoring-surface claim. `ruu` does not infer these states from process/session/heartbeat/liveness signals or from the convergence trigger.
 
 ## 4.10 Simultaneous invocation demands coalesce behind one top-level executor
 
@@ -1364,7 +1368,7 @@ Semantic development validation remains external and may influence when the Deve
 
 ## 4.21 Development-validation execution is outside Git mutation authority
 
-Fine-grained worktree/ref/promotion claims protect Git/provider correctness. Tests/review/security validation execution and its CPU/RAM/worker scheduling belong to the external Development System under ADR-057/060.
+Fine-grained authoring-surface/ref/promotion claims protect Git/provider correctness. Tests/review/security validation execution and its CPU/RAM/worker scheduling belong to the external Development System under ADR-057/060.
 
 `ruu` has no development-validation worker queue, evidence cache, validation-demand state, retry-until-green loop, or generic development-quality gate.
 
@@ -1602,7 +1606,7 @@ Do not spin while waiting on external governance or another transition-specific 
 
 ## 5.6 Unresolved contribution obligations block internal convergence-unit readiness
 
-Physical ContributionUnit branch/ref/worktree existence is not itself the readiness criterion. A ConvergenceUnit may become internally ready only when contribution membership is `SEALED`, every ContributionUnit is `CLOSED`, and every still-required exact managed checkpoint obligation in that scope is resolved into the exact ConvergenceUnit result.
+Physical ContributionUnit branch/ref/authoring-surface existence is not itself the readiness criterion. A ConvergenceUnit may become internally ready only when contribution membership is `SEALED`, every ContributionUnit is `CLOSED`, and every still-required exact managed checkpoint obligation in that scope is resolved into the exact ConvergenceUnit result.
 
 ```text
 CLOSED ContributionUnit
@@ -1636,7 +1640,7 @@ Git cannot safely reconcile concurrent filesystem writes that already happened d
 
 ---
 
-## 6.2 Separate Git worktrees are the isolation primitive
+## 6.2 A repository-local ContributionUnit Authoring Surface is the isolation primitive
 
 The required isolation object is repository-local:
 
@@ -1648,7 +1652,9 @@ exactly 1 repository_id
 exactly 1 convergence_unit_id
 
 while externally provisioned for active editing:
-  one isolated Git worktree/ref surface for that producer context
+  1 conforming ContributionUnit Authoring Surface
+  + 1 current managed authoring ref
+  for that producer context
 ```
 
 For one repository with two concurrent contribution units:
@@ -1659,7 +1665,7 @@ For one repository with two concurrent contribution units:
              ┌────────┴────────┐
              │                 │
        contribution-unit A    contribution-unit B
-       worktree-A         worktree-B
+       authoring-surface A    authoring-surface B
 ```
 
 Both contribution units may contain concurrent changes to the same logical path, for example:
@@ -1674,13 +1680,15 @@ If one higher-level activity needs Repo1 and Repo2, it uses two repository-local
 
 ```text
 higher-level work
-├── Repo1 / contribution-unit A1 / worktree-A1
-└── Repo2 / contribution-unit A2 / worktree-A2
+├── Repo1 / contribution-unit A1 / authoring-surface A1
+└── Repo2 / contribution-unit A2 / authoring-surface A2
 ```
 
 `ruu` does not require an actor identity proving that A1 and A2 came from the same producer/session/task.
 
-No worktree or contribution unit spans multiple Git repositories.
+No authoring surface or contribution unit spans multiple Git repositories.
+
+The surface contract is substrate-neutral. A dedicated linked Git worktree/ref is one conforming realization. A private primary working tree of an already externally isolated repository instance is another conforming realization after ordinary Ruu pre-edit admission, without creating an extra linked worktree merely for isolation. The outer mechanism that provides isolation — the coding harness, an orchestrator, a VM/container/sandbox/copy-on-write workspace, or process-level isolation — is outside the Ruu model; Ruu neither selects nor owns it.
 
 Reconciliation is deferred to Git:
 
@@ -1802,7 +1810,7 @@ contribution_unit_id → exactly one convergence_unit_id membership for its iden
 contribution_unit_id → authoritative lifecycle OPEN | CLOSED
 contribution_unit_id → latest authoritative managed checkpoint OID, if any
 contribution_unit_id → exact authoring base at admission
-contribution_unit_id ↔ observations of currently present editing ref/worktree/remote-ref surfaces, if any
+contribution_unit_id ↔ observations of currently present editing ref/authoring-surface/remote-ref artifacts, if any
 AuthoringDependency immutable source/consumer/OID definitions and current lifecycle
 AUTHORING_DEPENDENCY_OID_ANCHOR recovery-resource bindings
 external mutation-access state/handle for present editing surfaces
@@ -1841,7 +1849,7 @@ resolve/register repository
 → activate repository
 → resolve ConvergenceBase + immutable PromotionTarget
 → create/resolve convergence unit with exact target binding
-→ create contribution-unit ref/worktree
+→ establish contribution-unit ref + conforming ContributionUnit Authoring Surface
 → establish contribution-unit mutation authority
 → authorize first edit
 ```
@@ -2005,28 +2013,46 @@ Lifecycle answers only whether this bounded ContributionUnit may still produce f
 
 The exact checkpoint OID answers what durable managed Git state, if any, still participates in convergence. Branch/ref/worktree presence is not the logical identity.
 
-Mutation access answers only whether `ruu` may attempt to obtain exclusive mutation authority over a currently existing ContributionUnit worktree.
+Mutation access answers only whether `ruu` may attempt to obtain exclusive mutation authority over a currently existing ContributionUnit Authoring Surface.
 
 Neither dimension implies another. `CLOSED` never returns to `OPEN`; later work uses a new `contribution_unit_id`.
 
-## 8.0A V1 authoring substrate is a dedicated Git worktree
+## 8.0A V1 active authoring requires a conforming ContributionUnit Authoring Surface
 
-ADR-073 closes the v1 authoring-substrate boundary. Before the first managed write of every actively authored ContributionUnit, v1 requires one dedicated Git worktree/ref editing surface provisioned for that ContributionUnit. Concurrent ContributionUnits MUST NOT share one mutable checkout.
+ADR-084 closes the v1 authoring-substrate contract. Before the first managed write of every actively authored ContributionUnit, v1 requires one conforming **ContributionUnit Authoring Surface** with its current managed authoring ref. Concurrent ContributionUnits MUST NOT share one mutable authoring surface.
 
 The normative v1 path is:
 
 ```text
 ContributionUnit
-→ dedicated Git worktree/ref surface
+→ conforming ContributionUnit Authoring Surface
+(e.g. dedicated linked Git worktree, or private primary working tree
+ of an already externally isolated repository instance)
 → external authoring
 → frozen mutation-authority handoff
 → exact whole-surface capture
 → canonical managed checkpoint
 ```
 
-V1 does not define a second direct authoring contract for arbitrary prebuilt commit OIDs, `tree + parent` tuples, or external filesystem/sandbox snapshots that bypass this managed worktree topology. Ordinary native Git commits made by the human/agent inside the managed worktree remain ordinary Git and are reconciled from that managed topology.
+The surface contract requires at least:
 
-The worktree is the concrete **v1 authoring isolation substrate**, not the permanent identity of the ContributionUnit. After exact managed state has been captured, later worktree disappearance does not erase durable identity/checkpoints under ADR-038/071. A future sandbox substrate requires a new ADR proving equivalent isolation, exact-base, authority/freeze, and deterministic capture properties; no speculative generic authoring-adapter API is defined in v1.
+```text
+mutable isolation between concurrent ContributionUnits
+exact repository/base identity at admission and continuation
+ContributionUnit attribution/binding
+current managed authoring ref
+pre-write admission
+exclusive mutation authority
+freezeable handoff
+exact whole-surface capture
+continuity independent of surface lifetime after authoritative checkpointing
+```
+
+A dedicated linked Git worktree is a conforming realization. A private primary working tree in an already externally isolated repository instance is also a conforming realization after ordinary Ruu pre-edit admission. The mechanism that creates the isolation is not normative; VM, container, sandbox, process-isolation, and filesystem-isolation mechanisms stay outside the Ruu model.
+
+V1 still does not define a second direct authoring contract for arbitrary prebuilt commit OIDs, `tree + parent` tuples, or external filesystem/sandbox snapshots that bypass the managed surface. Arbitrary prebuilt commit/tree/snapshot ingress remains outside the contract. Ordinary native Git commits made by the human/agent inside the managed surface remain ordinary Git and are reconciled from that managed topology.
+
+The surface is the concrete **v1 authoring isolation substrate**, not the permanent identity of the ContributionUnit. After exact managed state has been captured, later surface disappearance does not erase durable identity/checkpoints under ADR-038/071. No speculative generic authoring-adapter API is defined in v1.
 
 ## 8.1 Protected contribution editing surface
 
@@ -2042,7 +2068,7 @@ means an external producer/control-plane owner still retains mutation authority 
 mutation_access = TRANSFERABLE_TO_RUU
 ```
 
-means the External Control Plane has durably relinquished external mutation authority over that editing surface to the `ruu` coordination domain. The current authoritative executor may attempt the ordinary exclusive worktree claim.
+means the External Control Plane has durably relinquished external mutation authority over that editing surface to the `ruu` coordination domain. The current authoritative executor may attempt the ordinary exclusive authoring-surface claim.
 
 This state is independent of whichever caller/trigger caused a sweep. It remains subject to the External Control Plane's explicit release/reacquisition contract; a convergence trigger never creates it.
 
@@ -2052,9 +2078,9 @@ This state is independent of whichever caller/trigger caused a sweep. It remains
 mutation_access = TRANSFERABLE_GENERAL
 ```
 
-means no external work producer retains mutation authority over that editing surface. The current authoritative executor may attempt the ordinary exclusive worktree claim under normal authorization/policy.
+means no external work producer retains mutation authority over that editing surface. The current authoritative executor may attempt the ordinary exclusive authoring-surface claim under normal authorization/policy.
 
-`UNKNOWN` fails closed for worktree mutation.
+`UNKNOWN` fails closed for authoring-surface mutation.
 
 ## 8.4 Editing-artifact presence is not ContributionUnit identity; managed-ref removal opens one explicit disposition transition
 
@@ -2105,7 +2131,7 @@ A known/observed mutation that violates the external/exclusive mutation-authorit
 
 # 9. Contribution-unit mutation-authority boundary
 
-The External Control Plane owns the right to edit a ContributionUnit worktree and is responsible for making that editing surface safely transferable when convergence should be allowed.
+The External Control Plane owns the right to edit a ContributionUnit Authoring Surface and is responsible for making that editing surface safely transferable when convergence should be allowed.
 
 The durable external contract is classified as:
 
@@ -2116,7 +2142,7 @@ PROTECTED_EXTERNAL
 
 TRANSFERABLE_TO_RUU
 → external mutation authority has been relinquished to the Ruu coordination domain
-→ the current authoritative executor may attempt the exclusive worktree claim
+→ the current authoritative executor may attempt the exclusive authoring-surface claim
 
 TRANSFERABLE_GENERAL
 → no external work producer retains mutation authority
@@ -2132,7 +2158,7 @@ The trigger that requests convergence is not part of this authority state.
 
 ```text
 observe/revalidate durable external mutation access
-→ atomically acquire exclusive worktree claim for the current authoritative executor/operation
+→ atomically acquire exclusive authoring-surface claim for the current authoritative executor/operation
 → revalidate exact topology/Git/candidate state under that authority
 → perform only authorized convergence mutations
 → release claim
@@ -2144,7 +2170,7 @@ Candidate attribution under ADR-040 follows this valid ContributionUnit mutation
 
 # 10. Atomic acquisition of an existing contribution unit
 
-`ruu` may mutate an existing contribution-unit worktree for operations such as:
+`ruu` may mutate an existing ContributionUnit Authoring Surface for operations such as:
 
 ```text
 commit collection from dirty files
@@ -2168,7 +2194,7 @@ contribution_unit_id
 mutation_access
 = external statement of whether this exact contribution unit is protected or safely transferable
 
-worktree_claim
+authoring_surface_claim
 = Ruu's own exclusive current-executor/operation claim for mutation
 ```
 
@@ -2186,9 +2212,9 @@ PROTECTED_EXTERNAL
 UNKNOWN
 ```
 
-are not claimable. `ruu` leaves the ContributionUnit worktree unchanged and continues unrelated work.
+are not claimable. `ruu` leaves the ContributionUnit Authoring Surface unchanged and continues unrelated work.
 
-A clean worktree does not weaken this protection.
+A clean authoring surface does not weaken this protection.
 
 ## 10.2 Transferable contribution unit
 
@@ -2198,7 +2224,7 @@ OR
 TRANSFERABLE_GENERAL
 ```
 
-allows the current authoritative executor to attempt the ordinary exclusive worktree claim.
+allows the current authoritative executor to attempt the ordinary exclusive authoring-surface claim.
 
 The transfer state itself is not mutation authority:
 
@@ -2241,7 +2267,7 @@ principal is a privileged orchestrator
 → therefore external mutation protection may be ignored         [FALSE]
 
 external producer/runtime appears absent
-→ therefore Ruu may declare the worktree transferable  [FALSE]
+→ therefore Ruu may declare the authoring surface transferable  [FALSE]
 
 convergence demand was accepted
 → therefore mutation authority moved to Ruu             [FALSE]
@@ -2252,7 +2278,7 @@ transferable state observed
 
 The External Control Plane establishes durable transferability; `ruu` establishes its own exact exclusive claim.
 
-This worktree mutation authority is distinct from claims on convergence-unit refs, promotion units, submission refs/revisions, DIRECT target advancement, remote publication targets, and submission/provider operations.
+This authoring-surface mutation authority is distinct from claims on convergence-unit refs, promotion units, submission refs/revisions, DIRECT target advancement, remote publication targets, and submission/provider operations.
 
 # 11. Concurrent convergence demands and single-run ownership
 
@@ -2320,7 +2346,7 @@ DIRECT_TARGET_ADVANCE route
 
 Claims are fine-grained and typed. A single global mutex is not the baseline.
 
-## 12.1 Contribution-unit-worktree mutation claim
+## 12.1 ContributionUnit authoring-surface mutation claim
 
 Required for:
 
@@ -2331,7 +2357,7 @@ ContributionUnit conflict resolution on an existing editing surface
 checkout/index-affecting reset/movement
 ```
 
-Exactly one incompatible current executor/operation may own the worktree claim.
+Exactly one incompatible current executor/operation may own the authoring-surface claim.
 
 External mutation-access eligibility is revalidated before and during claim acquisition.
 
@@ -2342,7 +2368,7 @@ Shared internal mutations require exact coordination on:
 ```text
 convergence-unit ref
 contribution-unit ref when a producer/editing ref exists and is synchronized
-ContributionUnit latest_authoritative_managed_checkpoint_oid record when exact-state progression occurs without that ref/worktree
+ContributionUnit latest_authoritative_managed_checkpoint_oid record when exact-state progression occurs without that ref/authoring surface
 ```
 
 Expected-old OIDs/record versions are revalidated immediately before mutation. A logical-checkpoint update produced in an isolated workspace must keep the exact result durably reachable until ConvergenceUnit adoption or recovery recording; it does not recreate a deleted producer branch/worktree.
@@ -2392,7 +2418,7 @@ Independent repositories, contribution units, convergence units, promotion units
 Likely coordination scopes include:
 
 ```text
-repository-local contribution-unit worktree
+repository-local ContributionUnit authoring surface
 convergence-unit ref
 contribution-unit ref when synchronized
 promotion_unit_id
@@ -2796,7 +2822,7 @@ The architecture therefore separates:
 
 ```text
 repository_id
-worktree_id
+authoring_surface_binding
 contribution_unit_id
 convergence_unit_id
 promotion_unit_id
@@ -2805,7 +2831,7 @@ actual Git refs/OIDs
 provider submission identity
 ```
 
-A descriptive branch name is metadata, not identity.
+A descriptive branch name is metadata, not identity. The authoring-surface binding/locator identifies the current exact surface for the applicable Ruu guards; for a worktree-backed realization it records the registered worktree identity/path.
 
 ## 18.1 Convergence-unit lifecycle and contribution-membership state
 
@@ -3007,7 +3033,7 @@ Unexpected movement outside an authorized revision transition:
 Examples include:
 
 ```text
-contribution-unit worktree exists but mapping/ownership is unknown
+ContributionUnit authoring surface exists but mapping/ownership is unknown
 unresolved authoritative checkpoint OID is known but no valid managed source can recover it
 convergence-unit identity maps ambiguously to refs
 promotion unit has ambiguous source bindings or target-incoherent member bindings
@@ -3037,9 +3063,9 @@ For each repository-local internal work graph:
 ```text
 ConvergenceBase ref
   └── convergence-unit ref
-        ├── contribution unit-A ref → worktree-A
-        ├── contribution unit-B ref → worktree-B
-        └── contribution unit-C ref → worktree-C
+        ├── contribution unit-A ref → authoring-surface A
+        ├── contribution unit-B ref → authoring-surface B
+        └── contribution unit-C ref → authoring-surface C
 ```
 
 The contribution-unit provisioner establishes this graph before the first managed write in each contribution unit.
@@ -3049,7 +3075,7 @@ For each repository-local `contribution_unit_id`, shared coordination state must
 ```text
 repository_id
 contribution_unit_id
-worktree_id/path
+authoring_surface_binding/locator
 contribution_unit_ref
 convergence_unit_id
 convergence_ref
@@ -3061,8 +3087,10 @@ external mutation-access state/handle as supplied by the External Control Plane
 Before committing or synchronizing a contribution unit, `ruu` verifies:
 
 ```text
-worktree belongs to expected repository
-checked-out ref is expected contribution-unit ref
+authoring surface belongs to the expected repository
+  (registered worktree identity/path when worktree-backed)
+checked-out ref/HEAD relationship is the expected contribution-unit ref
+  when the surface is a checkout
 contribution unit maps to the expected convergence unit
 contribution-unit topology/ref was provisioned from that convergence unit
 external mutation-access state and exclusive claim authority are valid
@@ -3275,7 +3303,7 @@ If a required work-bearing invocation, PromotionGroup group-local resolution, or
 
 ## 22.1 Managed checkpoint adoption and commit collection
 
-For every exact frozen work-bearing handoff, Ruu first observes the current managed ref, worktree, prior checkpoint/admitted base, and canonical ancestry under the current binding/claim/CAS guards.
+For every exact frozen work-bearing handoff, Ruu first observes the current managed authoring ref, the current ContributionUnit Authoring Surface, the prior checkpoint/admitted base, and canonical ancestry under the current binding/claim/CAS guards.
 
 ```text
 clean current managed-ref tip K
@@ -3313,16 +3341,16 @@ Native commit creation remains exact-state rediscovery. The managed event is cle
 
 ```text
 OPEN or CLOSED
-+ editing branch/worktree exists
++ authoring surface present
 → ordinary checkpoint/synchronization work may proceed when authority permits
 
 OPEN or CLOSED
-+ editing branch/worktree absent
++ authoring surface absent
 + no unresolved exact managed checkpoint obligation
 → no action required
 
 OPEN or CLOSED
-+ editing branch/worktree absent
++ authoring surface absent
 + unresolved exact managed checkpoint OID recoverable
 → continue exact-state convergence from OID using isolated workspace where needed
 
@@ -3367,11 +3395,11 @@ Synchronization has two mechanically equivalent exact-state paths depending on w
 
 ### Existing editing surface
 
-If the ContributionUnit branch/worktree is present and synchronization mutates that checked-out state, exclusive ContributionUnit-worktree mutation authority is required.
+If the ContributionUnit authoring surface is present and synchronization mutates that checked-out state, exclusive ContributionUnit authoring-surface mutation authority is required.
 
 ### Editing surface absent
 
-If the producer branch/worktree is absent but the latest authoritative managed checkpoint OID is still reachable, `ruu` MUST NOT recreate the producer branch/worktree merely to synchronize it. It may materialize the exact descendant/merge result in an isolated integration workspace. A newly synthesized clean result may advance the logical `latest_authoritative_managed_checkpoint_oid` when its exact transition-local topology/claim/conflict/expected-old guards hold.
+If the producer authoring surface is absent but the latest authoritative managed checkpoint OID is still reachable, `ruu` MUST NOT recreate the producer authoring surface merely to synchronize it. It may materialize the exact descendant/merge result in an isolated integration workspace. A newly synthesized clean result may advance the logical `latest_authoritative_managed_checkpoint_oid` when its exact transition-local topology/claim/conflict/expected-old guards hold.
 
 An operation-owned temporary reachability anchor or equivalent recovery-safe mechanism must keep the new exact OID recoverable until adoption/recovery disposition.
 
@@ -3558,7 +3586,7 @@ qualifying source handoff accepted after TX-A but before dependency-adoption TX-
 → never strand the dependency solely because anchor/adoption overlapped handoff
 ```
 
-For a resolved separate-group dependency, ADR-050 receives immutable owned `(old_base=A, owned_candidate=B)` plus current parent `K`. It never derives source identity from candidate ancestry alone and never mutates an active consumer worktree.
+For a resolved separate-group dependency, ADR-050 receives immutable owned `(old_base=A, owned_candidate=B)` plus current parent `K`. It never derives source identity from candidate ancestry alone and never mutates an active consumer authoring surface.
 
 ## 22.9 DIRECT_TARGET_ADVANCE realization
 
@@ -4147,19 +4175,19 @@ Underlying contribution-unit/convergence-unit refs retain stable OIDs.
 # 26. Important invariants
 
 ## Invariant 1 — No shared mutable checkout between concurrent contribution units
-Two concurrently active contribution units never write the same physical worktree.
+Two concurrently active contribution units never share one mutable authoring surface: they never write concurrently in the same working directory, the same index, or the same mutable authoring state.
 
 ---
-## Invariant 1A — V1 managed authoring requires a dedicated Git worktree substrate
-Every actively authored v1 ContributionUnit is provisioned with a dedicated Git worktree/ref surface before its first managed write. V1 defines no alternative direct authoring substrate that bypasses this topology with arbitrary prebuilt commit/tree/snapshot input. Post-capture worktree absence does not erase durable ContributionUnit identity or exact managed checkpoints.
+## Invariant 1A — V1 managed authoring requires a conforming ContributionUnit Authoring Surface
+Every actively authored v1 ContributionUnit is provisioned with a conforming ContributionUnit Authoring Surface and its current managed authoring ref before its first managed write. A dedicated linked Git worktree is one conforming realization; a private primary working tree of an already externally isolated repository instance is another after ordinary Ruu pre-edit admission. V1 defines no alternative direct authoring substrate that bypasses the admitted surface with arbitrary prebuilt commit/tree/snapshot input. Post-capture surface absence does not erase durable ContributionUnit identity or exact managed checkpoints.
 
 ---
 ## Invariant 2 — Every contribution unit has one stable repository-local convergence scope
-Each `contribution_unit_id` maps to exactly one `repository_id` and exactly one `convergence_unit_id` membership for that identity. While active editing is provisioned, isolation uses a dedicated worktree/ref surface; that surface may later disappear without erasing the ContributionUnit identity or any already-created exact managed checkpoint. Changing convergence scope requires a new ContributionUnit.
+Each `contribution_unit_id` maps to exactly one `repository_id` and exactly one `convergence_unit_id` membership for that identity. While active editing is provisioned, isolation uses a conforming ContributionUnit Authoring Surface with its current managed authoring ref; that surface may later disappear without erasing the ContributionUnit identity or any already-created exact managed checkpoint. Changing convergence scope requires a new ContributionUnit.
 
 ---
 ## Invariant 3 — Pre-edit provisioning happens before first managed write
-Repository/convergence-unit/contribution-unit/worktree topology and its safe mutation-authority mechanism must be established before the first managed write.
+Repository/convergence-unit/contribution-unit/authoring-surface topology and its safe mutation-authority mechanism must be established before the first managed write.
 
 ---
 ## Invariant 4 — Pre-edit provisioning is not a convergence side effect
@@ -4179,24 +4207,24 @@ Contribution-unit refs are provisioned from their convergence-unit ref, never di
 
 ---
 ## Invariant 8 — External producer/runtime liveness is outside `ruu`
-`ruu` never infers safe worktree transferability from heartbeat, timeout, process/session state, turn lifecycle, or model identity.
+`ruu` never infers safe authoring-surface transferability from heartbeat, timeout, process/session state, turn lifecycle, or model identity.
 
 ---
 ## Invariant 9 — Invocation principal, trigger, and contribution-unit identity are distinct
-Human/agent/script/Turnlock/`/go`/automation identity and the convergence trigger it emits do not imply contribution-unit-worktree mutation authority.
+Human/agent/script/Turnlock/`/go`/automation identity and the convergence trigger it emits do not imply ContributionUnit authoring-surface mutation authority.
 
 ---
 ## Invariant 10 — External mutation protection is absolute
-`PROTECTED_EXTERNAL` or `UNKNOWN` never authorizes contribution-unit-worktree mutation.
+`PROTECTED_EXTERNAL` or `UNKNOWN` never authorizes ContributionUnit authoring-surface mutation.
 
 ---
 ## Invariant 11 — Transferability still requires a race-safe exclusive claim
-`TRANSFERABLE_TO_RUU` or `TRANSFERABLE_GENERAL` permits only an attempt to claim. Mutation requires the current authoritative executor/operation to hold the exclusive worktree claim, with transferability revalidated under the same authority arbitration and external reacquisition prevented while the claim is held.
+`TRANSFERABLE_TO_RUU` or `TRANSFERABLE_GENERAL` permits only an attempt to claim. Mutation requires the current authoritative executor/operation to hold the exclusive authoring-surface claim, with transferability revalidated under the same authority arbitration and external reacquisition prevented while the claim is held.
 
 ---
 
 ## Invariant 12 — Contribution-unit identity is opaque
-`ruu` does not derive `contribution_unit_id` or mutation authority from principal, process, session, branch name, worktree path, or CWD.
+`ruu` does not derive `contribution_unit_id` or mutation authority from principal, process, session, branch name, authoring-surface locator, or CWD.
 
 ---
 ## Invariant 13 — Commit does not imply contribution-unit closure
@@ -4204,7 +4232,7 @@ Checkpoint commit, eager upward integration, contribution-unit closure, converge
 
 ---
 ## Invariant 14 — Contribution-unit lifecycle is externally authoritative and runtime-independent
-`ruu` never infers `CLOSED` from agent/process inactivity, waiting for user input, turn completion, clean state, commit, external development-validation PASS/attestation, current integration state, or branch/worktree presence/absence.
+`ruu` never infers `CLOSED` from agent/process inactivity, waiting for user input, turn completion, clean state, commit, external development-validation PASS/attestation, current integration state, or branch/authoring-surface presence/absence.
 
 ---
 ## Invariant 15 — Terminal contribution units never reopen
@@ -4255,8 +4283,8 @@ Upward integration requires exact convergence-unit tip to be ancestor of exact c
 Equal/ancestor/diverged classification comes from authoritative Git, not heuristics/metadata.
 
 ---
-## Invariant 24 — Contribution-unit-worktree mutation requires exclusive claim
-Commit, synchronization candidate mutation, reset/check-out effects, and any other `ruu` mutation of an existing ContributionUnit worktree require exact worktree authority. Semantic conflict authoring is outside `ruu`.
+## Invariant 24 — ContributionUnit authoring-surface mutation requires exclusive claim
+Commit, synchronization candidate mutation, reset/check-out effects, and any other `ruu` mutation of an existing ContributionUnit Authoring Surface require exact authoring-surface authority. Semantic conflict authoring is outside `ruu`.
 
 ---
 ## Invariant 25 — Shared ref mutations require exact expected-state coordination
@@ -4275,7 +4303,7 @@ If deterministic Git/repository mechanics cannot construct a safe result without
 Process identity does not determine contribution ownership. State produced inside a valid ContributionUnit mutation-authority boundary is attributed to that ContributionUnit candidate; known authority violations fail closed as integrity/staleness conditions.
 
 ---
-## Invariant 27 — Integration/projection work never hijacks externally protected contribution-unit worktrees
+## Invariant 27 — Integration/projection work never hijacks externally protected ContributionUnit authoring surfaces
 Shared merges and ADR-048 promotion-candidate materialization use isolated owned state.
 
 ---
@@ -4308,7 +4336,7 @@ A repository may leave the derived active index only when authoritative managed 
 
 ---
 ## Invariant 35 — `ruu` is explicitly invoked
-No background/implicit convergence starts merely because a contribution unit needs a worktree.
+No background/implicit convergence starts merely because a contribution unit needs an authoring surface.
 
 ---
 ## Invariant 36 — Every serviced convergence demand is satisfied only by a global managed-obligation sweep
@@ -4588,7 +4616,7 @@ The session that produced the provider submission may be closed/gone, and the se
 
 ---
 ## Invariant 63C — Review correction uses new ContributionUnits from the exact reviewed/group state, never the submission ref as an authoring surface
-Affected existing ConvergenceUnits may be reactivated while the correction session discovers the needed scope, but every new implementation write is performed through a newly provisioned ContributionUnit/writer branch/worktree seeded from the exact group/review state authorized by the correction. A `CLOSED` ContributionUnit never reopens, the provider-facing submission ref is never a coding workspace, and unrelated later live ConvergenceUnit work is not silently absorbed.
+Affected existing ConvergenceUnits may be reactivated while the correction session discovers the needed scope, but every new implementation write is performed through a newly provisioned ContributionUnit authoring surface seeded from the exact group/review state authorized by the correction. A `CLOSED` ContributionUnit never reopens, the provider-facing submission ref is never a coding workspace, and unrelated later live ConvergenceUnit work is not silently absorbed.
 
 ---
 ## Invariant 63C1 — Nonblocking semantic findings are not provider correction demands
@@ -4746,9 +4774,9 @@ Tests/review/security/code-quality execution belongs outside; exact OIDs, ancest
 
 Development-quality success never implicitly closes a ContributionUnit, seals membership, manufactures `READY_INTERNAL`, supplies a work-bearing invocation cohort/promotion binding, or requests provider review. Those facts remain explicit under their existing owners; Ruu mechanically creates the ordinary PromotionGroup from the accepted cohort.
 
-## Invariant 92 — ContributionUnit checkpoint mutation still requires exclusive worktree authority
+## Invariant 92 — ContributionUnit checkpoint mutation still requires exclusive authoring-surface authority
 
-While `ruu` holds the exclusive ContributionUnit worktree claim, no external producer may mutate that worktree.
+While `ruu` holds the exclusive ContributionUnit authoring-surface claim, no external producer may mutate that surface.
 
 ## Invariant 93 — Invocation is convergence demand, not universal authority
 
@@ -5076,7 +5104,7 @@ A different ref pointing at the same OID/tree or sharing ancestry with the old m
 
 ---
 ## Invariant 173 — Exceptional authoring-binding recovery is generation-bound and Git-revalidated
-When native causal evidence is irretrievably insufficient, the External Control Plane may resolve the current ambiguous occurrence only through an expected-old/binding-generation guarded `AuthoringBindingRecovery(REBIND(new_ref) | ABANDON)`. `ruu` independently validates actual Git/ref/worktree state and mutation authority; the declaration cannot manufacture Git history or allow stale metadata to resurrect abandoned work.
+When native causal evidence is irretrievably insufficient, the External Control Plane may resolve the current ambiguous occurrence only through an expected-old/binding-generation guarded `AuthoringBindingRecovery(REBIND(new_ref) | ABANDON)`. `ruu` independently validates actual Git/ref/authoring-surface state and mutation authority; the declaration cannot manufacture Git history or allow stale metadata to resurrect abandoned work.
 
 ---
 ## Invariant 174 — Ancestry interpretation environment is correctness-relevant state
@@ -5148,11 +5176,11 @@ If the pre-linearization observer still runs but its protection filter is unavai
 
 ---
 ## Invariant 191 — Managed binding admission is serialized with native ref mutation
-A candidate ref becomes a current managed binding only while a conforming `RefAdmissionBarrier` verifies its exact preimage under native-ref exclusion and keeps that exclusion held through authoritative binding commit. Releasing the barrier before binding publication is forbidden. Candidate branch/worktree creation alone has no managed-binding semantics.
+A candidate ref becomes a current managed binding only while a conforming `RefAdmissionBarrier` verifies its exact preimage under native-ref exclusion and keeps that exclusion held through authoritative binding commit. Releasing the barrier before binding publication is forbidden. Candidate branch/authoring-surface creation alone has no managed-binding semantics.
 
 ---
 ## Invariant 192 — Initial authoring handoff requires exact topology and exclusive pre-handoff authority
-Before first managed write, the provisioning path retains exclusive authority over the candidate worktree, revalidates repository/worktree identity, registered path, symbolic HEAD/ref relationship and exact OID, publishes the protected current binding, releases the ref barrier, then transfers authoring authority to the producer. `git worktree lock` may be defense-in-depth but is not the correctness fence for HEAD/topology.
+Before first managed write, the provisioning path retains exclusive authority over the candidate authoring surface, revalidates repository identity, the authoring-surface binding/locator including worktree identity and registered path when worktree-backed, the symbolic HEAD/ref relationship and exact OID, publishes the protected current binding, releases the ref barrier, then transfers authoring authority to the producer. `git worktree lock` may be defense-in-depth but is not the correctness fence for HEAD/topology.
 
 ---
 ## Invariant 193 — Observation authority is source-domain scoped
@@ -5196,11 +5224,11 @@ Any protocol that needs both a live native ref exclusion and a live Coordination
 
 ---
 ## Invariant 203 — Dirty authoring state is not an exact dependency version
-A dependency may identify only an exact native commit. Ruu never consumes or implicitly commits another producer's mutable worktree/index/untracked/ignored state.
+A dependency may identify only an exact native commit. Ruu never consumes or implicitly commits another producer's mutable authoring-surface/index/untracked/ignored state.
 
 ---
 ## Invariant 204 — ContributionUnit is the sole v1 authoring-occurrence identity
-Canonical authoring source identity is `(repository_id, contribution_unit_id)`. Session, process, task, branch, worktree, and a separate `work_occurrence_id` are not competing domain identities.
+Canonical authoring source identity is `(repository_id, contribution_unit_id)`. Session, process, task, branch, authoring-surface locator, and a separate `work_occurrence_id` are not competing domain identities.
 
 ---
 ## Invariant 205 — AuthoringDependency requires semantic selection plus exact Git proof
@@ -5232,7 +5260,7 @@ Mapping to `(PromotionGroup, source repository)` requires the same source Contri
 
 ---
 ## Invariant 212 — Source advancement never mutates active consumer authoring
-Later source movement does not change the selected consumed OID or rewrite a producer-owned consumer worktree. Reprojection occurs only at an authorized handoff/promotion boundary.
+Later source movement does not change the selected consumed OID or rewrite a producer-owned consumer authoring surface. Reprojection occurs only at an authorized handoff/promotion boundary.
 
 ---
 ## Invariant 213 — Same-group dependency creates no stack edge
@@ -5258,7 +5286,7 @@ Crash, retry, duplicate observation, concurrent compression, and repeated sweeps
 
 ## 27.1 Repository/bootstrap and contribution-unit provisioners — outside the convergence engine
 
-For an existing admitted repository, the contribution-unit provisioner owns pre-edit lazy establishment of convergence-unit/contribution-unit/worktree topology, adoption of any explicitly selected exact AuthoringDependencies and their initial bases/anchors, the native reflog required for the managed authoring ref, repository-common observer/protection-filter readiness, the exact `RefAdmissionBarrier`, and the initial external mutation-authority handoff. Candidate worktree/ref creation precedes managed admission; the candidate is not producer-writable until exact binding publication and handoff complete.
+For an existing admitted repository, the contribution-unit provisioner owns pre-edit lazy establishment of convergence-unit/contribution-unit/authoring-surface topology, adoption of any explicitly selected exact AuthoringDependencies and their initial bases/anchors, the native reflog required for the managed authoring ref, repository-common observer/protection-filter readiness, the exact `RefAdmissionBarrier`, and the initial external mutation-authority handoff. Candidate authoring-surface/ref establishment precedes managed admission; the candidate is not producer-writable until exact binding publication and handoff complete.
 
 For a brand-new repository, ADR-056 places a Repository Provisioner one step earlier: it executes current External Control Plane creation authority, establishes/adopts the exact `B0` bootstrap target and `RepositoryBootstrapContract`, and only then hands the `REPOSITORY_ADMITTED` repository to ordinary ADR-015/023 contribution-unit provisioning. Provider attachment may be later/lazy.
 
@@ -5284,9 +5312,9 @@ Resolves/revalidates the effective repo-local promotion policy and provider capa
 
 It must expose a state fingerprint/version suitable for exact authorization checks.
 
-## 27.4 Worktree manager — provisioning side
+## 27.4 ContributionUnit authoring-surface manager — provisioning side
 
-Provides isolated ContributionUnit worktree provisioning/removal for the External Control Plane. These editing-artifact lifecycle actions are outside the convergence engine's semantics but may be implemented by a Ruu-supplied harness/provisioning component.
+Provides isolated ContributionUnit authoring-surface establishment/admission/removal for the External Control Plane. A conforming surface may be a dedicated linked Git worktree or the private primary working tree of an already externally isolated repository instance. These editing-artifact lifecycle actions are outside the convergence engine's semantics but may be implemented by a Ruu-supplied harness/provisioning component.
 
 ## 27.5 Convergence-demand admission / mutation-access boundary
 
@@ -5301,7 +5329,7 @@ Owns external work-producer/runtime mutation rights, stop/crash/resume semantics
 Coordinates fine-grained claims for:
 
 ```text
-contribution-unit worktree
+ContributionUnit authoring surface
 convergence-unit ref
 promotion unit
 submission ref/revision
@@ -5348,7 +5376,7 @@ The ConvergenceEngine does not persist workflow-step position. Crash recovery is
 
 Consumes externally authoritative `OPEN | CLOSED`, exact latest managed checkpoint identity, and current editing-surface availability. It keeps checkpoint/integration orthogonal to lifecycle and does not own branch/worktree deletion or semantic abandonment.
 
-When an unresolved exact checkpoint remains recoverable, it can continue convergence without the producer worktree; when the required exact state is unrecoverable it records/localizes recovery-data-loss state.
+When an unresolved exact checkpoint remains recoverable, it can continue convergence without the producer authoring surface; when the required exact state is unrecoverable it records/localizes recovery-data-loss state.
 
 ## 27.13 Convergence-unit lifecycle engine
 
@@ -5388,7 +5416,7 @@ exact PromotionUnit sources
 → adopt/progress only under the exact transition-local Git/managed/policy/provider prerequisites of the next transition
 ```
 
-Materialization never rewrites internal ConvergenceUnit refs. Native multi-head octopus does not define the semantics. Conflicts requiring semantic authoring emit/refresh ADR-040 `RECONCILIATION_REQUIRED`. Candidate computation is isolated from producer worktrees and participates in ADR-042 Operation→Attempt→Observation→Adoption recovery.
+Materialization never rewrites internal ConvergenceUnit refs. Native multi-head octopus does not define the semantics. Conflicts requiring semantic authoring emit/refresh ADR-040 `RECONCILIATION_REQUIRED`. Candidate computation is isolated from producer authoring surfaces and participates in ADR-042 Operation→Attempt→Observation→Adoption recovery.
 
 ## 27.16 Direct promotion engine
 
@@ -5789,7 +5817,7 @@ Unsupported cross-repository stack topology blocks explicitly.
 
 A repository-local PromotionUnit may reference one or more exact convergence-unit inputs. ADR-048 fixes exact candidate materialization: exact effective base + ancestry-maximal reduction + canonical ancestry-aware pairwise full two-head merge semantics, with exact-state reuse when possible and otherwise one deterministic synthetic multi-parent final candidate.
 
-Candidate computation is isolated from ContributionUnit producer worktrees, conflict-detecting, recoverable/idempotent, exact-state-bound, and contains no hidden semantic grouping. Semantic conflicts route to ADR-040 `RECONCILIATION_REQUIRED`; the exact final candidate may be adopted only when its transition-local exact prerequisites hold.
+Candidate computation is isolated from ContributionUnit producer authoring surfaces, conflict-detecting, recoverable/idempotent, exact-state-bound, and contains no hidden semantic grouping. Semantic conflicts route to ADR-040 `RECONCILIATION_REQUIRED`; the exact final candidate may be adopted only when its transition-local exact prerequisites hold.
 
 ## 28.10 Repository promotion policy is authoritatively composed, target-bound, and current-state-bound
 
@@ -5907,7 +5935,7 @@ A naming convention may still improve observability, but correctness depends on 
 
 # 30. Design-question history and engineering tracking
 
-The archived `docs/history/design-backlog-through-adr-081.md` summarizes these historical questions and the verification/review topics introduced by ADR-029..ADR-032. New durable engineering follow-ups are tracked non-normatively in the GitHub Project **Ruu Engineering**. ADR-033/ADR-034/ADR-035 retire the former producer-liveness/actor-identity/runtime-handoff questions. ADR-036 fixes global sweep scope over all known nonterminal managed obligations across every lifecycle layer; repository activity indexes are non-authoritative acceleration state only. ADR-037 closes ConvergenceUnit creation/membership authority, removes a separate ContributionUnit integration-release signal, and defines sealed mechanical `READY_INTERNAL`. ADR-038 reduces ContributionUnit lifecycle to `OPEN | CLOSED`, removes abandonment/cleanup semantics, and makes exact managed checkpoint state—not branch/worktree existence—the continuity boundary. ADR-039 consolidates every normative upstream dependency into `EXTERNAL-CONTROL-PLANE-CONTRACT.md`. ADR-041 fixes v1 single-host scheduling: explicit invocations are coalescible convergence-demand triggers serviced by at most one fenced top-level run. ADR-042 closes 30.13 with the concrete reconciler-driven SQLite CoordinationStore, OS-owned run/fencing handshake, append-only recoverable-effect journal, transaction boundaries, stable repository relocation binding, and recovery-resource GC rules. ADR-043 closes 30.14 by fixing promotion-policy authority/constraint composition, trusted-target policy baselines, zero-onboarding built-in closure, and factual contradiction signaling without remediation advice. ADR-044 closes 30.15 by making immediate authoritative revalidation—not cache/TTL—the basis of policy currentness. ADR-045 closes 30.16 with immutable content-addressed PromotionUnit exact-state identity semantics. ADR-046 closes 30.17 by predeclaring durable closed content-addressed PromotionGroups over logical ConvergenceUnits without mid-sweep handoff or implicit singleton defaults. ADR-047 closes 30.18 by projecting each completely exact-resolved group deterministically into exactly one repository-local PromotionUnit per represented source repository. ADR-048 closes 30.39 by materializing a repository-local multi-source PromotionUnit through deterministic ancestry reduction, ancestry-aware canonical pairwise full two-head merge semantics, exact-state reuse when ancestry already suffices, otherwise one synthetic multi-parent final candidate, exact conflict/recovery boundaries, with no generic development-validation handoff for the final candidate after ADR-060. ADR-049 closes 30.19 with always-distinct submission refs, stable logical submission identity, exact revision guards, naming, and cleanup semantics. ADR-050 closes 30.20 by deriving stack shape from exact unsatisfied promotion dependencies and defining restack as an exact three-way state transplant over immutable owned child state. ADR-051 closes 30.21 by normalizing provider capability as contextual semantic-operation observation. ADR-052 closes 30.22 by making DIRECT target advancement a pure exact-old CAS+FF ref effect with recovery anchoring and authoritative-history adoption. ADR-053 closes 30.23 by turning exact `CHANGES_REQUESTED` generations into durable idempotent session-independent review-correction demands whose ordinary same-group corrections reconverge into new revisions of the same ADR-049 submission/PR. ADR-054 closes 30.24 by separating exact PromotionUnit completion from ConvergenceUnit semantic closure, operational retirement, GC eligibility, and physical retention; cross-repository partial promotion cannot prematurely close a lineage, and v1 historical internal-ref retention defaults to `KEEP`. ADR-055 closes 30.25 with durable exact-generation cross-repository settlement demands, external roll-forward/compensation authority, forward-only settlement effects, `ALL_PROMOTED | COMPENSATED` terminal settlement semantics, and sequential PublicationEpisodes for a stable logical submission whose earlier provider submission is already terminal. ADR-055 also retroactively makes the ADR-022/024/026/032/036 External Control Plane boundaries explicit in the companion contract. ADR-056 closes 30.26 by keeping new-repository creation outside the convergence engine/invocation, requiring an externally authoritative RepositoryCreationPolicy + recoverable Repository Provisioner (which ADR-078 permits the installed product to bundle), bootstrapping every newly admitted repository to a real exact target OID `B0` before managed authoring, separating local creation from optional/lazy provider attachment, and failing closed on unknown identity/collision rather than admitting unborn/null targets or guessing external authority. ADR-057 moves development verification execution outside `ruu`; ADR-060 further removes the generic development-validation evidence/demand protocol and replaces it with transition-local prerequisites. ADR-058 adds native-Git equivalence and fixes whole-editing-surface checkpoint intent with no v1 partial/path-selected checkpoint and no staging-based membership authority. ADR-059 closes 30.27 by canonicalizing the whole observable surface through native Git tree construction and fixing membership, structural blockers, submodule/sparse guards, no-op behavior, and exact pre-commit candidate identity. 30.29–30.33, 30.35, 30.37, and 30.38 are closed/reclassified outside the engine; ADR-061 closes 30.40 target-binding ownership/immutability; ADR-062 closes 30.36 by making early provider projection explicitly authorized and otherwise absent; ADR-063 keeps semantic findings/backlog outside the engine; ADR-064 makes pre-commit semantic-readiness identity a frozen mutation-handoff property rather than a generic validation-evidence gate. ADR-065 originally closed 30.34; ADR-066 corrects that proof to be route-conformant with explicit `C → H → R → O` provider lineage and historical-effect commitment semantics, while ADR-067 closes obsolete PromotionUnit supersession. ADR-068 originally closed 30.41 with explicit pre-promotion PromotionGroup `CANCELLED` settlement and deletion-neutrality; ADR-071 makes currently bound managed-authoring ref removal transactionally durable and ADR-074 corrects its classification to CONTINUATION-versus-ABANDON while unmanaged branch/worktree deletion remains neutral. ADR-069 closes hostile-audit items 30.42 and 30.43 by binding ordinary PromotionGroup occurrence identity to work-bearing logical invocations, making exact resolution group-local, and freezing terminal group resolution. ADR-071 closes 30.44 and 30.45 with current-disposition causal authorization fencing and transactional `reference-transaction` deletion capture. ADR-071 verification/v38 closes 30.48. ADR-072 closes 30.46 and ADR-073 closes 30.47. The native-Git observation-plane cluster under 30.49 is closed. ADR-074 closes 30.50, ADR-075 closes 30.51, ADR-076 closes 30.52, ADR-077 closes 30.53, ADR-079 closes 30.54, and ADR-080 closes 30.55 plus the umbrella with source-scoped local/remote/provider observation authority.
+The archived `docs/history/design-backlog-through-adr-081.md` summarizes these historical questions and the verification/review topics introduced by ADR-029..ADR-032. New durable engineering follow-ups are tracked non-normatively in the GitHub Project **Ruu Engineering**. ADR-033/ADR-034/ADR-035 retire the former producer-liveness/actor-identity/runtime-handoff questions. ADR-036 fixes global sweep scope over all known nonterminal managed obligations across every lifecycle layer; repository activity indexes are non-authoritative acceleration state only. ADR-037 closes ConvergenceUnit creation/membership authority, removes a separate ContributionUnit integration-release signal, and defines sealed mechanical `READY_INTERNAL`. ADR-038 reduces ContributionUnit lifecycle to `OPEN | CLOSED`, removes abandonment/cleanup semantics, and makes exact managed checkpoint state—not branch/worktree existence—the continuity boundary. ADR-039 consolidates every normative upstream dependency into `EXTERNAL-CONTROL-PLANE-CONTRACT.md`. ADR-041 fixes v1 single-host scheduling: explicit invocations are coalescible convergence-demand triggers serviced by at most one fenced top-level run. ADR-042 closes 30.13 with the concrete reconciler-driven SQLite CoordinationStore, OS-owned run/fencing handshake, append-only recoverable-effect journal, transaction boundaries, stable repository relocation binding, and recovery-resource GC rules. ADR-043 closes 30.14 by fixing promotion-policy authority/constraint composition, trusted-target policy baselines, zero-onboarding built-in closure, and factual contradiction signaling without remediation advice. ADR-044 closes 30.15 by making immediate authoritative revalidation—not cache/TTL—the basis of policy currentness. ADR-045 closes 30.16 with immutable content-addressed PromotionUnit exact-state identity semantics. ADR-046 closes 30.17 by predeclaring durable closed content-addressed PromotionGroups over logical ConvergenceUnits without mid-sweep handoff or implicit singleton defaults. ADR-047 closes 30.18 by projecting each completely exact-resolved group deterministically into exactly one repository-local PromotionUnit per represented source repository. ADR-048 closes 30.39 by materializing a repository-local multi-source PromotionUnit through deterministic ancestry reduction, ancestry-aware canonical pairwise full two-head merge semantics, exact-state reuse when ancestry already suffices, otherwise one synthetic multi-parent final candidate, exact conflict/recovery boundaries, with no generic development-validation handoff for the final candidate after ADR-060. ADR-049 closes 30.19 with always-distinct submission refs, stable logical submission identity, exact revision guards, naming, and cleanup semantics. ADR-050 closes 30.20 by deriving stack shape from exact unsatisfied promotion dependencies and defining restack as an exact three-way state transplant over immutable owned child state. ADR-051 closes 30.21 by normalizing provider capability as contextual semantic-operation observation. ADR-052 closes 30.22 by making DIRECT target advancement a pure exact-old CAS+FF ref effect with recovery anchoring and authoritative-history adoption. ADR-053 closes 30.23 by turning exact `CHANGES_REQUESTED` generations into durable idempotent session-independent review-correction demands whose ordinary same-group corrections reconverge into new revisions of the same ADR-049 submission/PR. ADR-054 closes 30.24 by separating exact PromotionUnit completion from ConvergenceUnit semantic closure, operational retirement, GC eligibility, and physical retention; cross-repository partial promotion cannot prematurely close a lineage, and v1 historical internal-ref retention defaults to `KEEP`. ADR-055 closes 30.25 with durable exact-generation cross-repository settlement demands, external roll-forward/compensation authority, forward-only settlement effects, `ALL_PROMOTED | COMPENSATED` terminal settlement semantics, and sequential PublicationEpisodes for a stable logical submission whose earlier provider submission is already terminal. ADR-055 also retroactively makes the ADR-022/024/026/032/036 External Control Plane boundaries explicit in the companion contract. ADR-056 closes 30.26 by keeping new-repository creation outside the convergence engine/invocation, requiring an externally authoritative RepositoryCreationPolicy + recoverable Repository Provisioner (which ADR-078 permits the installed product to bundle), bootstrapping every newly admitted repository to a real exact target OID `B0` before managed authoring, separating local creation from optional/lazy provider attachment, and failing closed on unknown identity/collision rather than admitting unborn/null targets or guessing external authority. ADR-057 moves development verification execution outside `ruu`; ADR-060 further removes the generic development-validation evidence/demand protocol and replaces it with transition-local prerequisites. ADR-058 adds native-Git equivalence and fixes whole-editing-surface checkpoint intent with no v1 partial/path-selected checkpoint and no staging-based membership authority. ADR-059 closes 30.27 by canonicalizing the whole observable surface through native Git tree construction and fixing membership, structural blockers, submodule/sparse guards, no-op behavior, and exact pre-commit candidate identity. 30.29–30.33, 30.35, 30.37, and 30.38 are closed/reclassified outside the engine; ADR-061 closes 30.40 target-binding ownership/immutability; ADR-062 closes 30.36 by making early provider projection explicitly authorized and otherwise absent; ADR-063 keeps semantic findings/backlog outside the engine; ADR-064 makes pre-commit semantic-readiness identity a frozen mutation-handoff property rather than a generic validation-evidence gate. ADR-065 originally closed 30.34; ADR-066 corrects that proof to be route-conformant with explicit `C → H → R → O` provider lineage and historical-effect commitment semantics, while ADR-067 closes obsolete PromotionUnit supersession. ADR-068 originally closed 30.41 with explicit pre-promotion PromotionGroup `CANCELLED` settlement and deletion-neutrality; ADR-071 makes currently bound managed-authoring ref removal transactionally durable and ADR-074 corrects its classification to CONTINUATION-versus-ABANDON while unmanaged branch/worktree deletion remains neutral. ADR-069 closes hostile-audit items 30.42 and 30.43 by binding ordinary PromotionGroup occurrence identity to work-bearing logical invocations, making exact resolution group-local, and freezing terminal group resolution. ADR-071 closes 30.44 and 30.45 with current-disposition causal authorization fencing and transactional `reference-transaction` deletion capture. ADR-071 verification/v38 closes 30.48. ADR-072 closes 30.46 and ADR-073 closes 30.47. The native-Git observation-plane cluster under 30.49 is closed. ADR-074 closes 30.50, ADR-075 closes 30.51, ADR-076 closes 30.52, ADR-077 closes 30.53, ADR-079 closes 30.54, and ADR-080 closes 30.55 plus the umbrella with source-scoped local/remote/provider observation authority. ADR-081 closes 30.56 with exact pre-edit authoring-dependency selection. ADR-084 supersedes ADR-073's mandatory linked-worktree substrate with the substrate-neutral `ContributionUnit Authoring Surface` contract.
 
 The following implementation/policy details are intentionally not fixed by the accepted architecture.
 
@@ -5945,7 +5973,7 @@ external mutation-access contract
  | UNKNOWN
 
 transferable state
-+ exclusive Ruu worktree claim held by current authoritative executor/operation
++ exclusive Ruu authoring-surface claim held by current authoritative executor/operation
 → necessary mutation-authority boundary
 ```
 
@@ -5975,7 +6003,7 @@ transition-local exact prerequisites for that OID
 internal fixed point reached
 ```
 
-No additional repository-specific semantic-readiness token is required at this layer. Code-state-specific custom checks belong to the Development System; ship/review/provider governance belongs at its specific transition boundary. Physical ContributionUnit branch/ref/worktree presence or absence is not itself the readiness criterion.
+No additional repository-specific semantic-readiness token is required at this layer. Code-state-specific custom checks belong to the Development System; ship/review/provider governance belongs at its specific transition boundary. Physical ContributionUnit branch/ref/authoring-surface presence or absence is not itself the readiness criterion.
 
 ## 30.8 Resolved by ADR-035/ADR-038 — ContributionUnit lifecycle and artifact independence
 
@@ -5991,7 +6019,7 @@ CLOSED
 → any later work requires a new contribution_unit_id
 ```
 
-The External Control Plane owns ContributionUnit lifecycle declaration. `ruu` never infers closure from producer/runtime/turn state or branch/worktree presence/absence.
+The External Control Plane owns ContributionUnit lifecycle declaration. `ruu` never infers closure from producer/runtime/turn state or branch/authoring-surface presence/absence.
 
 ContributionUnit identity is independent of local/remote contribution branch/ref and worktree existence. Already-created exact managed checkpoints are tracked by OID/state, not by editing-artifact existence.
 
@@ -6413,9 +6441,9 @@ ADR-077 additionally makes effective observer coverage a repository-common, func
 
 ADR-072 closes the surviving-child host-fence hole by requiring the top-level executor's host run-lock descriptor/handle to be non-inheritable across every subprocess boundary. A descendant may not keep the physical executor fence alive after the owning `ruu` process dies.
 
-## 30.47 Resolved by ADR-073 — Git worktrees are the v1 authoring isolation substrate
+## 30.47 Resolved historically by ADR-073; mandatory-substrate decision superseded by ADR-084
 
-ADR-073 requires a dedicated Git worktree/ref surface for every actively authored managed ContributionUnit in v1. Durable ContributionUnit/checkpoint identity remains independent of later worktree lifetime; arbitrary prebuilt commit/tree/snapshot ingress is not a v1 authoring contract.
+ADR-073 historically required a dedicated Git worktree/ref surface for every actively authored managed ContributionUnit in v1. ADR-084 replaces that mandatory-substrate rule with a conforming `ContributionUnit Authoring Surface`: a dedicated linked Git worktree remains one conforming realization, and a private primary working tree of an already externally isolated repository instance is another after ordinary Ruu pre-edit admission. Durable ContributionUnit/checkpoint identity remains independent of later surface lifetime; arbitrary prebuilt commit/tree/snapshot ingress is still not an authoring contract.
 
 ## 30.48 Closed by v38 / ADR-071 verification — extended hostile state-space coverage
 
@@ -6464,7 +6492,7 @@ Coverage is functionally attested, repository-scoped rather than session-scoped,
 
 ADR-079 makes native Git rejection proportional to causal necessity. Transactions with no cessation/replacement candidate remain exact-state observed and are allowed; advisory wakeups/logs/telemetry never become rejection authority. For a candidate that affects a current managed binding, the complete `NativeBindingPreparation` batch must be crash-durable before permission to linearize; unavailable classification or persistence fails closed after any bounded retry. Lost/failed post-preparation `COMMITTED | ABORTED` recording remains recoverable and never retroactively rolls Git back.
 
-A repository-common conservative `ManagedRefProtectionFilter` allows trustworthy negative fast-path decisions without duplicating binding authority. Filter degradation disables negative acceleration and falls back to the CoordinationStore rather than creating a coverage gap; double uncertainty on a cessation candidate fails closed. Initial binding admission is itself serialized with native ref mutation through a capability-based `RefAdmissionBarrier`; the binding becomes current while the barrier is held, exact worktree topology is revalidated, and only then is authoring authority handed to the producer. The current Git-core/files candidate uses a prepared exact no-op ref transaction as the admission barrier while the architecture remains capability-based.
+A repository-common conservative `ManagedRefProtectionFilter` allows trustworthy negative fast-path decisions without duplicating binding authority. Filter degradation disables negative acceleration and falls back to the CoordinationStore rather than creating a coverage gap; double uncertainty on a cessation candidate fails closed. Initial binding admission is itself serialized with native ref mutation through a capability-based `RefAdmissionBarrier`; the binding becomes current while the barrier is held, exact authoring-surface topology is revalidated, and only then is authoring authority handed to the producer. The current Git-core/files candidate uses a prepared exact no-op ref transaction as the admission barrier while the architecture remains capability-based.
 
 ## 30.55 CLOSED BY ADR-080 — local native-Git versus remote/provider observation boundary
 
@@ -6483,7 +6511,7 @@ Two non-normative work items track possible future generalization in the GitHub 
 - [#1 — multiple independently unsatisfied authoring predecessors](https://github.com/fanilosendrison/ruu/issues/1)
 - [#2 — late authoring-dependency refoundation](https://github.com/fanilosendrison/ruu/issues/2)
 
-Their project status does not modify product semantics. Until a later accepted ADR amends ADR-081, realization with more than one independently unsatisfied external predecessor remains locally blocked, and late dependency discovery grants no implicit active-worktree rewrite or ancestry-derived semantic selection.
+Their project status does not modify product semantics. Until a later accepted ADR amends ADR-081, realization with more than one independently unsatisfied external predecessor remains locally blocked, and late dependency discovery grants no implicit active authoring-surface rewrite or ancestry-derived semantic selection.
 
 # 31. Non-goals / things not to assume
 
@@ -6499,7 +6527,7 @@ CWD == scope
 commit == completion
 native commit == managed checkpoint or handoff
 exact commit OID alone == semantic authoring source identity
-dirty producer worktree == consumable exact version
+dirty producer authoring surface == consumable exact version
 integration == contribution unit closure
 zero commits created == nothing to do
 main == universal target ref
@@ -6524,17 +6552,17 @@ security scan == secret scan
 Do not let `ruu`:
 
 ```text
-provision missing contribution-unit worktrees as a side effect
+provision missing ContributionUnit authoring surfaces as a side effect
 infer product semantics from branch names
 infer provider-submission granularity using an LLM
 silently fallback from provider submission to direct target advance
 silently flatten an unsupported stack
-infer an AuthoringDependency from ancestry/recency or snapshot another producer's dirty worktree
+infer an AuthoringDependency from ancestry/recency or snapshot another producer's dirty authoring surface
 publish an abandoned source effect through its consumer
 release a required dependency OID anchor while any exact obligation needs it
 force-push target
 rebase contribution-unit/convergence-unit refs
-mutate a contribution-unit worktree that is externally protected, unknown, or not exclusively claimed by the current authoritative executor/operation
+mutate a ContributionUnit authoring surface that is externally protected, unknown, or not exclusively claimed by the current authoritative executor/operation
 treat stale repo policy as authorization
 globally block because one provider-submission/review/conflict is waiting
 ```
@@ -6562,7 +6590,7 @@ PRE-EDIT WORK-CONTEXT PROVISIONER
   ├── repo registration/reactivation
   ├── convergence-unit ref
   ├── contribution-unit ref
-  ├── isolated worktree
+  ├── conforming ContributionUnit Authoring Surface
   └── contribution-unit mutation-authority mechanism
   │
   ▼
@@ -6659,7 +6687,7 @@ The target state is **continuous safe progress**, not one universal branch workf
 The desired end-state additionally guarantees:
 
 ```text
-mutable WIP worktree
+mutable WIP authoring surface
 → exact candidate
 → required transition-specific external fact, if any
 → authoritative managed checkpoint/state
@@ -6848,7 +6876,7 @@ REQUESTED
 → durable selection TX-A + exact anchor + source-generation/disposition revalidation TX-B
 → AUTHORING_DEPENDENCIES_ADOPTED_OR_NONE
 → CONTRIBUTION_UNIT_REF_RESOLVED_AT_EXACT_BASE
-→ WORKTREE_RESOLVED
+→ AUTHORING_SURFACE_RESOLVED
 → EXTERNAL_MUTATION_AUTHORITY_ESTABLISHED
 → WRITE_AUTHORIZED
 ```
@@ -6967,7 +6995,7 @@ editing_surface:
   PRESENT_CONFLICT_OR_IN_PROGRESS
   ABSENT
 
-worktree_claim (only when editing surface exists):
+authoring_surface_claim (only when editing surface exists):
   NONE
   CURRENT_EXECUTOR_OPERATION
   INCOMPATIBLE_OTHER_OPERATION_OR_RECOVERY
@@ -6988,9 +7016,9 @@ OPEN   → may still contribute to current convergence scope
 CLOSED → no further contribution; later work requires a new ContributionUnit
 ```
 
-An absent branch/worktree does not close or erase the logical unit. If an unresolved authoritative checkpoint OID remains reachable, upward convergence can continue from that exact state without the producer worktree. If a still-required OID is unrecoverable, the path becomes `BLOCKED_MISSING_MANAGED_STATE`/recovery.
+An absent authoring surface does not close or erase the logical unit. If an unresolved authoritative checkpoint OID remains reachable, upward convergence can continue from that exact state without the producer authoring surface. If a still-required OID is unrecoverable, the path becomes `BLOCKED_MISSING_MANAGED_STATE`/recovery.
 
-## 33.9 Contribution-unit-worktree mutation authority
+## 33.9 ContributionUnit authoring-surface mutation authority
 
 ```text
 topology UNKNOWN
@@ -7012,10 +7040,10 @@ mutation_access TRANSFERABLE_TO_RUU / TRANSFERABLE_GENERAL
 claim CURRENT_EXECUTOR_OPERATION
 + mutation_access transferable
 + transferability revalidated under the same authority arbitration
-→ exclusive ContributionUnit-worktree mutation authority
+→ exclusive ContributionUnit authoring-surface mutation authority
 ```
 
-A clean worktree does not weaken external mutation protection. A Development System that needs to resume semantic authoring before claim acquisition must first revoke transferability and restore external mutation authority; after a current executor has acquired the exclusive claim, external reacquisition waits until that claim/effect has reached a safe release or recovery boundary. Any prior semantic readiness decision is stale after legitimate resumed mutation.
+A clean authoring surface does not weaken external mutation protection. A Development System that needs to resume semantic authoring before claim acquisition must first revoke transferability and restore external mutation authority; after a current executor has acquired the exclusive claim, external reacquisition waits until that claim/effect has reached a safe release or recovery boundary. Any prior semantic readiness decision is stale after legitimate resumed mutation.
 
 ## 33.10 Managed checkpoint adoption and commit collection
 
@@ -7047,7 +7075,7 @@ PRESENT_DIRTY + mutation_access UNKNOWN
 
 PRESENT_DIRTY + TRANSFERABLE_TO_RUU / TRANSFERABLE_GENERAL
 → frozen external-write interval is already in force
-→ acquire exclusive worktree claim
+→ acquire exclusive authoring-surface claim
 → construct exact ADR-059 whole-surface CheckpointCandidate (P,T)
 → immediately revalidate parent/surface/authority/structural assumptions under the same claim
 → if stale/changed: do not commit the old candidate; re-observe/recover as required
@@ -7071,7 +7099,7 @@ editing artifacts absent + no unresolved exact checkpoint
 → no-op
 
 editing artifacts absent + unresolved exact checkpoint reachable
-→ continue exact-state convergence without producer worktree
+→ continue exact-state convergence without the producer authoring surface
 
 editing artifacts absent + unresolved exact checkpoint unrecoverable
 → BLOCKED_MISSING_MANAGED_STATE / recovery-data-loss
@@ -7229,7 +7257,7 @@ After `READY_INTERNAL(OID)` is bound as promotion source, ordinary target moveme
 
 ## 33.16 `convergence-unit → contribution unit` synchronization
 
-Requires contribution-unit-worktree mutation authority.
+Requires ContributionUnit authoring-surface mutation authority.
 
 ```text
 UP_TO_DATE / CONTRIBUTION_UNIT_AHEAD
@@ -8343,7 +8371,7 @@ Development System / repository governance
 External Control Plane before first managed write
 → resolves ConvergenceBase
 → binds immutable PromotionTarget(target_repository_id, target_ref)
-→ provisions dedicated managed authoring worktree/ref + native reflog evidence
+→ provisions conforming ContributionUnit Authoring Surface + managed authoring ref + native reflog evidence
 
 managed authoring ref removal
 → transactional binding transition prepared
