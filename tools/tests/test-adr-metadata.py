@@ -11,6 +11,7 @@ import unittest
 from unittest import mock
 
 from proto_ring import adr_metadata as shared_adr_metadata
+from proto_ring import canonical_adr as shared_canonical_adr
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "tools" / "adr-metadata.py"
@@ -22,9 +23,22 @@ adr_metadata = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adr_metadata)
 
 
+def write_repository_governance(fixture_root: Path) -> None:
+    (fixture_root / "AGENTS.md").write_text(
+        "---\n"
+        "repository_governance:\n"
+        "  architecture_decisions:\n"
+        "    profile_path: docs/adr/adr-profile.yaml\n"
+        "---\n"
+        "# Test repository directives\n",
+        encoding="utf-8",
+    )
+
+
 def copy_adr_fixture(temporary: str) -> Path:
     fixture_root = Path(temporary)
     shutil.copytree(ROOT / "docs" / "adr", fixture_root / "docs" / "adr")
+    write_repository_governance(fixture_root)
     return fixture_root
 
 
@@ -78,7 +92,7 @@ class AdrMetadataTests(unittest.TestCase):
     def test_shared_primitives_are_bound_to_pinned_provider(self) -> None:
         requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8")
         self.assertIn(
-            "proto-ring.git@743d0e7142b84364ba47700e4774b94752670320",
+            "proto-ring.git@f7d07f23c8c3969166142049dd91c78ed4bc80fa",
             requirements,
         )
         bindings = {
@@ -95,6 +109,41 @@ class AdrMetadataTests(unittest.TestCase):
         for name, shared in bindings.items():
             with self.subTest(name=name):
                 self.assertIs(getattr(adr_metadata, name), shared)
+
+    def test_profile_path_resolution_delegates_to_shared_provider(self) -> None:
+        self.assertIs(
+            adr_metadata.configured_profile_path,
+            shared_canonical_adr.configured_profile_path,
+        )
+        self.assertEqual(
+            adr_metadata.configured_profile_path(ROOT),
+            (ROOT / "docs/adr/adr-profile.yaml").resolve(),
+        )
+
+    def test_adr_085_resolves_and_outside_same_id_is_ignored(self) -> None:
+        authority = shared_canonical_adr.resolve(ROOT, "ADR-085")
+        self.assertEqual(
+            authority.path,
+            (
+                ROOT
+                / "docs/adr/adr-085-require-proto-ring-for-applicable-generic-repository-governance.md"
+            ).resolve(),
+        )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture_root = copy_adr_fixture(temporary)
+            outside = fixture_root / "outside/adr-085-impostor.md"
+            outside.parent.mkdir(parents=True)
+            shutil.copyfile(authority.path, outside)
+
+            resolved = shared_canonical_adr.resolve(fixture_root, "ADR-085")
+            self.assertEqual(
+                resolved.path,
+                (
+                    fixture_root
+                    / "docs/adr/adr-085-require-proto-ring-for-applicable-generic-repository-governance.md"
+                ).resolve(),
+            )
 
     def test_calendar_schema_and_local_future_date_rule(self) -> None:
         adr_path = next((ROOT / "docs" / "adr").glob("adr-082-*.md"))
@@ -328,6 +377,7 @@ class AdrMetadataTests(unittest.TestCase):
     def test_real_git_migration_replaces_partial_frontmatter_only(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixture_root = Path(temporary)
+            write_repository_governance(fixture_root)
             adr_directory = fixture_root / "docs" / "adr"
             schema_directory = adr_directory / "schemas"
             schema_directory.mkdir(parents=True)

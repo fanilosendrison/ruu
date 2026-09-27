@@ -6,6 +6,8 @@ domain: "ruu"
 severity: "strict"
 name: "Ruu repository agent directives"
 repository_governance:
+  architecture_decisions:
+    profile_path: "docs/adr/adr-profile.yaml"
   shared_governance_provider:
     required: true
     binding_path: "docs/repository-governance/ruu-shared-governance-provider.md"
