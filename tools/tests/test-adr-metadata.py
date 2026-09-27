@@ -10,6 +10,8 @@ import tempfile
 import unittest
 from unittest import mock
 
+from proto_ring import adr_metadata as shared_adr_metadata
+
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "tools" / "adr-metadata.py"
 
@@ -72,6 +74,27 @@ def disable_git_bound_validation(fixture_root: Path) -> None:
 class AdrMetadataTests(unittest.TestCase):
     def test_repository_passes_full_profile(self) -> None:
         self.assertEqual([], adr_metadata.collect_errors(ROOT))
+
+    def test_shared_primitives_are_bound_to_pinned_provider(self) -> None:
+        requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8")
+        self.assertIn(
+            "proto-ring.git@7aa7ebbe6d7ad1c82aa440f285192c1385e69793",
+            requirements,
+        )
+        bindings = {
+            "AdrMetadataError": shared_adr_metadata.AdrMetadataError,
+            "decision_body_bytes": shared_adr_metadata.decision_body_bytes,
+            "load_json": shared_adr_metadata.load_json,
+            "load_yaml": shared_adr_metadata.load_yaml,
+            "parse_adr": shared_adr_metadata.parse_adr,
+            "preserved_payload_bytes": shared_adr_metadata.preserved_payload_bytes,
+            "repository_path": shared_adr_metadata.repository_path,
+            "schema_errors": shared_adr_metadata.schema_errors,
+            "sha256_hex": shared_adr_metadata.sha256_hex,
+        }
+        for name, shared in bindings.items():
+            with self.subTest(name=name):
+                self.assertIs(getattr(adr_metadata, name), shared)
 
     def test_calendar_schema_and_local_future_date_rule(self) -> None:
         adr_path = next((ROOT / "docs" / "adr").glob("adr-082-*.md"))
