@@ -51,6 +51,7 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
                 "JSON syntax: qualification/lineage/lineage-v2.schema.json",
                 "JSON syntax: qualification/state-space/post-baseline/qualification-metadata-v1.schema.json",
                 "ADR metadata tests",
+                "Projection Integrity tests",
                 "Historical qualification tests",
                 "Repository Integrity binding tests",
                 "Qualification infrastructure tests",
