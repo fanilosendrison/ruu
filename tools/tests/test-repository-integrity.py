@@ -15,7 +15,7 @@ from unittest import mock
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-PROVIDER_COMMIT = "7aa7ebbe6d7ad1c82aa440f285192c1385e69793"
+PROVIDER_COMMIT = "4b139e2858fcb26b694503386096eb3fcea80d31"
 
 
 def load_tool(name: str):
@@ -56,6 +56,7 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
                 "Repository Integrity binding tests",
                 "Qualification infrastructure tests",
                 "ADR metadata check",
+                "Shared Governance Provider binding",
                 "Retained lineage currentness",
                 "Active manifest currentness",
                 "Qualification layout",
