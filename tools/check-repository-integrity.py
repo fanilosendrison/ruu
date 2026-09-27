@@ -82,6 +82,13 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 argv=(python, "tools/adr-metadata.py", "check"),
             ),
             CommandObligation(
+                name="Shared Governance Provider binding",
+                argv=(
+                    python,
+                    "tools/check-shared-governance-provider.py",
+                ),
+            ),
+            CommandObligation(
                 name="Retained lineage currentness",
                 argv=(python, "tools/generate-qualification-lineage.py"),
             ),
