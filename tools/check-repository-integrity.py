@@ -85,7 +85,8 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 name="Shared Governance Provider binding",
                 argv=(
                     python,
-                    "tools/check-shared-governance-provider.py",
+                    "-m",
+                    "proto_ring.shared_governance_provider",
                 ),
             ),
             CommandObligation(
