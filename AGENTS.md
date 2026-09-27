@@ -27,6 +27,9 @@ This file is the operational map for agents working in the Ruu repository. Follo
 - Apply `docs/repository-governance/ruu-projection-integrity.md` whenever a
   change adds or modifies mechanically derivable mutable repository state.
 - When the user mentions an Issue, Project work, backlog work, or a review finding, apply the shared GitHub Engineering Projects operational protocol, then read `docs/repository-governance/ruu-engineering.md` before acting.
+- Before adding, modifying, replacing, or designing any repository-governance
+  mechanism, read and apply
+  `docs/repository-governance/ruu-shared-governance-provider.md`.
 
 ## Authority order
 
@@ -230,6 +233,8 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
   `docs/repository-governance/ruu-discovery-classification.md`
 - Projection Integrity binding:
   `docs/repository-governance/ruu-projection-integrity.md`
+- Shared Governance Provider binding:
+  `docs/repository-governance/ruu-shared-governance-provider.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`
 - Immutable ADR-080 package: `qualification/releases/adr-080-flat/`
