@@ -5,6 +5,10 @@ asset_type: "agent-directives"
 domain: "ruu"
 severity: "strict"
 name: "Ruu repository agent directives"
+repository_governance:
+  shared_governance_provider:
+    required: true
+    binding_path: "docs/repository-governance/ruu-shared-governance-provider.md"
 ---
 
 # Ruu repository directives

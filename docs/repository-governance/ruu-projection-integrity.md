@@ -79,6 +79,19 @@ qualification/state-space/ retained families and qualification/git-smoke/
 qualification/state-space/post-baseline/ registrations
     → own post-baseline qualification artifact registration and replay binding
 
+ADR-085
+    → owns accepted Shared Governance Provider adoption and the exact
+      Shared Governance Provider contract identity
+
+docs/repository-governance/ruu-shared-governance-provider.md
+    → mechanically validated maintained projection of ADR-085 for the
+      authority ADR identity/path, mandatory adoption, and Shared Governance
+      Provider contract identity
+
+AGENTS.md frontmatter.repository_governance.shared_governance_provider
+    → owns repository-operational routing to the local Shared Governance
+      Provider binding
+
 AGENTS.md
     → owns repository authorization, qualification, and validation guardrails
 
