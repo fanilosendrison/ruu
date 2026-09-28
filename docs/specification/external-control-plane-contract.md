@@ -3,7 +3,7 @@
 - **Status:** Normative companion contract
 - **Introduced by:** ADR-039
 - **Date:** 2026-09-05
-- **Current amendments:** ADR-062 through ADR-089, as applicable
+- **Current amendments:** ADR-062 through ADR-090, as applicable
 
 ## 1. Purpose
 
@@ -635,7 +635,7 @@ Remote publication/submission artifact deletion or rename-like topology never di
 
 A caller cannot request force, rewrite, or standing non-fast-forward authority. No invocation flag, local config, runtime request, profile, or External Control Plane declaration creates permission to replace a submission ref.
 
-UserBehavior and BuiltInBehavior cannot authorize or select ref mechanics. For one semantic `REVISE_SUBMISSION_HEAD`, authoritative exact Git state determines whether the required effect is `NOOP`, expected-old fast-forward, or `NON_FF_SUBMISSION_PROJECTION_REPLACEMENT`.
+UserBehavior and BuiltInBehavior cannot authorize or select ref mechanics. For one semantic `REVISE_SUBMISSION_HEAD`, Ruu first establishes whether the exact logical revision binding changes; authoritative exact Git state then determines whether the required physical effect is `REF_NOOP`, expected-old fast-forward, or `NON_FF_SUBMISSION_PROJECTION_REPLACEMENT`.
 
 Current authoritative governance may authorize one exact required non-fast-forward replacement effect for the submission ref of the current nonterminal PublicationEpisode. That authorization is reconstructed through current `EffectivePromotionPolicy`; it is not persisted on the Submission, episode, ref, or revision as future authority.
 
@@ -657,7 +657,9 @@ no durable matching authorized revision Operation/Attempt
 → never silently adopt as an authorized revision
 ```
 
-Old-head reachability, `SUBMISSION_REVISION_OID_ANCHOR`, effect recovery, exactly-once revision adoption, and recovery-resource GC are Ruu-owned coordination state. They preserve exact Git objects and recover owned effects; they do not become external semantic authority, future mutation permission, or authority to reopen a terminal provider state.
+Logical revision identity and physical ref effect are distinct. When a newly required exact PromotionUnit/candidate/projection binding resolves to the same head already published, `REF_NOOP` performs no ref mutation while Ruu may adopt the new logical revision exactly once. Re-observing the same already-current binding never increments again. This creates no new External Control Plane declaration, mutation authority, policy input, or provider mechanism.
+
+Old-head reachability, `SUBMISSION_REVISION_OID_ANCHOR`, effect recovery, exactly-once revision adoption, and recovery-resource GC are Ruu-owned coordination state. They preserve exact Git objects and recover owned effects; they do not become external semantic authority, future mutation permission, or authority to reopen a terminal provider state. `REF_NOOP` does not require an old-head anchor solely for its effect because it removes no reachability root.
 
 ## 3. Guarantees consumed by `ruu`
 

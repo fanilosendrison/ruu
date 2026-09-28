@@ -691,7 +691,7 @@ transition-local prerequisites
 
 Policy may additionally constrain submission-ref mechanics, provider/governance operations, and publication repository/remote mechanics. Provider capability observations establish whether the exact semantic operation required by current state is technically realizable; they never grant authorization.
 
-In a selected `PROVIDER_SUBMISSION` route, one stable logical submission may have a current provider-facing `PublicationEpisode`, and each episode has its own submission ref plus provider submission identity. Exact candidate changes while an episode is open become monotonic submission revisions on that episode. Each revision derives `NOOP`, an exact expected-old fast-forward effect, or an exact expected-old non-fast-forward projection replacement from the authoritative `H1 → H2` Git relation. Non-fast-forward replacement is a freshly authorized exact effect, never a durable submission-ref class. ADR-055 permits a later episode only when the previous provider submission is terminal but the same nonterminal logical submission still requires publication.
+In a selected `PROVIDER_SUBMISSION` route, one stable logical submission may have a current provider-facing `PublicationEpisode`, and each episode has its own submission ref plus provider submission identity. Exact PromotionUnit/candidate/projection-binding changes while an episode is open become monotonic submission revisions on that episode, including when ADR-048 reuses the same exact candidate/head. After logical revision need is established, each revision derives `REF_NOOP`, an exact expected-old fast-forward effect, or an exact expected-old non-fast-forward projection replacement from the authoritative `H1 → H2` Git relation. `REF_NOOP` means no ref mutation; it does not forbid adoption of a newly required exact logical binding. Non-fast-forward replacement is a freshly authorized exact effect, never a durable submission-ref class. ADR-055 permits a later episode only when the previous provider submission is terminal but the same nonterminal logical submission still requires publication.
 
 Every episode submission ref remains distinct from internal ConvergenceUnit refs and from refs of other episodes, even when some initially point at the same OID.
 
@@ -706,7 +706,7 @@ CONVERGENCE_UNIT_REF
 
 preserve exact OIDs and are never rebased/history-rewritten by `ruu`.
 
-A provider-facing submission ref is the projection of the current exact logical submission revision. For each required `H1 → H2` revision, exact Git equality/ancestry determines `NOOP`, expected-old fast-forward advance, or expected-old non-fast-forward projection replacement. The non-fast-forward effect requires fresh current policy authorization and contextual support for that transition; no ref carries standing rewrite authority.
+A provider-facing submission ref is the projection of the current exact logical submission revision. Ruu first determines whether the exact revision binding changes; exact Git equality/ancestry then determines only `REF_NOOP`, expected-old fast-forward advance, or expected-old non-fast-forward projection replacement. A new logical revision may therefore be adopted exactly once while the ref remains at the same OID. The non-fast-forward effect requires fresh current policy authorization and contextual support for that transition; no ref carries standing rewrite authority.
 
 This gives the system two identity layers:
 
@@ -2739,11 +2739,13 @@ For a required provider-facing update/restack:
 
 ```text
 enter explicit REVISE_SUBMISSION_HEAD transition
+→ establish the exact current and required logical revision bindings
 → derive exact required H2, using ADR-050 EXECUTE_RESTACK_CONTRACT when applicable
-→ classify H1 == H2 / H1 ancestor H2 / non-FF exact relation
-→ require the selected exact effect's current policy/capability/recovery guards
-→ invalidate/re-read head-bound evidence for an actual new H2
-→ bind the new exact submission head/revision exactly once after observation
+→ classify REF_NOOP / expected-old FF / non-FF exact ref effect from H1 and H2
+→ require ordinary revision guards plus mutation-only policy/capability/recovery guards when a ref mutation is selected
+→ evaluate provider facts against their complete exact binding
+→ bind the required logical submission revision exactly once after observation
+   even when REF_NOOP leaves H1 == H2
 ```
 
 Internal convergence-unit source OIDs remain unchanged unless a separate semantic reopen explicitly produces new internal state.
@@ -2813,7 +2815,7 @@ For current bound head `H1` and required exact head `H2`:
 
 ```text
 H1 == H2
-→ NOOP
+→ REF_NOOP
 
 H1 ancestor-of H2
 → FF_SUBMISSION_REF_ADVANCE
@@ -2822,7 +2824,9 @@ otherwise
 → NON_FF_SUBMISSION_PROJECTION_REPLACEMENT
 ```
 
-`NOOP` retains the current revision. Fast-forward publication uses `AdvanceSubmissionRefExpectedOldFF(submission_ref, expected_old=H1, new=H2)` and requires exact expected-old success, descendant/equal ancestry, mutation of only the intended ref, and authoritative post-observation at `H2`.
+`REF_NOOP` performs no submission-ref mutation. If the required exact logical binding equals the current binding, the current revision remains. If a new exact binding is required, Ruu authoritatively observes that the applicable local/remote/provider heads remain `H1 == H2`, records the new PromotionUnit/candidate/projection binding, and adopts `submission_revision := revision + 1` exactly once. No expected-old transport, non-FF replacement authorization, or old-head reachability anchor is consumed solely by this no-ref effect.
+
+Fast-forward publication uses `AdvanceSubmissionRefExpectedOldFF(submission_ref, expected_old=H1, new=H2)` and requires exact expected-old success, descendant/equal ancestry, mutation of only the intended ref, and authoritative post-observation at `H2`.
 
 Non-fast-forward publication uses `ReplaceSubmissionRefExpectedOld(submission_ref, expected_old=H1, new=H2)` only when all of these hold:
 
@@ -3220,30 +3224,45 @@ DRIFTED
 UNKNOWN_INCONSISTENT
 ```
 
-For a required revision from `BOUND(rev,H1)` to exact `H2`:
+Ruu first compares the exact current revision binding with the newly required binding. The binding includes the revision-bound PromotionUnit, candidate, submitted head, projection proof, episode/ref/provider identity, and publication destination/relation facts owned by their existing contracts.
+
+For current `BOUND(rev,H1)` and required exact head `H2`:
 
 ```text
-H1 == H2
+required binding == current binding
++ H1 == H2
+→ REF_NOOP
 → remain BOUND(rev,H1)
-→ no new physical head revision
 
-H1 ancestor-of H2
+required binding != current binding
++ H1 == H2
+→ REVISING
+→ REF_NOOP; no ref mutation
+→ observe applicable local/remote/provider head == H2
+→ adopt the new exact binding once
+→ BOUND(rev+1,H2)
+
+required binding != current binding
++ H1 ancestor-of H2
 → REVISING
 → exact expected-old FF effect
 → observe local/remote/provider head == H2
-→ adopt revision exactly once
+→ adopt the new exact binding once
 → BOUND(rev+1,H2)
 
-H1 not ancestor-of H2
+required binding != current binding
++ H1 not ancestor-of H2
 → require current nonterminal episode submission_ref
 → establish REQUIRED H1 reachability
 → require fresh policy/capability/claim/fence/recovery guards
 → REVISING
 → exact expected-old non-FF projection replacement
 → observe local/remote/provider head == H2
-→ adopt revision exactly once
+→ adopt the new exact binding once
 → BOUND(rev+1,H2)
 ```
+
+A repeated observation/request for an already-current exact binding never creates another logical revision.
 
 For dependency restack specifically, `H2` is derived by three-way state transplant from the immutable owned `(old_base_oid, owned_candidate_oid)` anchor onto the current new predecessor/base. A previous restacked provider head is never the semantic source for the next restack. Logical revision monotonicity does not require Git ancestry monotonicity between provider heads.
 
@@ -3510,7 +3529,7 @@ Conceptual flow:
     descendant-only exact-old CAS+FF target advance
 15 for PROVIDER_SUBMISSION realization:
     materialize/update submission refs only when provider projection is currently required/authorized
-    derive exact H1→H2 relation and select NOOP / expected-old FF / exact expected-old non-FF replacement under current guards
+    derive exact H1→H2 relation and select REF_NOOP / expected-old FF / exact expected-old non-FF replacement under current guards
     create/update/observe provider submissions
     react to UPDATE_REQUIRED / RESTACK_REQUIRED / CHANGES_REQUESTED / MERGE_QUEUED / provider finalization
     automatically progress machine-authorized provider target integration once all actual prerequisites are satisfied
@@ -4004,7 +4023,7 @@ RESTACK_REQUIRED
 → reproject immutable owned `(old_base_oid, owned_candidate_oid)` onto current new base by ADR-050 three-way state transplant
 → no internal source rewrite and no chained restack from prior provider head
 → conflict requiring authoring → RECONCILIATION_REQUIRED / RESTACK_BLOCKED
-→ clean exact new revision derives NOOP / expected-old FF / exact expected-old non-FF replacement and requires the selected effect's current policy/capability/recovery guards
+→ clean exact new revision derives REF_NOOP / expected-old FF / exact expected-old non-FF replacement and requires the selected effect's applicable current guards
 
 unexpected movement
 → DRIFTED/UNKNOWN
@@ -4795,7 +4814,7 @@ Every provider-submission-route logical submission uses a submission ref distinc
 
 ---
 ## Invariant 54 — Submission identity is logical while revisions are exact
-`submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination; `promotion_unit_id`, exact head OID, and monotonic `submission_revision` may change across authorized revisions.
+`submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination; `promotion_unit_id`, candidate/projection binding, and monotonic `submission_revision` may change across authorized revisions. Successive revisions may share the same exact head OID.
 
 ---
 ## Invariant 55 — No submission ref has standing rewrite authority
@@ -4803,7 +4822,11 @@ A Submission, PublicationEpisode, SubmissionRef, or `BOUND(rev,H)` state records
 
 ---
 ## Invariant 56 — Exact Git relation mechanically classifies each submission-ref effect
-For current `H1` and required `H2`, equality is `NOOP`, descendant relation is `FF_SUBMISSION_REF_ADVANCE`, and every other relation is `NON_FF_SUBMISSION_PROJECTION_REPLACEMENT`. Policy, behavior, and provider terminology cannot alter this classification.
+For current `H1` and required `H2`, equality is `REF_NOOP`, descendant relation is `FF_SUBMISSION_REF_ADVANCE`, and every other relation is `NON_FF_SUBMISSION_PROJECTION_REPLACEMENT`. Policy, behavior, provider terminology, and logical-binding identity cannot alter this classification.
+
+---
+## Invariant 56A — Logical revision need is distinct from physical ref effect
+Ruu determines whether the required exact revision binding differs from the current binding before classifying the physical ref effect. `REF_NOOP` forbids ref mutation but permits exactly one new logical revision when the PromotionUnit/candidate/projection binding changed. The same already-current binding never increments again.
 
 ---
 ## Invariant 57 — Non-fast-forward replacement is confined to the current nonterminal episode ref
@@ -4826,8 +4849,8 @@ Before non-FF replacement removes `H1` as the current submission-ref root, a REQ
 ContributionUnit/ConvergenceUnit/base/target refs, immutable owned promotion anchors, and recovery/retention refs never receive non-FF submission-projection authority.
 
 ---
-## Invariant 62 — Head-bound provider facts and logical revision history are revision-specific
-Checks/reviews/queue/provider observations tied to `H1` do not transfer to `H2`. Each actual new exact head is adopted once, while logical revision monotonicity does not require Git ancestry monotonicity between successive provider heads.
+## Invariant 62 — Provider facts and logical revision history retain their complete exact binding
+Checks/reviews/queue/provider observations tied to `H1` do not transfer to a distinct `H2`. When a logical revision changes while `H` remains equal, a fact is reusable only if every dimension of its existing exact binding remains current; head equality alone cannot transfer facts bound also to changed PromotionUnit, candidate, projection proof, submission revision, policy, episode, or provider context. Each newly required exact logical binding is adopted once, while logical revision monotonicity requires neither OID inequality nor Git ancestry monotonicity between successive provider heads.
 
 ---
 ## Invariant 63 — Semantic reopen and provider restack are distinct
@@ -5651,7 +5674,7 @@ For `selected_target_realization_route=DIRECT_TARGET_ADVANCE`, consumes an alrea
 
 ## 27.17 Submission revision engine
 
-For PROVIDER_SUBMISSION route, owns semantic `REVISE_SUBMISSION_HEAD`, logical submission identity, exact current revision/head, and exactly-once revision adoption. It derives the exact `H1 → H2` relation, selects `NOOP`, expected-old FF, or exact expected-old non-FF replacement, and coordinates Operation/Attempt/recovery-resource/Observation/Adoption state. ADR-050 remains the source of exact restack projection semantics when `EXECUTE_RESTACK_CONTRACT` is required.
+For PROVIDER_SUBMISSION route, owns semantic `REVISE_SUBMISSION_HEAD`, logical submission identity, exact current revision/head/binding, and exactly-once revision adoption. It first establishes whether a new exact logical binding is required, then derives the exact `H1 → H2` relation and selects `REF_NOOP`, expected-old FF, or exact expected-old non-FF replacement. A `REF_NOOP` transition may adopt a new binding once without a ref mutation. The engine coordinates Operation/Attempt/recovery-resource/Observation/Adoption state as applicable. ADR-050 remains the source of exact restack projection semantics when `EXECUTE_RESTACK_CONTRACT` is required.
 
 ## 27.18 Push engine
 
@@ -5931,12 +5954,11 @@ If neither `REVIEW_REQUESTED` nor explicit current authority/need for exceptiona
 
 ## 28.5 Submission-ref revision effect classification
 
-For current bound head `H1` and required exact head `H2`:
+Ruu first determines whether the newly required exact logical revision binding differs from the current binding. It then classifies only the physical ref effect from current bound head `H1` and required exact head `H2`:
 
 ```text
 H1 == H2
-→ NOOP
-→ remain at the current logical revision
+→ REF_NOOP
 
 H1 ancestor-of H2
 → FF_SUBMISSION_REF_ADVANCE
@@ -5948,6 +5970,18 @@ otherwise
 ```
 
 The relation is derived solely from authoritative exact Git objects. `REVISE_SUBMISSION_HEAD` remains the semantic transition; these are physical effect contracts below it.
+
+```text
+REF_NOOP + unchanged exact binding
+→ remain at the current logical revision
+
+REF_NOOP + newly required exact binding
+→ mutate no ref
+→ observe exact H
+→ adopt revision r+1 with the new PromotionUnit/candidate/C→H binding exactly once
+```
+
+Retry or repeated observation of the same already-adopted binding does not increment again.
 
 ## 28.6 Exact expected-old non-fast-forward submission projection replacement
 
@@ -6405,13 +6439,13 @@ This preserves ADR-047's structural multi-source projection rule while removing 
 
 ## 30.19 Resolved by ADR-049 — stable submission identity/ref lifecycle
 
-ADR-049/055 as amended by ADR-089 close submission-ref creation/naming/retention and provider-episode semantics. Provider-submission publication always uses provider-facing episode refs distinct from internal refs. `submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination while exact PromotionUnit/head and monotonic logical revision may change. One nonterminal PublicationEpisode owns one provider submission. It has no persistent rewrite class: each revision derives `NOOP`, expected-old FF, or exact expected-old non-FF replacement, and a non-FF effect requires fresh role/policy/capability/recovery guards. If that provider submission becomes terminal while the same nonterminal logical submission later needs another exact publication, a distinct new PublicationEpisode/ref/provider submission is created under first-publication expected-absent/policy/provider guards. Preferred new-episode namespace is `refs/heads/Ruu/submissions/<submission_id>/episodes/<publication_episode_id>` with repository-approved compatible alternatives. Physical episode-ref cleanup is allowed only after that episode's terminal provider/target/recovery state and never carries durable identity/audit authority. ADR-054 closes ConvergenceUnit historical internal-ref lifecycle with `RETIRED → GC_ELIGIBLE` separation and v1 built-in `KEEP`; ADR-060 closes 30.28 by removing the generic development-validation evidence contract.
+ADR-049/055 as amended by ADR-089/090 close submission-ref creation/naming/retention and provider-episode semantics. Provider-submission publication always uses provider-facing episode refs distinct from internal refs. `submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination while exact PromotionUnit/binding/head and monotonic logical revision may change. One nonterminal PublicationEpisode owns one provider submission. It has no persistent rewrite class: after logical revision need is established, each revision derives `REF_NOOP`, expected-old FF, or exact expected-old non-FF replacement. `REF_NOOP` may adopt a new exact binding at the same head without mutating the ref; a non-FF effect requires fresh role/policy/capability/recovery guards. If that provider submission becomes terminal while the same nonterminal logical submission later needs another exact publication, a distinct new PublicationEpisode/ref/provider submission is created under first-publication expected-absent/policy/provider guards. Preferred new-episode namespace is `refs/heads/Ruu/submissions/<submission_id>/episodes/<publication_episode_id>` with repository-approved compatible alternatives. Physical episode-ref cleanup is allowed only after that episode's terminal provider/target/recovery state and never carries durable identity/audit authority. ADR-054 closes ConvergenceUnit historical internal-ref lifecycle with `RETIRED → GC_ELIGIBLE` separation and v1 built-in `KEEP`; ADR-060 closes 30.28 by removing the generic development-validation evidence contract.
 
 ## 30.20 Resolved by ADR-050 — derived stacked publication and exact-state restacking
 
 ADR-050 closes the restacking semantic core. A stacked provider submission is not requested by a caller: it is the provider projection of an exact promotion dependency that is not yet satisfied by the authoritative target. If the dependency is already target-satisfied, publication is ordinary; if unsatisfied and stack representation is supported/authorized, it is stacked; otherwise the child waits.
 
-When the predecessor exact head moves, restack reprojects the child's immutable owned state `(old_base_oid, owned_candidate_oid)` onto the new exact base with a versioned full three-way state-transplant semantic (`base=old base`, `ours=new base`, `theirs=owned candidate`). Internal refs never move, repeated restacks never chain from prior provider heads, conflicts route to `RECONCILIATION_REQUIRED`, and every new exact head satisfies the transition-local prerequisites of the revision/publication transition. ADR-089 then classifies the exact old/new provider-head relation and permits only the corresponding expected-old effect; logical revision monotonicity does not require provider-head ancestry. Local/provider-native/external-tool execution is pluggable only if the observed result conforms to the same normative transplant contract.
+When the predecessor exact head moves, restack reprojects the child's immutable owned state `(old_base_oid, owned_candidate_oid)` onto the new exact base with a versioned full three-way state-transplant semantic (`base=old base`, `ours=new base`, `theirs=owned candidate`). Internal refs never move, repeated restacks never chain from prior provider heads, conflicts route to `RECONCILIATION_REQUIRED`, and every new exact head satisfies the transition-local prerequisites of the revision/publication transition. ADR-089 then classifies the exact old/new provider-head relation and permits only the corresponding ref effect; ADR-090 separates that physical effect from logical revision need, so an equal reused head produces `REF_NOOP` while a newly required binding may still advance exactly once. Logical revision monotonicity does not require provider-head inequality or ancestry. Local/provider-native/external-tool execution is pluggable only if the observed result conforms to the same normative transplant contract.
 
 ## 30.21 Resolved by ADR-051 — contextual semantic provider capability observations
 
@@ -7817,12 +7851,15 @@ publication_episode_id
 submission_ref               # scoped to current episode
 provider_submission_identity # scoped to current episode
 submission_revision          # monotonic across logical submission
+current_promotion_unit_id
+current_candidate_oid
 current_submission_head
+current_submission_projection_proof
 immutable exact revision/projection history
 relevant recovery-resource bindings
 ```
 
-There is one submission-ref role and no durable rewrite-authority class. An actual next exact head is handled per transition as `NOOP`, expected-old FF, or exact expected-old non-FF replacement. Internal source refs remain distinct in authority.
+There is one submission-ref role and no durable rewrite-authority class. Ruu establishes exact logical revision need independently, then handles the required head relation as `REF_NOOP`, expected-old FF, or exact expected-old non-FF replacement. `REF_NOOP` may leave the logical revision unchanged or adopt one newly required exact binding; it never mutates the ref. Internal source refs remain distinct in authority.
 
 Review-request intent is an independent submission/publication axis:
 
@@ -7978,21 +8015,30 @@ UNMATERIALIZED
 → BOUND(rev,H)
 ```
 
-For `BOUND(rev,H1)` plus newly required exact `H2`:
+For `BOUND(rev,H1)` plus a required exact binding/head:
 
 ```text
-classify exact relation
+compare required binding with current binding
+classify exact H1→H2 ref relation
 
-EQUAL
+same binding + EQUAL
+→ REF_NOOP
 → remain BOUND(rev,H1)
 
-FF
+new binding + EQUAL
+→ REVISING
+→ REF_NOOP; no ref mutation
+→ authoritative head/projection observation
+→ adopt the new binding exactly once
+→ BOUND(rev+1,H1)
+
+new binding + FF
 → REVISING
 → AdvanceSubmissionRefExpectedOldFF(ref,H1,H2)
 → authoritative observation/adoption
 → BOUND(rev+1,H2)
 
-NON_FF
+new binding + NON_FF
 → require current nonterminal episode submission_ref
 → require REQUIRED H1 reachability
 → require fresh policy/capability/claim/fence/recovery guards
@@ -8002,9 +8048,11 @@ NON_FF
 → BOUND(rev+1,H2)
 ```
 
+Every new binding records its exact PromotionUnit, candidate and `C→H` proof. A crash/retry or repeated sweep observing an already-current binding never increments the revision twice.
+
 For dependency restack, exact `H2` is produced by the ADR-050 state transplant from immutable `(B0,C0)` onto current new base `B1`. A later restack uses that immutable owned child anchor again, not the prior provider head as semantic input. Internal ConvergenceUnit OIDs do not change.
 
-If a material new revision invalidates an exact head-bound ship-ready/review-request fact, that fact is re-established for `H2` according to its existing transition-local contract; it is never inherited merely from `H1`.
+Every provider fact is evaluated against its complete existing binding. For a distinct `H2`, head-bound facts are re-established according to their contracts. For a same-head new logical revision, facts whose complete subject remains unchanged may remain reusable; facts also bound to the changed PromotionUnit, candidate, projection proof, submission revision, policy, episode, or provider context are rebound, re-observed, invalidated, or re-established as their existing contracts require.
 
 ## 33.28 submission/provider lifecycle
 
@@ -8245,7 +8293,8 @@ UNKNOWN
 
 ```text
 EQUAL required head
-→ NOOP
+→ REF_NOOP
+→ no ref mutation; logical revision adoption is decided independently from exact binding identity
 
 required head descendant of current head
 → exact expected-old FF
