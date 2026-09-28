@@ -12,6 +12,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import yaml
+
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -37,6 +39,37 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
             requirements,
         )
         self.assertNotIn("proto-ring.git@main", requirements)
+
+    def test_authoritative_ref_monotonicity_binding(self) -> None:
+        binding = (
+            REPOSITORY
+            / "docs/repository-governance/ruu-authoritative-ref-monotonicity.md"
+        ).read_text(encoding="utf-8")
+        _prefix, frontmatter, _body = binding.split("---", 2)
+        metadata = yaml.safe_load(frontmatter)
+        configuration = metadata["authoritative_ref_monotonicity"]
+
+        self.assertEqual(
+            {
+                "repository": "fanilosendrison/proto-ring",
+                "commit": "650a481b7dfa7c4d3671bd053c63642a5dab1087",
+                "path": "docs/contracts/authoritative-ref-monotonicity.md",
+            },
+            configuration["contract"],
+        )
+        self.assertEqual(
+            {
+                "provider": "github",
+                "owner": "fanilosendrison",
+                "name": "ruu",
+            },
+            configuration["repository"],
+        )
+        self.assertEqual("refs/heads/main", configuration["authoritative_ref"])
+        protection = configuration["protection"]
+        self.assertEqual("github-repository-ruleset", protection["mechanism"])
+        self.assertIs(type(protection["ruleset_id"]), int)
+        self.assertGreater(protection["ruleset_id"], 0)
 
     def test_ruu_owns_exact_repository_integrity_membership(self) -> None:
         tool = load_tool("check-repository-integrity.py")
