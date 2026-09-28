@@ -645,44 +645,53 @@ Movement of a live ConvergenceUnit after that adoption does not by itself refres
 
 ## 2.4 Promotion topology and submission representation
 
-Repository policy determines the authorized promotion path, while current promotion topology is derived mechanically from exact managed Git/promotion state.
-
-The canonical publication destination is already fixed by the member ConvergenceUnit `PromotionTarget`. The source/target repository relation is therefore derived managed context:
+The canonical publication destination is fixed by each member ConvergenceUnit's immutable `PromotionTarget`. The source/target repository relation and current promotion topology remain mechanically derived:
 
 ```text
-PromotionTarget:
-  (target_repository_id, target_ref)   # immutable ConvergenceUnit binding
+PromotionTarget
+= (target_repository_id, target_ref)
 
-publication_relation:
-  SAME_REPOSITORY | CROSS_REPOSITORY   # derived from source repository + PromotionTarget
+derived publication_relation
+= SAME_REPOSITORY | CROSS_REPOSITORY
+
+derived promotion topology
+= INDEPENDENT | dependency-derived STACKED representation need
 ```
 
-Core policy outputs/constraints include:
+Neither relation nor topology is policy-selected or UserBehavior.
+
+The current authoritative promotion policy returns a route space rather than one scalar route:
 
 ```text
-target_realization_route:
-  DIRECT_TARGET_ADVANCE | PROVIDER_SUBMISSION
-
-submission rewrite authorization
-provider/governance operation constraints
-publication repository/remote mechanics when needed
+EffectivePromotionPolicy.allowed_routes ⊆ {
+  DIRECT_TARGET_ADVANCE,
+  PROVIDER_SUBMISSION
+}
 ```
 
-Policy answers **how** the current exact state may reach its already-bound target; it never chooses **where** the work should land.
+A set containing both routes is fully resolved. `Resolved UserBehavior` then supplies a non-authorizing SOFT preference order or STRICT requirement within that route space. Contextual capability and exact current state determine technical/mechanical admissibility; transition-local prerequisites determine whether the positively selected route can progress now or must wait locally.
 
-Separately:
+Conceptually:
 
 ```text
-current promotion dependency/topology
-= derived managed state
-= INDEPENDENT or dependency-derived STACKED representation need
+EffectivePromotionPolicy.allowed_routes
+→ authoritative route space
+
+Resolved UserBehavior
+→ non-authorizing preference/requirement
+
+capability + exact current state
+→ technical/mechanical admissibility
+
+transition-local prerequisites
+→ progression now versus localized wait
 ```
 
-Provider capability observations determine whether the exact semantic operation required by that derived state is technically realizable in the current context; policy determines whether it is authorized. Unsupported/forbidden operations fail closed without topology fallback.
+Policy may additionally constrain submission-ref mechanics, provider/governance operations, and publication repository/remote mechanics. Provider capability observations establish whether the exact semantic operation required by current state is technically realizable; they never grant authorization.
 
-In PROVIDER_SUBMISSION route, one stable logical submission may have a current provider-facing **PublicationEpisode**, and each episode has its own **submission ref** + provider submission identity. Exact candidate changes while an episode is open become monotonic submission revisions on that same episode; ADR-055 permits a later distinct episode when the previous provider submission is terminal but the same nonterminal logical submission still requires another repository-local publication.
+In a selected `PROVIDER_SUBMISSION` route, one stable logical submission may have a current provider-facing `PublicationEpisode`, and each episode has its own submission ref plus provider submission identity. Exact candidate changes while an episode is open become monotonic submission revisions on that episode; ADR-055 permits a later episode when the previous provider submission is terminal but the same nonterminal logical submission still requires publication.
 
-Every episode submission ref is distinct conceptually from internal convergence-unit refs and from refs of other episodes, even when some initially point at the same OID.
+Every episode submission ref remains distinct from internal ConvergenceUnit refs and from refs of other episodes, even when some initially point at the same OID.
 
 ## 2.5 Internal source state versus provider-facing representation
 
@@ -1309,59 +1318,174 @@ WAITING_FOR_REVIEW / waiting CI / merge queue / provider wait
 
 `ACTIVE_CONVERGENCE_SET` remains only a derived acceleration index; caller, CWD, repository, age, trigger identity, and trigger reason never define processing scope.
 
-## 4.16 Repository promotion policy is authoritatively composed for an immutable PromotionTarget and revalidated
+## 4.16 Repository promotion policy authorizes route space; UserBehavior selects without authorizing
 
-Each promotion obligation has a resolved `EffectivePromotionPolicy` evaluated in the context of its already-bound ConvergenceUnit/PromotionUnit PromotionTarget. The target identity is not a policy output. Policy is compiled from authoritative current facts/constraints rather than selected by a generic source-precedence ladder.
-
-Immutable/derived promotion context is:
+Each promotion obligation has a current `EffectivePromotionPolicy` evaluated for its already-bound immutable `PromotionTarget`. Target identity is not a policy output. Policy is compiled from authoritative governance facts and constraints without a generic source-precedence ladder:
 
 ```text
-PromotionTarget = (target_repository_id, target_ref)
-publication_relation = SAME_REPOSITORY | CROSS_REPOSITORY
-  derived from authoritative source repository + PromotionTarget
+provider / organization governance constraints
++ trusted target-baseline repository policy
++ other authoritative governance facts
+→ authorized behavior space
 ```
 
-Authoritative policy inputs are:
+The policy exposes:
 
 ```text
-provider capabilities/current provider facts
-provider governance constraints
-organization governance constraints, when applicable
-trusted repository-committed policy, when present
-built-in policy rules for still-underdetermined dimensions only
+allowed_routes ⊆ {
+  DIRECT_TARGET_ADVANCE,
+  PROVIDER_SUBMISSION
+}
 ```
 
-At minimum the resulting policy resolves/authorizes:
+The set has no preference order. Each singleton and `{DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}` is a complete resolved result. More than one authorized route is not `MISSING` or underdetermined. Policy determines authorization, not preference.
+
+`PromotionTarget` remains immutable. `SAME_REPOSITORY | CROSS_REPOSITORY` remains derived from authoritative source and target identity. `INDEPENDENT | STACKED` remains derived from exact managed dependency state. Neither derived dimension is UserBehavior.
+
+Provider governance authorization facts may constrain the policy. Contextual technical capability is separate:
 
 ```text
-target_realization_route:
-  DIRECT_TARGET_ADVANCE | PROVIDER_SUBMISSION
-
-publication repository/remote mechanics when applicable
-provider/governance operation constraints
-submission rewrite permissions
-review/queue requirements when applicable
+technical capability != governance authorization != UserBehavior
 ```
 
-It MUST NOT select or mutate `target_repository_id` / `target_ref`. If the derived SAME/CROSS repository relation is unsupported or forbidden under current provider/governance facts, the affected promotion blocks; policy does not obtain a satisfiable result by changing the destination.
+Execution still requires:
 
-The effective-policy observation/fingerprint is target-context-bound: it includes the immutable PromotionTarget identity plus the exact mutable target-policy baseline/provider-governance source identities required for that authorization. A policy result for one target repository/ref can never authorize another target.
+```text
+REQUIRED
+∩ SUPPORTED
+∩ AUTHORIZED
+∩ exact current state and transition guards
+→ executable effect
+```
 
-`promotion_topology` is not selected by policy: ADR-050 derives current dependency/topology from exact managed base/predecessor/target facts. ADR-051 then asks whether the semantic operation required to represent that derived dependency is currently supported by the provider/context and authorized by the effective policy.
+### UserBehavior semantics
 
-Explicit authoritative constraints compose according to their field semantics. If they have no common satisfying assignment, the policy is `CONTRADICTORY`; `ruu` never silently chooses one authoritative source over another. Runtime human/agent/orchestrator requests and local config cannot bypass or alter promotion authorization.
+UserBehavior is non-authorizing:
 
-Repository-committed policy governing a promotion is read from the trusted exact target baseline, never from a policy change that exists only in the candidate/submission being promoted. A candidate therefore cannot authorize its own promotion by editing policy.
+```text
+UserBehavior ⊆ authorization
+UserBehavior never creates authorization
+```
 
-Built-in rules close only still-underdetermined dimensions. In particular, lack of a repo policy file does not imply `MISSING`: when direct promotion is admissible and no authoritative constraint requires an indirect path, the baseline built-in route resolves to `DIRECT_TARGET_ADVANCE`; when only provider-mediated submission is admissible, it resolves to `PROVIDER_SUBMISSION`.
+It has exactly two semantic forms over the V1 route domain:
 
-`ruu` revalidates the effective policy on every executed global sweep. Policy snapshots are immutable/fingerprinted observations, but cached age/TTL is never proof that a snapshot is `CURRENT`. Immediately before every **policy-sensitive promotion mutation**, `ruu` MUST re-observe/revalidate every mutable authoritative policy source needed by that mutation. A changed target-policy anchor, provider/org governance observation, capability/fact observation, or other authoritative source identity/fingerprint makes the prior snapshot `STALE` and forces policy recomputation before mutation.
+```text
+SOFT route preference ordering
+STRICT route requirement
 
-Policy-sensitive promotion mutations include, at minimum, direct target-ref advancement/publication, submission-ref publication/rewrite, provider submission creation/update, formal review-request mutation, stack/restack/update-branch/base mutation, merge/merge-queue entry or equivalent provider target-integration mutation, and cross-repository publication governed by promotion policy. Pure local candidate materialization/Git validation that does not itself exercise promotion authority is not made policy-sensitive merely because it precedes promotion.
+routes = {
+  DIRECT_TARGET_ADVANCE,
+  PROVIDER_SUBMISSION
+}
+```
 
-Where a provider exposes a strong version/fingerprint/ETag or equivalent source identity, revalidation binds to it. Where it does not, an immediate fresh provider observation is required. If the provider offers no atomic governance-check+mutation primitive, the unavoidable check/use window is not papered over with TTL: provider-side enforcement and exact post-operation observation/rejection form the final external authority boundary. A rejection caused by concurrent governance/capability drift is surfaced as factual machine-readable current-state evidence and is never automatically repaired or reinterpreted as permission.
+Public names and serialization are not defined here. Personal behavior resolution order is:
 
-Missing, stale, unsupported, contradictory, or otherwise inconsistent effective policy blocks only affected promotion actions. Contradictions are emitted as factual machine-readable diagnostics with exact source provenance; `ruu` does not recommend or apply remediation.
+```text
+applicable repository-specific UserBehavior
+→ else global UserBehavior
+→ else BuiltInBehavior
+```
+
+This precedence exists only within personal behavior resolution. It never becomes governance-source precedence. Repository-specific behavior does not override repository governance; global behavior does not override provider/organization governance; BuiltInBehavior authorizes nothing.
+
+The V1 `BuiltInBehavior` is the non-authorizing SOFT order:
+
+```text
+1. DIRECT_TARGET_ADVANCE
+2. PROVIDER_SUBMISSION
+```
+
+This preserves zero-onboarding direct preference without putting preference in policy. It cannot enlarge `allowed_routes`, change PromotionTarget/topology, change checks/reviews, grant provider permissions, or invent capability.
+
+### Route resolution
+
+Route choice begins with:
+
+```text
+A = EffectivePromotionPolicy.allowed_routes
+```
+
+Core-derived exact facts then remove routes incapable of satisfying the current semantic obligation. Behavior cannot retarget, alter derived repository relation/topology, suppress an already-derived REQUIRED operation, or change Git mechanics.
+
+Technical support is evaluated separately. For SOFT behavior, positively policy-forbidden routes are skipped and a positively `UNSUPPORTED` higher-preference route may fall through. `UNKNOWN | UNKNOWN_INCONSISTENT` is not positive unavailability and fails closed/localizes instead of silently falling through.
+
+For STRICT behavior there is no fallback:
+
+```text
+required route not authorized
+→ BEHAVIOR_UNSATISFIABLE
+
+authorized route technically unsupported
+→ UNSUPPORTED
+
+required authority/capability unknown
+→ MISSING / UNKNOWN as applicable
+```
+
+After positive selection, an unmet review/check/queue/exact-state or other transition-local prerequisite is a localized wait on that route. A temporary progression wait never silently reselects another route.
+
+### Outcome classification
+
+These outcomes remain distinct:
+
+```text
+required authoritative information unavailable / unobservable
+→ MISSING / UNKNOWN
+
+authoritative governance constraints mutually incompatible
+→ POLICY_CONTRADICTION
+
+valid authoritative policy cannot satisfy strict personal behavior
+→ BEHAVIOR_UNSATISFIABLE
+
+required semantic mechanism technically not realizable
+→ UNSUPPORTED
+```
+
+`BEHAVIOR_UNSATISFIABLE != POLICY_CONTRADICTION` and `UNSUPPORTED != POLICY_CONTRADICTION`. Technical inability is not an EffectivePromotionPolicy authorization state.
+
+### Authority, exclusion, and currentness
+
+Runtime requests, ad hoc flags, and local operational config cannot alter policy. Resolved UserBehavior may only prefer or restrict inside current authorization; neither can enlarge authorization.
+
+UserBehavior MUST NOT contain, select, mutate, or override:
+
+```text
+PromotionTarget
+ConvergenceBase
+source/target repository relation
+PromotionGroup membership
+ConvergenceUnit membership
+promotion dependency topology
+stack topology
+merge strategy
+restack algorithm
+FF/non-FF mechanics
+rebase mechanics
+checkpoint membership
+ContributionUnit lifecycle
+ConvergenceUnit lifecycle
+provider capability
+provider governance
+organization governance
+repository governance
+provider execution identity
+required checks
+required reviews
+merge queue requirements
+governance bypass
+development validation
+exact ancestry decisions
+REVIEW_REQUESTED assertion
+early/draft publication authority
+generic manual finalization
+executor/backend implementation choice
+```
+
+Native-Git versus provider-native execution of the same semantic operation is RuntimeConfig/implementation plumbing, not UserBehavior.
+
+Repository policy remains read from the trusted target baseline. Authoritative policy inputs, technical capability/current facts, and exact Git/managed state are immediately revalidated before policy-sensitive mutation. Cache/TTL and stale snapshots never authorize. Provider enforcement plus exact post-observation remains the final external boundary where atomic check-and-mutation is unavailable.
 
 ## 4.17 Promotion-group boundaries come from work-bearing invocation cohorts, not semantic submission guessing
 
@@ -1539,9 +1663,30 @@ Internal contribution-unit/convergence-unit refs are never rebased/history-rewri
 
 ## 5.2 Promotion is repository-policy-driven
 
-After internal readiness and explicit promotion-unit binding, promotion follows the repository's current policy.
+After internal readiness and explicit promotion-unit binding, route-specific mechanics follow this boundary:
 
-### `target_realization_route = DIRECT_TARGET_ADVANCE`
+```text
+current EffectivePromotionPolicy.allowed_routes
+→ authoritative route space
+
+exact core constraints
+→ routes capable of satisfying the current semantic obligation
+
+repository-specific UserBehavior
+→ else global UserBehavior
+→ else BuiltInBehavior
+→ non-authorizing SOFT ordering or STRICT requirement
+
+current contextual capability
+→ technical support
+
+positive selection
+→ selected_target_realization_route
+```
+
+Unknown authority/capability fails closed rather than causing preference fallback. Once selected, transition-local waits remain on that route. The route-specific execution mechanics below are unchanged.
+
+### `selected_target_realization_route = DIRECT_TARGET_ADVANCE`
 
 Conceptually:
 
@@ -1561,7 +1706,7 @@ refresh authoritative target + policy
 
 DIRECT target advancement is a pure ref operation after candidate materialization. It does not check out or merge into a local target worktree, does not pre-advance a local target ref as staging, and never authorizes target history rewrite or non-fast-forward semantics.
 
-### `target_realization_route = PROVIDER_SUBMISSION`
+### `selected_target_realization_route = PROVIDER_SUBMISSION`
 
 Conceptually:
 
@@ -1820,41 +1965,32 @@ A waiting submission/review/check/merge queue/provider state remains a nontermin
 
 ## 7.3 Shared repository policy state
 
-Shared coordination state records the **effective promotion-policy observation** used by `ruu` and enough exact provenance to reconstruct its authoritative inputs or a contradiction.
+Shared coordination state records the current effective promotion-policy observation and enough exact provenance to reconstruct its authoritative inputs, authorized route space, or contradiction.
 
-At minimum the runtime must be able to reason about:
+At minimum the runtime can reason about:
 
 ```text
 policy identity/version/fingerprint
 immutable PromotionTarget(target_repository_id, target_ref)
 derived publication_relation
-target_realization_route
+allowed_routes ⊆ {DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}
 publication remote/repository mechanics
-current exact target OID / trusted policy-baseline OID
-current derived promotion dependency/topology identity/fingerprint
-normalized provider semantic-operation capability/current-fact observations
+trusted target-policy baseline OID/fingerprint
 provider/organization governance source identities + revisions/fingerprints
-trusted repository-policy target-baseline OID + policy fingerprint when present
-submission rewrite permission/class
+provider governance authorization facts required by policy composition
+normalized provider technical capability/current-fact observations
+current derived promotion dependency/topology identity/fingerprint
+submission/ref-update governance dimensions when applicable
 last refresh observation identity
-per-mutable-source freshness evidence: source kind/identity, observed revision/version/fingerprint when exposed, observation method, and observation identity
-current trusted target OID/policy anchor used for the snapshot
-contradictory dimension(s) + normalized incompatible constraint provenance when applicable
+per-source currentness provenance
+contradictory dimensions and source provenance when applicable
 ```
 
-ADR-043 fixes policy authority/composition semantics:
+Authoritative governance constraints compose without silent precedence fallback. A two-route `allowed_routes` set is a fully resolved policy result. Personal UserBehavior and BuiltInBehavior are separate non-authorizing selection inputs and are not policy sources. This section defines no profile, repository-scope, persistence, or binding-generation schema for UserBehavior.
 
-```text
-authoritative capabilities/facts + governance constraints + trusted repo constraints
-→ compose without silent precedence fallback
-→ contradiction if unsatisfiable
-→ otherwise built-in rules fill only underdetermined dimensions
-→ EffectivePromotionPolicy
-```
+Provider governance authorization facts may constrain `allowed_routes`; provider technical capability observations cannot grant authorization. Progression requires `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` plus exact transition guards.
 
-Under ADR-051, provider capabilities/facts are normalized as semantic-operation observations bound to exact context. Provider feature labels do not select topology or authorize mutations. Current derived topology is separate managed state; when it requires a provider operation, progression requires `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` plus the ordinary transition guards.
-
-Local config and runtime caller/human/agent/orchestrator preferences are not promotion-policy authority. Policy is an exact authorization input, not a stale static assumption. Cache entries may retain parsed/normalized observations for efficiency, but cache presence, cache age, TTL, or a previously successful policy resolution never by themselves establish `CURRENT` for a policy-sensitive promotion mutation.
+Local config, caller requests, and personal behavior cannot enlarge policy. Cache presence, age, TTL, or prior successful resolution never establish currentness for a policy-sensitive mutation.
 
 ## 7.4 Convergence-unit and contribution unit mappings
 
@@ -2452,7 +2588,7 @@ A rewriteable submission revision also requires exact expected-old local/remote/
 
 ## 12.5 DIRECT target-promotion claim
 
-In `target_realization_route=DIRECT_TARGET_ADVANCE`, target advancement is a shared mutation resource.
+When `selected_target_realization_route=DIRECT_TARGET_ADVANCE`, target advancement is a shared mutation resource.
 
 Only one incompatible direct promotion may own the exact target operation at a time.
 
@@ -2541,7 +2677,7 @@ another authorized/recovered operation or external Git update advances it to D
 Example policy race:
 
 ```text
-current executor observes target_realization_route = DIRECT_TARGET_ADVANCE
+current executor observes selected_target_realization_route = DIRECT_TARGET_ADVANCE
 repository policy changes to provider-submission-required
 → stale direct-promotion authorization/state is invalid
 → refresh/recompute
@@ -3546,37 +3682,33 @@ No second repository-specific semantic-readiness token is required inside `ruu`.
 
 This state is not semantic product completion.
 
-## 22.7 Repository-policy resolution
+## 22.7 Repository-policy, capability, and behavior resolution
 
-Before promotion evaluation, resolve the current effective repository policy from authoritative inputs. Immediately before each policy-sensitive promotion mutation:
-
-```text
-re-observe every mutable authoritative policy source required by the mutation
-verify trusted target OID / repository-policy anchor
-verify provider/org governance observation
-verify normalized provider semantic-operation capabilities/current facts
-compare exact source identities/revisions/fingerprints when exposed
-recompute policy if any authoritative observation changed
-verify every exact semantic operation required by current derived topology/publication relation remains contextually supported
-```
-
-Cache/TTL cannot satisfy this pre-mutation revalidation requirement. If any authoritative source changed:
+Before promotion evaluation, establish the current authoritative policy route space. Immediately before each policy-sensitive mutation:
 
 ```text
-prior policy snapshot → STALE
-invalidate stale promotion authorization/evidence
-→ recompute before mutation
+re-observe authoritative governance inputs required for authorization
+verify trusted target OID / target-baseline repository policy
+verify provider/organization governance observations
+recompute EffectivePromotionPolicy.allowed_routes when any source changed
+separately re-observe technical capability/current facts needed by execution
+revalidate exact Git/managed state
 ```
 
-If no atomic provider check+mutation primitive exists, perform the fresh observation immediately before the mutation and treat provider enforcement plus exact post-operation observation/rejection as the final external authority boundary.
+Cache/TTL cannot satisfy currentness. Provider technical support never grants policy authorization.
 
-If unknown/contradictory:
+After current `allowed_routes` is established, apply exact core constraints and resolve applicable repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior. Apply SOFT or STRICT semantics from §4.16. Unknown authority/capability fails closed; it is not positive unavailability. A positively selected route that is waiting on transition-local prerequisites remains selected and waits locally.
+
+Distinct blocking outcomes are preserved:
 
 ```text
-BLOCKED_POLICY / UNKNOWN_INCONSISTENT
+MISSING / UNKNOWN
+POLICY_CONTRADICTION
+BEHAVIOR_UNSATISFIABLE
+UNSUPPORTED
 ```
 
-Internal convergence can continue if unaffected.
+Internal convergence continues when unaffected. Where provider check-and-mutation is non-atomic, immediate observation, provider enforcement, and exact post-operation observation/rejection remain the external authority boundary.
 
 ## 22.8 Promotion-unit eligibility
 
@@ -3652,7 +3784,7 @@ For a resolved separate-group dependency, ADR-050 receives immutable owned `(old
 Direct promotion requires:
 
 ```text
-target_realization_route = DIRECT_TARGET_ADVANCE
+selected_target_realization_route = DIRECT_TARGET_ADVANCE
 zero raw or resolved-but-target-unsatisfied external AuthoringDependencies
 zero unsatisfied promotion predecessors
 target ref policy-authorized mutable
@@ -3716,7 +3848,7 @@ No force-push/rebase of target.
 Requires:
 
 ```text
-target_realization_route = PROVIDER_SUBMISSION
+selected_target_realization_route = PROVIDER_SUBMISSION
 promotion_dependency = NONE | SATISFIED_BY_TARGET
 all AuthoringDependencies terminally target-satisfied or internal to the same group
 valid SAME/CROSS_REPOSITORY publication relation
@@ -3752,7 +3884,7 @@ The target ref remains read-only to `ruu`.
 Requires:
 
 ```text
-target_realization_route = PROVIDER_SUBMISSION
+selected_target_realization_route = PROVIDER_SUBMISSION
 current promotion_dependency = UNSATISFIED(parent_submission_id,parent_exact_head)
 that predecessor was resolved from durable authoring provenance or another already-authoritative promotion relation
 exactly one external predecessor remains unsatisfied for this submission revision
@@ -3970,18 +4102,18 @@ Now suppose immutable targets/derived repository relations and current policies 
 Repo1:
   PromotionTarget = Repo1/main
   publication_relation = SAME_REPOSITORY   # derived
-  policy.target_realization_route = DIRECT_TARGET_ADVANCE
+  selected_target_realization_route = DIRECT_TARGET_ADVANCE
 
 Repo2:
   PromotionTarget = Repo2/main
   publication_relation = SAME_REPOSITORY   # derived
-  policy.target_realization_route = PROVIDER_SUBMISSION
+  selected_target_realization_route = PROVIDER_SUBMISSION
   promotion_dependency = NONE | SATISFIED_BY_TARGET
 
 Repo3:
   PromotionTarget = upstream3/main
   publication_relation = CROSS_REPOSITORY  # derived from source Repo3 + target upstream3
-  policy.target_realization_route = PROVIDER_SUBMISSION
+  selected_target_realization_route = PROVIDER_SUBMISSION
   promotion_dependency = NONE | SATISFIED_BY_TARGET
 ```
 
@@ -4135,7 +4267,7 @@ This does not imply a product feature is complete.
 Suppose Repo1 policy is:
 
 ```text
-target_realization_route = DIRECT_TARGET_ADVANCE
+selected_target_realization_route = DIRECT_TARGET_ADVANCE
 target_ref = main
 ```
 
@@ -4168,7 +4300,7 @@ Repo2 target/context + policy:
 PromotionTarget = Repo2/main
 publication_relation = SAME_REPOSITORY   # derived
 promotion_dependency = NONE | SATISFIED_BY_TARGET
-policy.target_realization_route = PROVIDER_SUBMISSION
+selected_target_realization_route = PROVIDER_SUBMISSION
 ```
 
 Promotion-unit P2 becomes:
@@ -4190,7 +4322,7 @@ Repo3 target/context + policy:
 PromotionTarget = upstream3/main
 publication_relation = CROSS_REPOSITORY  # derived
 promotion_dependency = NONE | SATISFIED_BY_TARGET
-policy.target_realization_route = PROVIDER_SUBMISSION
+selected_target_realization_route = PROVIDER_SUBMISSION
 ```
 
 Then:
@@ -4410,16 +4542,16 @@ Mutation/publication/provider/policy changes trigger refresh and re-evaluation u
 Blocked/waiting work on one resource does not stop unrelated actionable resources.
 
 ---
-## Invariant 39 — Repository promotion policy is repository-local
-Different repos in one global sweep may legitimately use different target-realization routes/topologies/relations.
+## Invariant 39 — Repository promotion authorization is repository-local route space
+Different repositories in one global sweep may authorize different route sets. A current policy may authorize either singleton route or both routes without becoming missing or underdetermined.
 
 ---
-## Invariant 40 — Promotion policy is revalidated
-Effective policy is refreshed on every executed global sweep, and every policy-sensitive promotion mutation requires an immediately preceding re-observation/revalidation of all mutable authoritative policy sources needed by that mutation.
+## Invariant 40 — Promotion policy and capability are independently revalidated
+Every sweep refreshes relevant policy state. Before mutation, authoritative governance needed for authorization, technical capability/current facts needed for execution, and exact Git/managed state are immediately revalidated.
 
 ---
-## Invariant 40A — Promotion authorization has no runtime/local bypass
-Caller identity, human/agent/orchestrator request, and explicit local config cannot enlarge or replace the `EffectivePromotionPolicy`. Different behavior requires a change to an authoritative policy/governance source followed by ordinary revalidation.
+## Invariant 40A — Promotion authorization has no runtime, local-config, or behavior bypass
+Caller identity, ad hoc request, invocation flag, local operational config, UserBehavior, and BuiltInBehavior cannot enlarge or replace `EffectivePromotionPolicy.allowed_routes`. Resolved behavior may only prefer or restrict inside current authorization.
 
 ---
 ## Invariant 40B — Repository policy cannot self-authorize from the candidate it governs
@@ -4427,53 +4559,52 @@ Repo-committed policy for a promotion is taken from the trusted exact target bas
 
 ---
 ## Invariant 40C — Authoritative promotion constraints compose; contradictions remain visible
-Provider capabilities/current facts, provider/org governance, and trusted repository policy are jointly composed according to their constraint semantics. No generic precedence silently repairs incompatible explicit constraints.
+Provider/organization governance and trusted repository policy compose according to their constraint semantics. No personal behavior or generic precedence silently repairs incompatible authoritative constraints.
 
 ---
-## Invariant 40D — Built-in policy rules only close underdetermined dimensions
-Built-in rules may derive a complete policy without repository onboarding, but cannot weaken or contradict an explicit authoritative constraint. Absence of a repo policy file alone is not `MISSING`.
+## Invariant 40D — BuiltInBehavior owns preference, not authorization
+BuiltInBehavior supplies the zero-onboarding SOFT route order `DIRECT_TARGET_ADVANCE` then `PROVIDER_SUBMISSION`. It never changes `allowed_routes`, target, topology, governance, review/check requirements, permissions, capability, or exact Git mechanics.
 
 ---
-## Invariant 40E — Policy contradiction diagnostics are factual, not prescriptive
-A `CONTRADICTORY` policy exposes machine-readable incompatible constraints and exact source provenance to the external system. `ruu` does not recommend, rank, or apply remediation.
+## Invariant 40E — Policy contradiction, behavior unsatisfiability, unsupported mechanism, and unknown authority are distinct
+Mutually incompatible authoritative constraints yield `POLICY_CONTRADICTION`; a strict personal requirement outside valid authorization yields `BEHAVIOR_UNSATISFIABLE`; technical impossibility yields `UNSUPPORTED`; unavailable/unobservable required authority or capability remains `MISSING / UNKNOWN`. None is substituted for another.
 
 ---
-## Invariant 40F — Cache/TTL never establishes promotion-policy currentness
-Cached policy/observation data may optimize resolution, but cache presence, age, TTL, or prior success never authorizes a policy-sensitive promotion mutation.
+## Invariant 40F — Cache/TTL never establishes promotion-policy or capability currentness
+Cache presence, age, TTL, or prior success never authorizes a mutation and never proves current technical support.
 
 ---
-## Invariant 40G — Authority-anchor movement invalidates the policy snapshot
-Any changed trusted target OID/repo-policy anchor or mutable provider/org governance/capability/fact observation used by the policy makes the prior snapshot `STALE`; mutation waits for recomputation.
+## Invariant 40G — Authority or capability movement invalidates the affected snapshot
+Changed trusted target/repository-policy, provider/organization governance, or technical capability/current facts force recomputation/revalidation before mutation. Capability movement affects support, not governance authorization by itself.
 
 ---
 ## Invariant 40H — Non-atomic provider freshness ends at provider enforcement and exact observation
-When the provider exposes no atomic governance-check+mutation primitive, `ruu` performs immediate pre-mutation re-observation. Provider enforcement/rejection and exact post-operation observation are the final external authority boundary; concurrent drift is surfaced factually and never auto-repaired.
+Where no atomic check-and-mutation primitive exists, immediate re-observation precedes mutation and provider enforcement/rejection plus exact post-observation is the final external boundary. Drift is factual and never permission.
 
 ---
-## Invariant 41 — Stale/unknown/contradictory policy fails closed for promotion
-Policy ambiguity cannot authorize direct push, provider-submission rewrite, or topology fallback.
+## Invariant 41 — UserBehavior is non-authorizing and has a closed exclusion boundary
+UserBehavior is only SOFT route preference or STRICT route requirement within `allowed_routes`. It cannot select or alter target/base, repository relation, group/unit membership, dependency/stack topology, merge/restack/FF/rebase mechanics, lifecycle/checkpoint membership, provider/governance/execution identity, required reviews/checks/queues, bypass, validation, ancestry, review-request/early-publication authority, manual finalization, or executor/backend choice.
 
 ---
-## Invariant 42 — Policy mode, derived repository relation, and derived topology are distinct
-`DIRECT_TARGET_ADVANCE|PROVIDER_SUBMISSION` is a target-realization-route authorization dimension. `SAME_REPOSITORY|CROSS_REPOSITORY` is derived from authoritative source repository identity plus the immutable PromotionTarget. `INDEPENDENT|STACKED` is current derived promotion topology under ADR-050. Neither relation nor topology is a caller/policy-selected publication-layout preference.
+## Invariant 42 — Authorized route space, selected route, relation, and topology are distinct
+`allowed_routes` is governance authorization; the selected route results from non-authorizing behavior plus exact core/support constraints. `SAME_REPOSITORY | CROSS_REPOSITORY` and `INDEPENDENT | STACKED` remain derived facts and are never UserBehavior.
 
 ---
-## Invariant 43 — Unsupported required operations never silently fallback
-If the semantic operation required by current exact state/topology is unsupported, unknown, or forbidden, the affected obligation blocks/waits explicitly rather than changing topology, target-realization route, repository relation, or grouping.
+## Invariant 43 — Route fallback requires positive unavailability and never follows a temporary wait
+SOFT behavior may skip a forbidden or positively unsupported route. Unknown does not authorize fallback. After positive route selection, an unmet transition-local prerequisite localizes a wait and never silently reselects another route. STRICT behavior never falls back.
 
 ---
-## Invariant 43A — Provider capability is semantic and contextual
-The core queries a versioned semantic operation against an exact provider context. Provider-wide feature labels/booleans are never sufficient applicability or authorization evidence.
+## Invariant 43A — Provider capability is semantic, contextual, and non-authorizing
+The core queries a versioned semantic operation against an exact provider context. Provider feature labels are insufficient, and technical support never grants governance authorization.
 
 ---
-## Invariant 43B — Required, supported, and authorized are separate guards
-A provider operation may execute only when it is required by core exact-state semantics, supported in the current provider context, authorized by current effective policy, and all ordinary exact-state/transition-local/claim/recovery guards hold.
+## Invariant 43B — Required, supported, and authorized remain separate guards
+An operation executes only when required by core exact-state semantics, technically supported in context, authorized by current effective policy, and fully guarded. UserBehavior is not a fourth authority.
 
 ---
 ## Invariant 43C — Provider-native executors never own normative semantics
 Provider-native or external mechanisms may execute a core operation only if their exact observed result conforms to the same normative contract. API success or feature identity alone is not adoption evidence.
 
----
 ## Invariant 44 — Promotion unit is distinct from convergence unit
 A PromotionUnit is an immutable non-empty set of canonical exact ConvergenceUnit-state references from exactly one authoritative source repository, mechanically materialized from one repository projection of a complete adopted PromotionGroup group-local exact resolution.
 
@@ -4806,8 +4937,8 @@ Task-descriptive names do not define convergence identity, promotion grouping, o
 Provider-submission completion may result from merge/squash/rebase-style provider behavior; resulting target observation is authoritative.
 
 ---
-## Invariant 85 — Provider capabilities are explicit authorization inputs
-A topology/rewrite workflow proceeds only when current provider/policy capability supports it.
+## Invariant 85 — Provider capabilities are explicit technical inputs
+A topology/rewrite workflow proceeds only when the required semantic operation is contextually supported and separately authorized by current policy.
 
 ---
 ## Invariant 86 — Policy changes invalidate in-flight promotion assumptions
@@ -5063,7 +5194,7 @@ For a checkpoint attempt that reaches materialization, `ruu` constructs the ADR-
 
 ---
 ## Invariant 148 — Promotion is terminal only after exact route-conformant target realization proof
-A provider submission becoming `MERGED` / `PROVIDER_FINALIZED` is not itself `PromotionUnit PROMOTED`. Terminal adoption requires a durable exact realization proof for the immutable PromotionTarget **and** proof that the realized effect conforms to the authoritative `target_realization_route` applicable to that effect.
+A provider submission becoming `MERGED` / `PROVIDER_FINALIZED` is not itself `PromotionUnit PROMOTED`. Terminal adoption requires a durable exact realization proof for the immutable PromotionTarget **and** proof that the realized effect conforms to the positively selected route authorized for that effect.
 
 ---
 ## Invariant 149 — DIRECT native realization does not require Ruu actor attribution
@@ -5365,11 +5496,11 @@ immutable Operation / Attempt / Observation / Adoption history
 
 It does not replace Git/remotes/provider as authority for the external facts those systems own.
 
-## 27.3 Repository policy resolver
+## 27.3 Promotion authorization, behavior, and capability resolution
 
-Resolves/revalidates the effective repo-local promotion policy and provider capabilities.
+The policy resolver composes current authoritative governance into `EffectivePromotionPolicy.allowed_routes` and exposes a fingerprint/version suitable for exact authorization checks. It does not choose a preference.
 
-It must expose a state fingerprint/version suitable for exact authorization checks.
+A separate semantic behavior-resolution responsibility selects or restricts within that authorized set using applicable repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior. Contextual provider capability remains an independently revalidated technical guard. This boundary defines no profile, persistence, or public-field representation.
 
 ## 27.4 ContributionUnit authoring-surface manager — provisioning side
 
@@ -5479,7 +5610,7 @@ Materialization never rewrites internal ConvergenceUnit refs. Native multi-head 
 
 ## 27.16 Direct promotion engine
 
-For `target_realization_route=DIRECT_TARGET_ADVANCE`, consumes an already materialized ADR-048 candidate for the immutable PromotionTarget and requires every AuthoringDependency/promotion predecessor to be target-satisfied or internal to the same group. When the DIRECT_TARGET_ADVANCE transition-local prerequisites are satisfied, it performs the ADR-052 semantic operation `AdvanceTargetFF(PromotionTarget.ref, expected_old, new)`: one atomic exact-old compare-and-swap whose only successful effect is descendant-only advancement of that already-bound target. It owns no target worktree/merge staging, keeps an attempt-scoped candidate recovery anchor while nonterminal, and adopts success only from authoritative target observation/history.
+For `selected_target_realization_route=DIRECT_TARGET_ADVANCE`, consumes an already materialized ADR-048 candidate for the immutable PromotionTarget and requires every AuthoringDependency/promotion predecessor to be target-satisfied or internal to the same group. When the DIRECT_TARGET_ADVANCE transition-local prerequisites are satisfied, it performs the ADR-052 semantic operation `AdvanceTargetFF(PromotionTarget.ref, expected_old, new)`: one atomic exact-old compare-and-swap whose only successful effect is descendant-only advancement of that already-bound target. It owns no target worktree/merge staging, keeps an attempt-scoped candidate recovery anchor while nonterminal, and adopts success only from authoritative target observation/history.
 
 ## 27.17 Submission revision engine
 
@@ -5610,7 +5741,7 @@ OR
 promotion unit → submission ref(s) → submission/provider → target
 ```
 
-The repository promotion policy selects the authorized promotion path.
+The repository promotion policy defines the authorized route space; resolved non-authorizing behavior selects or restricts within that space.
 
 ## 28.1 Internal reconciliation matrix
 
@@ -5695,7 +5826,7 @@ force-with-lease push
 Preconditions:
 
 ```text
-effective target realization route = DIRECT_TARGET_ADVANCE
+selected target realization route = DIRECT_TARGET_ADVANCE
 promotion unit exact and ready
 zero raw or resolved-but-target-unsatisfied external AuthoringDependencies
 zero unsatisfied promotion predecessors
@@ -5739,7 +5870,7 @@ fallback to direct because provider submission failed
 Preconditions:
 
 ```text
-effective target_realization_route = PROVIDER_SUBMISSION
+selected_target_realization_route = PROVIDER_SUBMISSION
 promotion unit exact and ready
 target read-only to Ruu
 publication relation valid
@@ -5878,30 +6009,27 @@ A repository-local PromotionUnit may reference one or more exact convergence-uni
 
 Candidate computation is isolated from ContributionUnit producer authoring surfaces, conflict-detecting, recoverable/idempotent, exact-state-bound, and contains no hidden semantic grouping. Semantic conflicts route to ADR-040 `RECONCILIATION_REQUIRED`; the exact final candidate may be adopted only when its transition-local exact prerequisites hold.
 
-## 28.10 Repository promotion policy is authoritatively composed, target-bound, and current-state-bound
+## 28.10 Authorize route space, then apply non-authorizing behavior
 
-The immutable PromotionTarget comes from ConvergenceUnit topology established before authoring. Before any direct target update, submission rewrite, provider submission create/update, or provider topology mutation:
+The immutable PromotionTarget comes from pre-authoring ConvergenceUnit topology. Before any policy-sensitive promotion mutation:
 
 ```text
-refresh/revalidate authoritative policy inputs
+refresh/revalidate authoritative governance inputs
 → compose constraints
-→ apply built-in rules only to underdetermined dimensions
-→ require CURRENT(EffectivePromotionPolicy fingerprint)
+→ produce CURRENT EffectivePromotionPolicy.allowed_routes
+→ apply exact core constraints
+→ resolve repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior
+→ evaluate contextual technical support separately
+→ positively select one route or emit the exact localized outcome
 ```
 
-No generic precedence or runtime override exists. Explicit incompatible provider/org/trusted-repo constraints produce `CONTRADICTORY` and block the affected promotion. Policy contradiction or provider limitation never causes implicit target substitution/retargeting.
+No generic governance precedence or runtime authorization override exists. Explicit incompatible authoritative constraints produce `POLICY_CONTRADICTION`. A complete route set containing both routes is resolved and needs no policy default.
 
-The trusted repository-committed policy is read from the exact authoritative target baseline that governs the promotion. Candidate-only policy changes cannot govern that same candidate.
+BuiltInBehavior, not policy, supplies the zero-onboarding SOFT direct-then-provider preference. UserBehavior cannot enlarge authorization, retarget, alter topology, create review/early-publication authority, change Git mechanics, or suppress a REQUIRED operation.
 
-If policy sources/facts changed after earlier planning:
+SOFT behavior may fall through only on positive policy prohibition or positive `UNSUPPORTED`; unknown does not justify fallback. STRICT behavior produces `BEHAVIOR_UNSATISFIABLE` when its route is not authorized and `UNSUPPORTED` when the authorized route is technically unrealizable. After route selection, transition-local waits do not trigger reselection.
 
-```text
-old promotion authorization becomes stale
-→ do not execute
-→ recompute under new authoritative state
-```
-
-The system never “tries the old operation and sees whether the server rejects it”, never silently normalizes a contradiction, and never accepts a caller/local-config bypass.
+Trusted repository policy comes from the exact target baseline. Candidate-only policy changes cannot authorize that candidate. Changed policy or capability observations stale prior decisions; every causal mutation uses freshly current authorization, support, and exact state. Provider limitation never causes target substitution, topology invention, or governance bypass.
 
 ## 28.11 Route-conformant provider target-integration result
 
@@ -6177,7 +6305,9 @@ Unknown/incompatible schema/state fails closed. Known schema migrations are expl
 
 The effective promotion policy is compiled from authoritative provider capabilities/current facts, provider/organization governance constraints, and trusted repo-committed policy. There is no generic source-precedence ladder and no runtime/local-config bypass.
 
-Explicit incompatible authoritative constraints produce `CONTRADICTORY` and block the affected promotion without silent fallback. Repo-committed policy is read from the trusted exact target baseline, so a candidate cannot change the rules governing its own promotion. Deterministic built-in rules fill only still-underdetermined dimensions and provide zero-onboarding behavior, including default `DIRECT_TARGET_ADVANCE` when direct target advancement is admissible and no authoritative constraint requires an indirect path.
+Explicit incompatible authoritative constraints produce `CONTRADICTORY` and block the affected promotion without silent fallback. Repo-committed policy is read from the trusted exact target baseline, so a candidate cannot change the rules governing its own promotion. Historically, ADR-043 assigned zero-onboarding scalar route selection to deterministic built-in policy rules.
+
+ADR-087 amends that current reading: authoritative composition now returns the complete unordered `allowed_routes` set, and non-authorizing BuiltInBehavior supplies the zero-onboarding SOFT preference for direct then provider submission. Constraint composition, trusted target baseline, contradiction signaling, non-prescriptive diagnostics, and the no-runtime-bypass boundary remain unchanged.
 
 Contradictions surface as first-class factual machine-readable blocking diagnostics containing exact incompatible constraints and source provenance. `ruu` does not infer, recommend, rank, or apply remediation; the external Development System/operator decides what to do with the signal.
 
@@ -6859,66 +6989,52 @@ index missing/stale/inconsistent with managed obligations
 
 `KNOWN_INACTIVE` never suppresses an authoritative nonterminal obligation. If one exists, the index is wrong and must be repaired.
 
-## 33.3 Effective repository promotion-policy state
+## 33.3 Effective repository promotion-policy and behavior-selection state
 
 ```text
 policy_state:
-  CURRENT(policy_fingerprint)
+  CURRENT(policy_fingerprint, allowed_routes)
   STALE
   MISSING
   CONTRADICTORY
-  UNSUPPORTED_COMBINATION
   UNKNOWN_INCONSISTENT
+
+allowed_routes ⊆ {
+  DIRECT_TARGET_ADVANCE,
+  PROVIDER_SUBMISSION
+}
 ```
 
-Interpretation under ADR-043 + ADR-044:
+`CURRENT` means authoritative constraints are jointly satisfiable, the complete authorized route set is known for the immutable PromotionTarget context, and required mutable sources have been immediately revalidated for the pending mutation. `{DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}` is fully resolved and unordered.
 
 ```text
-CURRENT(policy_fingerprint)
-→ fingerprint is bound to the immutable PromotionTarget identity + authoritative policy-source identities/baseline
-→ authoritative inputs are jointly satisfiable and all required policy dimensions are resolved for that target context
-→ for a policy-sensitive promotion mutation, every mutable authoritative source needed by that mutation has just been re-observed/revalidated
-→ cache age/TTL/prior success is not sufficient currentness evidence
+MISSING / UNKNOWN
+→ required authoritative information unavailable or unobservable
 
-MISSING
-→ a complete effective policy cannot be derived from available authoritative inputs + built-in rules
-→ merely lacking a repo policy file is NOT sufficient for MISSING
-
-CONTRADICTORY
-→ explicit authoritative constraints/facts have no common satisfying assignment
-→ no silent provider/org/repo precedence fallback
-→ emit exact factual contradiction descriptor outward
+CONTRADICTORY / POLICY_CONTRADICTION
+→ authoritative governance constraints have no common satisfying assignment
 ```
 
-Core policy authorization includes:
+Technical inability is not policy state. It is evaluated separately as `UNSUPPORTED | UNKNOWN_INCONSISTENT` for the required semantic mechanism.
+
+After a current policy result, behavior selection is conceptually:
 
 ```text
-target_realization_route:
-  DIRECT_TARGET_ADVANCE | PROVIDER_SUBMISSION
+behavior_source:
+  REPOSITORY_SPECIFIC_USER_BEHAVIOR
+  GLOBAL_USER_BEHAVIOR
+  BUILT_IN_BEHAVIOR
+
+behavior_form:
+  SOFT(preference_order)
+  STRICT(required_route)
 ```
 
-Promotion context independently contains the immutable PromotionTarget and derived `SAME_REPOSITORY | CROSS_REPOSITORY` relation. Current dependency/topology is separately derived by ADR-050. ADR-051 classifies the semantic operation required by that current state. Validity examples:
+Behavior cannot add a route to `allowed_routes`. Strict incompatibility with a valid policy yields `BEHAVIOR_UNSATISFIABLE`, not policy contradiction. An authorized but technically impossible strict route yields `UNSUPPORTED`. Unknown authority/support remains `MISSING / UNKNOWN` as applicable.
 
-```text
-DIRECT_TARGET_ADVANCE + no unresolved promotion dependency
-→ potentially valid if target direct mutation is supported/authorized
+The built-in behavior is SOFT `[DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION]`. Public names, persistence, profiles, repository-scope identity, and binding generations are outside this state model.
 
-PROVIDER_SUBMISSION + no unresolved dependency + SAME/CROSS relation
-→ provider-submission flow only if CREATE_PROVIDER_SUBMISSION is supported in that exact context and authorized
-
-PROVIDER_SUBMISSION + exact unsatisfied predecessor dependency
-→ REPRESENT_PROMOTION_DEPENDENCY is REQUIRED
-→ stacked provider representation only if that operation is SUPPORTED + AUTHORIZED
-→ otherwise child waits
-
-submission revision/restack required
-→ exact semantic revision/restack operation must be SUPPORTED + AUTHORIZED
-→ provider-native executor result must conform to the normative core contract
-```
-
-For `CONTRADICTORY`, the externally visible diagnostic is factual and machine-readable. It contains the affected repository/obligation, conflicting dimension(s), normalized incompatible constraints/facts, and source identities/revisions/fingerprints where available. It contains no `recommended_fix`, `resolution_candidates`, ranked remediation, or suggested governance/policy mutation.
-
-Only `CURRENT(...)` policy may authorize promotion mutation.
+Only a positively selected route whose `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` and exact transition guards hold may progress. A transition-local prerequisite wait preserves the selected route and does not trigger fallback.
 
 ## 33.4 Contribution-unit provisioning state
 
@@ -7613,7 +7729,7 @@ READY_FOR_PROMOTION
 Guards:
 
 ```text
-policy CURRENT + target_realization_route = DIRECT_TARGET_ADVANCE
+policy CURRENT + selected_target_realization_route = DIRECT_TARGET_ADVANCE
 every AuthoringDependency target-satisfied or internal to the same group
 zero unsatisfied promotion predecessors
 target mutation authorized

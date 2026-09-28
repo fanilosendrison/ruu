@@ -3,7 +3,7 @@
 - **Status:** Normative companion contract
 - **Introduced by:** ADR-039
 - **Date:** 2026-09-05
-- **Current amendments:** ADR-062 through ADR-081, as applicable (through 2026-11-03)
+- **Current amendments:** ADR-062 through ADR-087, as applicable
 
 ## 1. Purpose
 
@@ -505,21 +505,36 @@ The External Control Plane MUST make active `RECONCILIATION_REQUIRED` obligation
 
 The reconciliation descriptor is diagnostic only. A claimed/resolved status from external tooling MUST NOT authorize adoption. Any authored state returns through ordinary current-state observation/revalidation and claims/CAS plus the transition-local prerequisites for the resulting state.
 
-### 2.11 Promotion-policy contradiction delivery to the external system
+### 2.11 Promotion-policy and behavior-resolution diagnostics
 
-When authoritative promotion-policy inputs are jointly unsatisfiable, `ruu` emits a first-class machine-readable `POLICY_CONTRADICTION` / `policy_state=CONTRADICTORY` blocking diagnostic.
+When authoritative promotion-policy inputs are mutually incompatible, `ruu` emits factual machine-readable `POLICY_CONTRADICTION` / `policy_state=CONTRADICTORY` evidence with the affected obligation, conflicting dimensions, normalized constraints, and source identities/revisions/fingerprints where available.
 
-The External Control Plane MUST make the active contradiction visible/actionable to the external Development System/operator. The diagnostic contains factual provenance sufficient to reconstruct the contradiction, including the affected repository/obligation, conflicting dimension(s), normalized incompatible constraint/fact values, and exact source identities/revisions/fingerprints where available.
+A valid current policy that cannot satisfy a STRICT personal UserBehavior requirement instead yields `BEHAVIOR_UNSATISFIABLE`. It is not a policy contradiction. Technical inability to realize an authorized required mechanism remains `UNSUPPORTED`; unavailable or unobservable required authority/capability remains `MISSING / UNKNOWN` as applicable.
 
-The diagnostic MUST NOT contain a recommended fix, candidate remediation set, ranked next action, or suggested governance/policy mutation. `ruu` and the External Control Plane do not decide how the contradiction should be resolved merely from the diagnostic; the external Development System/operator interprets the facts and independently decides what, if anything, to do.
+The External Control Plane MUST preserve these distinctions and make the current localized diagnostic visible. Every diagnostic is factual and non-prescriptive: it contains no recommended fix, ranked next action, or suggested governance/behavior mutation. A downstream claim of resolution is not authority; `ruu` re-observes current governance, behavior inputs, capability, and exact state before progress.
 
-A downstream claim that the contradiction is “resolved” is not authorization. `ruu` re-observes current authoritative policy/provider facts and reconstructs a `CURRENT` effective policy before any promotion can proceed.
+### 2.12 Policy, behavior, and capability drift delivery
 
-### 2.12 Promotion-policy staleness / concurrent provider-drift delivery
+Immediate revalidation may change the authorized route space, personal-behavior satisfiability, or technical support independently:
 
-If immediate pre-mutation revalidation detects changed authoritative policy/provider inputs, the prior policy snapshot becomes `STALE` and the affected mutation does not proceed until policy is recomputed. If a provider changes concurrently after revalidation and rejects or otherwise changes the exact outcome of a non-atomic provider mutation, `ruu` exposes the exact observed rejection/current provider state as factual machine-readable evidence.
+```text
+policy drift
+→ recompute EffectivePromotionPolicy.allowed_routes
 
-The External Control Plane makes that blocking/current-state evidence available to the external Development System/operator. As with policy contradiction delivery, neither `ruu` nor this contract infers a remediation or treats a retry/override request as authorization; later progress requires ordinary current-state re-observation and policy revalidation.
+SOFT behavior
+→ may select another positively available authorized route according to its ordering
+
+STRICT behavior
+→ may become BEHAVIOR_UNSATISFIABLE
+
+technical capability drift
+→ affects support/executability
+→ does not grant or revoke governance authorization by itself
+```
+
+Unknown or inconsistent authorization/capability remains fail-closed and localized; it is never positive unavailability for SOFT fallback. After a route is positively selected, a temporary review/check/queue/exact-state wait does not trigger route reselection.
+
+The External Control Plane exposes current factual drift/rejection evidence without inferring remediation or treating retry/override requests as authorization. Later progress requires ordinary re-observation of current policy, behavior, capability, and exact state.
 
 ### 2.13 Provider-submission review-request publication-intent boundary
 
@@ -527,9 +542,22 @@ ADR-032's pre-ADR-039 boundary is explicit here and generalized by ADR-062. `REV
 
 ADR-057/060 move the exact composition/execution of the ship-ready gate outside `ruu`: repository governance / the Development System decides what tests, reviews, security checks, documentation checks, or other semantic processes justify the assertion. ADR-062 closes former backlog 30.36: exceptional `REVIEW_NOT_REQUESTED` publication requires explicit current authority/need; if neither that authority nor `REVIEW_REQUESTED` is established, no provider submission is created merely to manufacture a draft/provider object.
 
-### 2.14 Runtime requests cannot manufacture promotion authorization
+### 2.14 Runtime requests and UserBehavior cannot manufacture promotion authorization
 
-ADR-026's repository-policy boundary, as strengthened by ADR-043/044/061, is explicit here. A user, agent, session, orchestrator, local config, or later External Control Plane request may express workflow intent but cannot override current authoritative provider/organization governance, trusted target-baseline repository policy, contextual capability facts, or the immutable PromotionTarget already bound to an authored ConvergenceUnit. The External Control Plane may surface contradictions/drift and may arrange semantic remediation, but promotion authorization is reconstructed from current authoritative sources by `ruu`; a runtime declaration such as “push direct”, “skip review”, “force this provider submission/PR”, or “send this existing ConvergenceUnit to another branch” is never sufficient authority by itself.
+A user, agent, session, orchestrator, ad hoc invocation flag, local operational config, or later External Control Plane request cannot enlarge or replace current authoritative provider/organization governance, trusted target-baseline repository policy, or the immutable PromotionTarget.
+
+Resolved UserBehavior is distinct from a runtime override. It MAY prefer or strictly require a realization route only within `EffectivePromotionPolicy.allowed_routes`; it cannot add a route, mutate governance, retarget, change derived topology/relation, create capability, suppress checks/reviews/queues, or manufacture review/early-publication/finalization authority.
+
+Therefore requests such as:
+
+```text
+push direct
+skip review
+force this provider submission
+send this ConvergenceUnit to another target
+```
+
+are never sufficient authority. The External Control Plane may expose `POLICY_CONTRADICTION`, `BEHAVIOR_UNSATISFIABLE`, `UNSUPPORTED`, or `MISSING / UNKNOWN` facts and arrange external semantic remediation, but `ruu` reconstructs authorization and support from current authoritative sources and exact state.
 
 ### 2.15 Semantic review findings and backlog projection
 
@@ -717,6 +745,7 @@ This contract consolidates the external boundary established across:
 - ADR-055 — partial cross-repository settlement and publication-episode continuation;
 - ADR-061 — immutable pre-authoring ConvergenceUnit PromotionTarget binding and policy HOW/WHERE separation;
 - ADR-062 — route-independent promotion and provider-submission projection semantics;
+- ADR-087 — authorized realization-route space, non-authorizing UserBehavior, BuiltInBehavior preference, and distinct policy/behavior/capability outcomes;
 - ADR-063 — semantic findings/backlog boundary;
 - ADR-064 — frozen pre-commit mutation handoff and exact checkpoint identity bridge;
 - ADR-071 — transactional managed-authoring-ref abandonment ingress and current-disposition causal authorization fencing;
