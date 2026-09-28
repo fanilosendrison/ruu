@@ -846,3 +846,19 @@ capability
 A complete `EffectivePromotionPolicy.allowed_routes` may authorize both `DIRECT_TARGET_ADVANCE` and `PROVIDER_SUBMISSION`; policy owns authorization while UserBehavior selects or restricts only inside that space. BuiltInBehavior preserves zero-onboarding direct-first preference without acquiring governance authority.
 
 The correction preserves authoritative constraint composition, the trusted target-baseline rule, and the no-policy-bypass boundary from ADR-043; ADR-051's `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` separation; ADR-061's HOW/WHERE boundary and immutable PromotionTarget; and ADR-062's provider-submission projection/finalization semantics. Policy contradiction, strict-behavior unsatisfiability, technical unsupported state, and unknown/missing authority remain distinct factual outcomes.
+
+## 2026-09-28 — ADR-088 — nonempty current promotion authorization route space
+
+ADR-088 closes one cardinality ambiguity left by ADR-087:
+
+```text
+CURRENT EffectivePromotionPolicy
+→ direct singleton | provider singleton | both routes
+
+authoritative composition yields zero admissible routes
+→ POLICY_CONTRADICTION
+→ no current policy
+→ behavior resolution not entered
+```
+
+The empty route set therefore cannot flow into STRICT behavior and become `BEHAVIOR_UNSATISFIABLE`. That outcome remains available only after a valid nonempty current policy exists. Capability, exact-state, fallback, currentness, review/finalization, and UserBehavior exclusion semantics remain unchanged. Future formal-verification work owns model coverage; no qualification package is added by ADR-088.

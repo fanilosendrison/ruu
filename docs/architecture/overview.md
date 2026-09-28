@@ -2,7 +2,7 @@
 
 > **Status: non-normative architecture map.**
 >
-> This document explains the current architecture through ADR-087 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
+> This document explains the current architecture through ADR-088 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
 
 ## 1. Product in one sentence
 
@@ -575,7 +575,7 @@ capability + exact current state
 → WHETHER the selected behavior can actually be realized now
 ```
 
-Policy does not choose another destination and UserBehavior never creates authorization. A policy authorizing both `DIRECT_TARGET_ADVANCE` and `PROVIDER_SUBMISSION` is complete, not underdetermined.
+Policy does not choose another destination and UserBehavior never creates authorization. A current policy contains exactly the direct singleton, the provider singleton, or both routes. A policy authorizing both `DIRECT_TARGET_ADVANCE` and `PROVIDER_SUBMISSION` is complete, not underdetermined. Zero authoritatively admissible routes is `POLICY_CONTRADICTION`, not a current empty policy; behavior resolution is not entered.
 
 The zero-configuration route order belongs to non-authorizing `BuiltInBehavior`:
 
@@ -629,7 +629,7 @@ authoritative target Git realization
 
 The provider-facing representation is a projection of already-defined exact managed/Git state. It is not core identity.
 
-Normative anchors: [ADR-043](../adr/adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md), [ADR-049](../adr/adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md), [ADR-051](../adr/adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md), [ADR-061](../adr/adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md), [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md), [ADR-065](../adr/adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md), [ADR-066](../adr/adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md), [ADR-087](../adr/adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md).
+Normative anchors: [ADR-043](../adr/adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md), [ADR-049](../adr/adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md), [ADR-051](../adr/adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md), [ADR-061](../adr/adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md), [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md), [ADR-065](../adr/adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md), [ADR-066](../adr/adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md), [ADR-087](../adr/adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md), [ADR-088](../adr/adr-088-require-nonempty-current-promotion-authorization-route-space.md).
 
 ---
 
