@@ -104,6 +104,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | Allow shared governance implementation without transferring repository authority | accepted | 2026-09-22 | complete | Ownership boundary between repository authority and shared governance implementation<br>Use of proto-ring as a reusable governance implementation provider<br>Immutable pinning and local bindings for shared governance tooling |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | Replace mandatory linked worktrees with ContributionUnit Authoring Surfaces | accepted | 2026-09-27 | complete | ContributionUnit authoring-surface contract<br>Pre-edit managed-authoring isolation substrate<br>Managed authoring ref and authoring-surface binding<br>Authoring-surface mutation authority and frozen handoff<br>Exact checkpoint capture from active authoring surfaces<br>Supported-harness zero-preflight provisioning boundary |
 | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | Require proto-ring for applicable generic repository governance | accepted | 2026-09-27 | complete | Mandatory use of proto-ring for applicable generic repository governance<br>Classification boundary between generic and Ruu-specific repository governance<br>Immutable local adoption of the proto-ring Shared Governance Provider contract |
+| [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | Require substrate-independent heterogeneous authoring surfaces | accepted | 2026-09-28 | complete | Product-intent authoring-surface substrate independence<br>Heterogeneous authoring-surface coexistence<br>Per-ContributionUnit authoring-surface realization<br>Convergence semantics independence from authoring-surface realization |
 
 ## Recorded outgoing relations
 
@@ -296,6 +297,9 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | confirms | [ADR-077](adr-077-require-attested-repository-common-observer-coverage-without-owning-foreign-git-mutation-infrastructure.md) |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | supersedes | [ADR-073](adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md) |
 | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | amends | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
+| [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | amends | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) |
+| [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | amends | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
+| [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | confirms | [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) |
 
 ## Derived incoming relations
 
@@ -455,6 +459,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) | amended by | [ADR-071](adr-071-make-managed-branch-deletion-durable-abandonment-and-fence-realization-by-current-disposition.md) |
 | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) | amended by | [ADR-077](adr-077-require-attested-repository-common-observer-coverage-without-owning-foreign-git-mutation-infrastructure.md) |
 | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
+| [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) | amended by | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) |
 | [ADR-071](adr-071-make-managed-branch-deletion-durable-abandonment-and-fence-realization-by-current-disposition.md) | amended by | [ADR-074](adr-074-minimize-native-git-event-observation-to-managed-authoring-binding-disposition.md) |
 | [ADR-071](adr-071-make-managed-branch-deletion-durable-abandonment-and-fence-realization-by-current-disposition.md) | amended by | [ADR-075](adr-075-require-pre-linearization-native-ref-witnesses-and-state-rediscovery-by-observation-class.md) |
 | [ADR-071](adr-071-make-managed-branch-deletion-durable-abandonment-and-fence-realization-by-current-disposition.md) | amended by | [ADR-076](adr-076-separate-native-witness-provenance-from-managed-effect-identity-and-make-semantic-adoption-idempotent.md) |
@@ -483,8 +488,10 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-077](adr-077-require-attested-repository-common-observer-coverage-without-owning-foreign-git-mutation-infrastructure.md) | confirmed by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) | amended by | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) |
 | [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
+| [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) | confirmed by | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) |
 | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) | amended by | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) |
 | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-081](adr-081-manage-exact-authoring-dependencies-before-promotion.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | amended by | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
 | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | amended by | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) |
+| [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | amended by | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) |
