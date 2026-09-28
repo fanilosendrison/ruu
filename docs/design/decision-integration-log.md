@@ -824,3 +824,25 @@ Ruu proves exact source lineage, durably linearizes semantic selection in TX-A, 
 A raw dependency blocks unauthorized realization rather than otherwise legal authoring/checkpointing/convergence. Current target containment may satisfy it without a fake parent. A qualifying handoff accepted after durable selection may CAS-resolve it to `(PromotionGroup, source repository)` only when the source's own frozen pre-sync checkpoint contains `A`, group-local state incorporates that checkpoint, and source/consumer immutable PromotionTargets are exactly equal. This prevents aggregate lineage from laundering `A` back through the consumer. The relation retains consumed `A`; if parent current exact state is `K`, ADR-050 uses `Restack(A,B,K)`. Same-group dependencies create no provider edge. Source abandonment without valid realization creates reconciliation and never transfers authority to the consumer.
 
 The accompanying global hostile audit records two HIGH engineering follow-ups rather than inventing semantics: [GitHub issue #1](https://github.com/fanilosendrison/ruu/issues/1) for more than one independently unsatisfied predecessor over a one-base provider model, and [GitHub issue #2](https://github.com/fanilosendrison/ruu/issues/2) for late dependency discovery/refoundation after consumer authoring has begun. They are tracked in the GitHub Project **Ruu Engineering**; accepted repository semantics remain fail-closed until amended by a later ADR.
+
+## 2026-09-28 — ADR-087 — promotion authorization space and non-authorizing UserBehavior
+
+ADR-087 corrects the current reading of ADR-043 without rewriting its historical entry:
+
+```text
+scalar route
+→ authorized route set
+
+built-in policy route selection
+→ non-authorizing BuiltInBehavior
+
+personal behavior
+→ non-authorizing SOFT preference or STRICT requirement
+
+capability
+→ separate contextual technical guard
+```
+
+A complete `EffectivePromotionPolicy.allowed_routes` may authorize both `DIRECT_TARGET_ADVANCE` and `PROVIDER_SUBMISSION`; policy owns authorization while UserBehavior selects or restricts only inside that space. BuiltInBehavior preserves zero-onboarding direct-first preference without acquiring governance authority.
+
+The correction preserves authoritative constraint composition, the trusted target-baseline rule, and the no-policy-bypass boundary from ADR-043; ADR-051's `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` separation; ADR-061's HOW/WHERE boundary and immutable PromotionTarget; and ADR-062's provider-submission projection/finalization semantics. Policy contradiction, strict-behavior unsatisfiability, technical unsupported state, and unknown/missing authority remain distinct factual outcomes.
