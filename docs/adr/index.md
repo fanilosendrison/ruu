@@ -105,6 +105,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | Replace mandatory linked worktrees with ContributionUnit Authoring Surfaces | accepted | 2026-09-27 | complete | ContributionUnit authoring-surface contract<br>Pre-edit managed-authoring isolation substrate<br>Managed authoring ref and authoring-surface binding<br>Authoring-surface mutation authority and frozen handoff<br>Exact checkpoint capture from active authoring surfaces<br>Supported-harness zero-preflight provisioning boundary |
 | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | Require proto-ring for applicable generic repository governance | accepted | 2026-09-27 | complete | Mandatory use of proto-ring for applicable generic repository governance<br>Classification boundary between generic and Ruu-specific repository governance<br>Immutable local adoption of the proto-ring Shared Governance Provider contract |
 | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | Require substrate-independent heterogeneous authoring surfaces | accepted | 2026-09-28 | complete | Product-intent authoring-surface substrate independence<br>Heterogeneous authoring-surface coexistence<br>Per-ContributionUnit authoring-surface realization<br>Convergence semantics independence from authoring-surface realization |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | Separate promotion authorization space from non-authorizing UserBehavior | accepted | 2026-09-28 | complete | EffectivePromotionPolicy authorized route-space semantics<br>Non-authorizing UserBehavior route preference and requirement semantics<br>BuiltInBehavior zero-onboarding route selection<br>Promotion policy, behavior, capability, and error-classification boundary<br>UserBehavior exclusion boundary<br>Promotion realization-route selection and fallback semantics |
 
 ## Recorded outgoing relations
 
@@ -300,6 +301,13 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | amends | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) |
 | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | amends | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) | confirms | [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amends | [ADR-026](adr-026-make-promotion-repository-policy-driven.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amends | [ADR-043](adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amends | [ADR-044](adr-044-establish-promotion-policy-currentness-by-immediate-authoritative-revalidation.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amends | [ADR-061](adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amends | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | confirms | [ADR-032](adr-032-model-pr-review-request-as-publication-intent-not-business-readiness.md) |
+| [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | confirms | [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) |
 
 ## Derived incoming relations
 
@@ -333,6 +341,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-026](adr-026-make-promotion-repository-policy-driven.md) | amended by | [ADR-052](adr-052-advance-direct-targets-by-atomic-exact-old-cas-fast-forward.md) |
 | [ADR-026](adr-026-make-promotion-repository-policy-driven.md) | amended by | [ADR-055](adr-055-settle-partial-cross-repository-ships-with-forward-actions-and-publication-episodes.md) |
 | [ADR-026](adr-026-make-promotion-repository-policy-driven.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
+| [ADR-026](adr-026-make-promotion-repository-policy-driven.md) | amended by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-027](adr-027-separate-convergence-units-from-promotion-units-and-topology.md) | amended by | [ADR-050](adr-050-derive-stacked-publication-from-unsatisfied-promotion-dependencies-and-restack-by-exact-state-transplant.md) |
 | [ADR-027](adr-027-separate-convergence-units-from-promotion-units-and-topology.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
 | [ADR-028](adr-028-preserve-internal-oids-and-allow-policy-authorized-submission-rewrites.md) | amended by | [ADR-049](adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md) |
@@ -341,6 +350,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-032](adr-032-model-pr-review-request-as-publication-intent-not-business-readiness.md) | amended by | [ADR-055](adr-055-settle-partial-cross-repository-ships-with-forward-actions-and-publication-episodes.md) |
 | [ADR-032](adr-032-model-pr-review-request-as-publication-intent-not-business-readiness.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
 | [ADR-032](adr-032-model-pr-review-request-as-publication-intent-not-business-readiness.md) | amended by | [ADR-063](adr-063-keep-findings-and-backlog-outside-ruu.md) |
+| [ADR-032](adr-032-model-pr-review-request-as-publication-intent-not-business-readiness.md) | confirmed by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-033](adr-033-consume-external-contribution-unit-mutation-authority.md) | amended by | [ADR-064](adr-064-bind-pre-commit-readiness-by-frozen-mutation-handoff.md) |
 | [ADR-033](adr-033-consume-external-contribution-unit-mutation-authority.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-033](adr-033-consume-external-contribution-unit-mutation-authority.md) | confirmed by | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) |
@@ -377,9 +387,11 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-042](adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md) | confirmed by | [ADR-070](adr-070-make-hands-off-concurrent-invoke-anywhere-convergence-the-governing-product-intent.md) |
 | [ADR-043](adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md) | amended by | [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) |
 | [ADR-043](adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
+| [ADR-043](adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md) | amended by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-044](adr-044-establish-promotion-policy-currentness-by-immediate-authoritative-revalidation.md) | amended by | [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) |
 | [ADR-044](adr-044-establish-promotion-policy-currentness-by-immediate-authoritative-revalidation.md) | amended by | [ADR-052](adr-052-advance-direct-targets-by-atomic-exact-old-cas-fast-forward.md) |
 | [ADR-044](adr-044-establish-promotion-policy-currentness-by-immediate-authoritative-revalidation.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
+| [ADR-044](adr-044-establish-promotion-policy-currentness-by-immediate-authoritative-revalidation.md) | amended by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-045](adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) | amended by | [ADR-049](adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md) |
 | [ADR-045](adr-045-make-promotion-units-immutable-content-addressed-exact-state-sets.md) | amended by | [ADR-067](adr-067-terminalize-obsolete-unpromoted-promotion-units-by-current-resolution-supersession.md) |
 | [ADR-046](adr-046-predeclare-closed-promotion-groups-and-resolve-them-to-exact-promotion-units.md) | amended by | [ADR-053](adr-053-turn-changes-requested-into-durable-session-independent-review-correction-work.md) |
@@ -408,6 +420,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
 | [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) | amended by | [ADR-065](adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md) |
 | [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) | amended by | [ADR-080](adr-080-separate-local-git-causality-remote-git-state-and-provider-workflow-evidence.md) |
+| [ADR-051](adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md) | confirmed by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-052](adr-052-advance-direct-targets-by-atomic-exact-old-cas-fast-forward.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
 | [ADR-052](adr-052-advance-direct-targets-by-atomic-exact-old-cas-fast-forward.md) | amended by | [ADR-065](adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md) |
 | [ADR-052](adr-052-advance-direct-targets-by-atomic-exact-old-cas-fast-forward.md) | amended by | [ADR-066](adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md) |
@@ -442,8 +455,10 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-060](adr-060-use-transition-local-prerequisites-instead-of-generic-development-validation-evidence.md) | amended by | [ADR-063](adr-063-keep-findings-and-backlog-outside-ruu.md) |
 | [ADR-060](adr-060-use-transition-local-prerequisites-instead-of-generic-development-validation-evidence.md) | amended by | [ADR-064](adr-064-bind-pre-commit-readiness-by-frozen-mutation-handoff.md) |
 | [ADR-061](adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md) | amended by | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) |
+| [ADR-061](adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md) | amended by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) | amended by | [ADR-065](adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md) |
 | [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) | amended by | [ADR-066](adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md) |
+| [ADR-062](adr-062-make-promotion-route-independent-and-provider-submissions-projections.md) | amended by | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) |
 | [ADR-064](adr-064-bind-pre-commit-readiness-by-frozen-mutation-handoff.md) | amended by | [ADR-069](adr-069-bind-promotion-groups-to-work-bearing-invocations-and-group-local-exact-state.md) |
 | [ADR-064](adr-064-bind-pre-commit-readiness-by-frozen-mutation-handoff.md) | amended by | [ADR-079](adr-079-minimize-native-git-rejection-with-conservative-protection-filtering-and-exact-binding-admission.md) |
 | [ADR-064](adr-064-bind-pre-commit-readiness-by-frozen-mutation-handoff.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
