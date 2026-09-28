@@ -37,7 +37,7 @@ The External Control Plane MUST NOT manufacture Git/provider truth merely by dec
 
 ### 1.1 Product-intent conformance
 
-This contract is interpreted under ADR-070, ADR-078 and §0 of `RUU-SPEC.md`.
+This contract is interpreted under ADR-070, ADR-078, ADR-086 and §0 of `RUU-SPEC.md`.
 
 For a supported coding harness, ordinary managed authoring MUST be zero-preflight from the user's perspective: after one-time product installation/integration, asking the agent to implement work is sufficient to trigger the required pre-edit provisioning before first managed write. The user MUST NOT be required to issue a separate `start`, `create-cu`, or `provision` command, install observer plumbing per repository, or operate another control-plane product merely to begin ordinary managed coding. Administrative/testing/recovery interfaces may expose those primitives.
 
@@ -149,6 +149,22 @@ write authorization / external mutation-authority mechanism
 ```
 
 ADR-084 makes the v1 authoring-surface requirement explicit: before its first managed write, every actively authored managed ContributionUnit MUST have a conforming ContributionUnit Authoring Surface and its current managed authoring ref. The substrate contract is realization-neutral: a dedicated linked Git worktree/ref surface is one conforming realization, and a private primary working tree of an already externally isolated repository instance is another after ordinary Ruu pre-edit admission. V1 does not define an alternative direct authoring contract that bypasses this admitted surface by supplying arbitrary prebuilt commits, trees, or external sandbox/filesystem snapshots. Ordinary native Git activity inside the admitted surface remains supported. Neither the outer isolation mechanism (VM, container, sandbox, process/filesystem isolation, or another environment mechanism) nor a required external product is selected or owned by Ruu.
+
+ADR-086 makes realization independence explicit at the Product Intent boundary. The realization is chosen and established per `ContributionUnit Authoring Surface`: several active ContributionUnits MAY have simultaneously different conforming realizations, including within the same coordination domain, the same logical repository, the same ConvergenceUnit, the same LogicalInvocation cohort, or one global convergence sweep. The External Control Plane MUST NOT impose a global authoring-substrate mode for Ruu semantic reasons. No realization difference creates a new ContributionUnit identity, ConvergenceUnit identity, or authority. The common guarantees MUST be established separately for each surface before its first managed write.
+
+```text
+CU-A → conforming surface realization X
+CU-B → conforming surface realization Y
+
+X != Y
+is valid
+
+provided:
+conforms(X)
+conforms(Y)
+```
+
+`X` and `Y` are placeholders for independently established conforming realizations. They are not persisted types and MUST NOT become an enumeration. No VM, container, sandbox, microVM, worktree, or comparable substrate taxonomy becomes a Ruu or External Control Plane domain type.
 
 Repository identity and repository location are distinct under ADR-042. The External Control Plane may explicitly relocate the current host-local locator bound to an existing opaque `repository_id`; relocation MUST NOT mint a new repository identity merely because the path changed, and a locator MUST NOT be authoritatively bound to multiple repository identities in the same coordination domain. `ruu` records such locator changes through exact expected-state/CAS semantics and still revalidates the Git facts found at the declared locator.
 
@@ -579,7 +595,7 @@ When `ruu` consumes External Control Plane state, it may rely on the following d
 
 ```text
 managed repository admission/reactivation is durable before managed writes; ACTIVE_CONVERGENCE_SET is non-authoritative derived acceleration only
-active ContributionUnit authoring is provisioned on one conforming ContributionUnit Authoring Surface with its managed authoring ref before first managed write; linked Git worktrees are one realization, not the mandatory substrate, and no direct arbitrary commit/tree/snapshot authoring substrate bypasses the admitted surface
+active ContributionUnit authoring is provisioned on one conforming ContributionUnit Authoring Surface with its managed authoring ref before first managed write; linked Git worktrees are one realization, not the mandatory substrate, and no direct arbitrary commit/tree/snapshot authoring substrate bypasses the admitted surface; that surface's realization is independent per ContributionUnit and may differ simultaneously from the realization of any other active ContributionUnit
 ContributionUnit identity is opaque, stable, and the sole v1 authoring-occurrence identity; work_occurrence_id is not a second domain key
 an AuthoringDependency exists only from explicit pre-edit Development System selection of stable source ContributionUnit + exact commit OID, followed by Ruu exact Git proof and durable anchor adoption; no selection means no inferred dependency
 ordinary native commit creation is exact Git state, not managed checkpoint/handoff/completion; a clean tip becomes a managed checkpoint only through exact frozen-handoff adoption

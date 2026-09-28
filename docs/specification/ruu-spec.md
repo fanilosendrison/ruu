@@ -2,7 +2,7 @@
 
 # 0. Product intent — governing user experience
 
-This section is normative, ratified by **ADR-070**, and strengthened by **ADR-078** and **ADR-081**. It states the product outcome that the technical invariants below exist to serve. If a lower-level architectural rule admits several interpretations, the interpretation that preserves this product intent while satisfying the applicable safety invariants is required. If a prior technical clause directly conflicts, ADR-070 supersedes that clause to the minimum extent necessary. A future change to this product promise must explicitly amend ADR-070 and update this section in the same decision.
+This section is normative, ratified by **ADR-070**, and strengthened by **ADR-078**, **ADR-081**, and **ADR-086**. It states the product outcome that the technical invariants below exist to serve. If a lower-level architectural rule admits several interpretations, the interpretation that preserves this product intent while satisfying the applicable safety invariants is required. If a prior technical clause directly conflicts, ADR-070 supersedes that clause to the minimum extent necessary. A future change to this product promise must explicitly amend ADR-070 and update this section in the same decision.
 
 ## 0.1 Product definition: agentic version control built on Git
 
@@ -91,6 +91,28 @@ ordinary later `ruu` invocation
 ```
 
 Therefore a design is non-conformant if its ordinary supported-harness workflow requires the user to run commands such as `ruu start`, `ruu create-cu`, or `ruu provision`, manually install observer hooks per repository, operate a second control-plane product, or understand internal CU/ConvergenceUnit/binding identities before asking an agent to implement work. Administrative, diagnostic, recovery, or testing interfaces MAY expose such primitives, but they are not the ordinary authoring contract.
+
+## 0.2B Authoring-surface realization is substrate-independent and may be heterogeneous
+
+Ruu depends on the conformance properties of each active `ContributionUnit Authoring Surface`, not on the concrete mechanism that isolates or realizes it. A surface is admissible independently of its realization, provided it satisfies every applicable guarantee of the common surface contract.
+
+Ruu MUST NOT require every active ContributionUnit in a coordination domain to use the same authoring-surface realization. Different active ContributionUnits MAY use simultaneously different conforming realizations. That coexistence MUST remain valid when those ContributionUnits belong to:
+
+```text
+the same coordination domain
+the same repository
+the same ConvergenceUnit
+the same LogicalInvocation cohort
+the global convergence sweep
+```
+
+The realization mechanism is not ContributionUnit identity. It MUST NOT change managed checkpoint semantics, convergence semantics, promotion/publication semantics, or coordination-domain membership.
+
+Realization-specific adapters and plumbing MAY exist below the common surface contract in order to establish its guarantees. They MUST remain outside Ruu product semantics. Ruu MUST NOT expose a global authoring-substrate mode as a product concept.
+
+An implementation that requires a global authoring-substrate mode while several conforming surfaces could coexist is non-conformant.
+
+The linked-worktree, VM, container, sandbox, microVM, and copy-on-write examples remain non-exhaustive illustrations. They do not define Ruu product types, do not create support tiers, and do not privilege any mechanism.
 
 ## 0.3 Invoke anywhere: CWD is not orchestration truth
 
@@ -269,6 +291,8 @@ Repeated reconciliation drives managed Git/provider state to a safe fixed point.
 ```
 
 A design is also non-conformant if it makes provider objects such as pull requests or merge queues the source of core version identity/convergence truth where those facts can be established provider-independently. Provider publication extends and realizes the core; it does not define the core.
+
+A design is also non-conformant if it requires otherwise-conforming active ContributionUnits to share one concrete authoring-surface realization or one coordination-domain-wide authoring-substrate mode.
 
 The technical sections and ADRs that follow are mechanisms for satisfying this contract, not substitutes for it.
 
@@ -959,6 +983,41 @@ Contribution unit B → authoring-surface B/src/foo.ts
 ```
 
 Reconciliation occurs later through Git, not through concurrent writes to one checkout.
+
+## 4.2A Heterogeneous authoring-surface realizations
+
+This requirement derives from the product intent in §0.2B.
+
+For any active ContributionUnits A and B:
+
+```text
+if AuthoringSurface(A) conforms to the Ruu authoring-surface contract
+and AuthoringSurface(B) conforms to the Ruu authoring-surface contract
+
+then:
+
+realization(AuthoringSurface(A))
+MAY differ from
+realization(AuthoringSurface(B))
+
+without changing:
+ContributionUnit identity
+ConvergenceUnit membership
+checkpoint semantics
+convergence semantics
+promotion/publication semantics
+coordination-domain membership
+```
+
+No correctness rule may require:
+
+```text
+realization(A) == realization(B)
+```
+
+unless a specific local requirement follows directly from a guarantee of the common contract for that surface itself.
+
+Realization creates no new domain identity. A domain-level substrate type, a realization enum, or a coordination-domain-wide authoring mode selecting the realization MUST NOT be introduced.
 
 ## 4.3 Repository-local hierarchy: ConvergenceBase → convergence unit → contribution unit, with immutable PromotionTarget
 
