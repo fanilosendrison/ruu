@@ -862,3 +862,17 @@ authoritative composition yields zero admissible routes
 ```
 
 The empty route set therefore cannot flow into STRICT behavior and become `BEHAVIOR_UNSATISFIABLE`. That outcome remains available only after a valid nonempty current policy exists. Capability, exact-state, fallback, currentness, review/finalization, and UserBehavior exclusion semantics remain unchanged. Future formal-verification work owns model coverage; no qualification package is added by ADR-088.
+
+## 2026-09-28 — ADR-089 — exact expected-old submission projection replacement
+
+ADR-089 removes the persistent `REWRITEABLE` submission class while retaining `REVISE_SUBMISSION_HEAD` as the semantic transition:
+
+```text
+required exact H2
+→ compare with current H1
+→ NOOP | expected-old FF | exact expected-old non-FF replacement
+```
+
+The non-fast-forward effect is fresh, exact EffectivePromotionPolicy authorization for the current nonterminal PublicationEpisode submission ref, combined with contextual `REVISE_SUBMISSION_HEAD` capability and ordinary claim/fence/recovery guards. Blind force is absent from core semantics and no other ref role receives that authority.
+
+Before a replacement removes `H1` as the current projection-ref root, a REQUIRED `SUBMISSION_REVISION_OID_ANCHOR` or another proven sufficient existing root preserves the old exact head through every correctness-critical recovery/proof obligation. The same open PublicationEpisode/provider submission is retained. ADR-050 continues to derive each restack from immutable owned state rather than a prior provider head, head-bound provider facts remain revision-specific, and logical revision monotonicity is independent of Git ancestry between successive provider heads.
