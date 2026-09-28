@@ -2,7 +2,7 @@
 
 > **Status: non-normative architecture map.**
 >
-> This document explains the current architecture through ADR-084 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
+> This document explains the current architecture through ADR-086 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
 
 ## 1. Product in one sentence
 
@@ -265,11 +265,36 @@ Two concurrent producers in the same repository therefore do not share a mutable
 
 The surface contract is realization-neutral. A dedicated linked Git worktree remains one conforming realization; an already-isolated repository instance may use its private primary working tree after normal Ruu pre-edit admission, without creating an extra linked worktree merely for isolation. The outer isolation mechanism (VM, container, sandbox, copy-on-write workspace, or comparable environment facility) is outside the Ruu model and is neither selected nor owned by Ruu.
 
+These realizations are not global modes. The model stays centered on the ContributionUnit-to-surface relationship:
+
+```text
+ContributionUnit
+→ ContributionUnit Authoring Surface
+→ conforming realization
+```
+
+and never on a substrate type:
+
+```text
+ContributionUnit
+→ VM/worktree/sandbox type
+```
+
+Several active ContributionUnits may therefore use simultaneously different conforming realizations, including inside the same ConvergenceUnit, the same repository, or one global convergence sweep. A non-normative illustration:
+
+```text
+CU-A → Authoring Surface → linked worktree
+CU-B → Authoring Surface → isolated primary working tree
+CU-C → Authoring Surface → another conforming realization
+```
+
+The reconciler/convergence model does not depend on that difference: checkpoint, convergence, and promotion semantics are properties of the common surface contract, not of the realization that satisfies it. No coordination-domain-wide authoring substrate is required or selected.
+
 A ContributionUnit is **not a commit**. While `OPEN`, it may produce several ordinary native commits and several authoritative managed checkpoints over time. Native commits are exact Git versions, but they become managed checkpoints only through exact frozen-handoff adoption. Checkpoints may be integrated upward eagerly while the ContributionUnit remains capable of further contribution. Once `CLOSED`, it cannot reopen; later work uses a new ContributionUnit identity, which may still belong to the same ConvergenceUnit if the convergence scope remains the same.
 
 ContributionUnit identity also survives loss/removal of its editing artifacts after durable checkpoint continuity exists. Branch/worktree existence is not the semantic identity. `ContributionUnit` is also the sole v1 stable authoring-occurrence identity; session, process, branch, worktree, and a separate `work_occurrence_id` do not compete with it.
 
-Normative anchors: [ADR-001](../adr/adr-001-isolate-concurrent-work-production-with-git-worktrees.md), [ADR-002](../adr/adr-002-use-repository-local-contribution-units-as-the-isolation-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-038](../adr/adr-038-decouple-contribution-unit-identity-from-editing-artifacts.md), [ADR-084](../adr/adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) (superseding [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md), retained as history), [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
+Normative anchors: [ADR-001](../adr/adr-001-isolate-concurrent-work-production-with-git-worktrees.md), [ADR-002](../adr/adr-002-use-repository-local-contribution-units-as-the-isolation-unit.md), [ADR-035](../adr/adr-035-use-bounded-contribution-units-with-external-lifecycle-authority.md), [ADR-038](../adr/adr-038-decouple-contribution-unit-identity-from-editing-artifacts.md), [ADR-084](../adr/adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) (superseding [ADR-073](../adr/adr-073-require-git-worktrees-as-the-v1-authoring-isolation-substrate.md), retained as history), [ADR-086](../adr/adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md), [ADR-081](../adr/adr-081-manage-exact-authoring-dependencies-before-promotion.md).
 
 ### 4.4 Exact authoring dependencies before promotion
 
