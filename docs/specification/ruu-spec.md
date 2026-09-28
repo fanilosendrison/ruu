@@ -660,16 +660,18 @@ derived promotion topology
 
 Neither relation nor topology is policy-selected or UserBehavior.
 
-The current authoritative promotion policy returns a route space rather than one scalar route:
+The current authoritative promotion policy returns one nonempty route space rather than one scalar route:
 
 ```text
-EffectivePromotionPolicy.allowed_routes ⊆ {
-  DIRECT_TARGET_ADVANCE,
-  PROVIDER_SUBMISSION
-}
+CURRENT(policy_fingerprint, allowed_routes)
+⇒ allowed_routes ∈ {
+    {DIRECT_TARGET_ADVANCE},
+    {PROVIDER_SUBMISSION},
+    {DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}
+  }
 ```
 
-A set containing both routes is fully resolved. `Resolved UserBehavior` then supplies a non-authorizing SOFT preference order or STRICT requirement within that route space. Contextual capability and exact current state determine technical/mechanical admissibility; transition-local prerequisites determine whether the positively selected route can progress now or must wait locally.
+Each listed set is fully resolved. If zero routes satisfy all current authoritative constraints, the result is `POLICY_CONTRADICTION`, not a `CURRENT` policy, and behavior resolution is not entered. `Resolved UserBehavior` then supplies a non-authorizing SOFT preference order or STRICT requirement within a valid current route space. Contextual capability and exact current state determine technical/mechanical admissibility; transition-local prerequisites determine whether the positively selected route can progress now or must wait locally.
 
 Conceptually:
 
@@ -1329,16 +1331,18 @@ provider / organization governance constraints
 → authorized behavior space
 ```
 
-The policy exposes:
+A current policy exposes exactly one nonempty V1 route set:
 
 ```text
-allowed_routes ⊆ {
-  DIRECT_TARGET_ADVANCE,
-  PROVIDER_SUBMISSION
-}
+CURRENT(policy_fingerprint, allowed_routes)
+⇒ allowed_routes ∈ {
+    {DIRECT_TARGET_ADVANCE},
+    {PROVIDER_SUBMISSION},
+    {DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}
+  }
 ```
 
-The set has no preference order. Each singleton and `{DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}` is a complete resolved result. More than one authorized route is not `MISSING` or underdetermined. Policy determines authorization, not preference.
+The set has no preference order. Each listed set is a complete resolved result. More than one authorized route is not `MISSING` or underdetermined. Zero authoritatively admissible routes instead produces `POLICY_CONTRADICTION`, leaves `EffectivePromotionPolicy` absent, and prevents entry into behavior resolution. Policy determines authorization, not preference.
 
 `PromotionTarget` remains immutable. `SAME_REPOSITORY | CROSS_REPOSITORY` remains derived from authoritative source and target identity. `INDEPENDENT | STACKED` remains derived from exact managed dependency state. Neither derived dimension is UserBehavior.
 
@@ -1663,10 +1667,12 @@ Internal contribution-unit/convergence-unit refs are never rebased/history-rewri
 
 ## 5.2 Promotion is repository-policy-driven
 
-After internal readiness and explicit promotion-unit binding, route-specific mechanics follow this boundary:
+After internal readiness and explicit promotion-unit binding, authoritative composition must first produce one of the three nonempty current route sets. Zero authoritatively admissible routes produces `POLICY_CONTRADICTION`; no current `EffectivePromotionPolicy` exists and behavior resolution is not entered.
+
+Route-specific mechanics follow this boundary:
 
 ```text
-current EffectivePromotionPolicy.allowed_routes
+nonempty current EffectivePromotionPolicy.allowed_routes
 → authoritative route space
 
 exact core constraints
@@ -1973,7 +1979,7 @@ At minimum the runtime can reason about:
 policy identity/version/fingerprint
 immutable PromotionTarget(target_repository_id, target_ref)
 derived publication_relation
-allowed_routes ⊆ {DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}
+nonempty allowed_routes over {DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}
 publication remote/repository mechanics
 trusted target-policy baseline OID/fingerprint
 provider/organization governance source identities + revisions/fingerprints
@@ -1986,7 +1992,7 @@ per-source currentness provenance
 contradictory dimensions and source provenance when applicable
 ```
 
-Authoritative governance constraints compose without silent precedence fallback. A two-route `allowed_routes` set is a fully resolved policy result. Personal UserBehavior and BuiltInBehavior are separate non-authorizing selection inputs and are not policy sources. This section defines no profile, repository-scope, persistence, or binding-generation schema for UserBehavior.
+Authoritative governance constraints compose without silent precedence fallback. Each singleton and the two-route `allowed_routes` set is a fully resolved current policy result. An empty authoritative route intersection is `POLICY_CONTRADICTION`, not current policy state, and no personal behavior source is resolved for it. Personal UserBehavior and BuiltInBehavior are separate non-authorizing selection inputs and are not policy sources. This section defines no profile, repository-scope, persistence, or binding-generation schema for UserBehavior.
 
 Provider governance authorization facts may constrain `allowed_routes`; provider technical capability observations cannot grant authorization. Progression requires `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` plus exact transition guards.
 
@@ -3697,7 +3703,9 @@ revalidate exact Git/managed state
 
 Cache/TTL cannot satisfy currentness. Provider technical support never grants policy authorization.
 
-After current `allowed_routes` is established, apply exact core constraints and resolve applicable repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior. Apply SOFT or STRICT semantics from §4.16. Unknown authority/capability fails closed; it is not positive unavailability. A positively selected route that is waiting on transition-local prerequisites remains selected and waits locally.
+A current `allowed_routes` exists only when it is one of the two singleton sets or the two-route set. If authoritative composition yields zero admissible routes, emit `POLICY_CONTRADICTION`, retain no current `EffectivePromotionPolicy`, and do not enter behavior resolution.
+
+After a nonempty current `allowed_routes` is established, apply exact core constraints and resolve applicable repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior. Apply SOFT or STRICT semantics from §4.16. Unknown authority/capability fails closed; it is not positive unavailability. A positively selected route that is waiting on transition-local prerequisites remains selected and waits locally.
 
 Distinct blocking outcomes are preserved:
 
@@ -4542,8 +4550,8 @@ Mutation/publication/provider/policy changes trigger refresh and re-evaluation u
 Blocked/waiting work on one resource does not stop unrelated actionable resources.
 
 ---
-## Invariant 39 — Repository promotion authorization is repository-local route space
-Different repositories in one global sweep may authorize different route sets. A current policy may authorize either singleton route or both routes without becoming missing or underdetermined.
+## Invariant 39 — Repository promotion authorization is repository-local nonempty route space
+Different repositories in one global sweep may authorize different route sets. A current policy authorizes exactly either singleton route or both routes without becoming missing or underdetermined. An empty authoritative intersection is `POLICY_CONTRADICTION`; `CURRENT(..., allowed_routes = ∅)` is nonconforming and behavior resolution is not entered.
 
 ---
 ## Invariant 40 — Promotion policy and capability are independently revalidated
@@ -5498,9 +5506,9 @@ It does not replace Git/remotes/provider as authority for the external facts tho
 
 ## 27.3 Promotion authorization, behavior, and capability resolution
 
-The policy resolver composes current authoritative governance into `EffectivePromotionPolicy.allowed_routes` and exposes a fingerprint/version suitable for exact authorization checks. It does not choose a preference.
+The policy resolver composes current authoritative governance into a nonempty `EffectivePromotionPolicy.allowed_routes` and exposes a fingerprint/version suitable for exact authorization checks. Zero admissible routes yields `POLICY_CONTRADICTION` and no current policy. The resolver does not choose a preference.
 
-A separate semantic behavior-resolution responsibility selects or restricts within that authorized set using applicable repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior. Contextual provider capability remains an independently revalidated technical guard. This boundary defines no profile, persistence, or public-field representation.
+Only after a nonempty current policy exists does a separate semantic behavior-resolution responsibility select or restrict within that authorized set using applicable repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior. Contextual provider capability remains an independently revalidated technical guard. This boundary defines no profile, persistence, or public-field representation.
 
 ## 27.4 ContributionUnit authoring-surface manager — provisioning side
 
@@ -6016,14 +6024,15 @@ The immutable PromotionTarget comes from pre-authoring ConvergenceUnit topology.
 ```text
 refresh/revalidate authoritative governance inputs
 → compose constraints
-→ produce CURRENT EffectivePromotionPolicy.allowed_routes
+→ if zero routes are admissible: POLICY_CONTRADICTION; stop before behavior
+→ else produce nonempty CURRENT EffectivePromotionPolicy.allowed_routes
 → apply exact core constraints
 → resolve repository-specific UserBehavior, else global UserBehavior, else BuiltInBehavior
 → evaluate contextual technical support separately
 → positively select one route or emit the exact localized outcome
 ```
 
-No generic governance precedence or runtime authorization override exists. Explicit incompatible authoritative constraints produce `POLICY_CONTRADICTION`. A complete route set containing both routes is resolved and needs no policy default.
+No generic governance precedence or runtime authorization override exists. Explicit incompatible authoritative constraints, including an authoritative intersection with zero admissible routes, produce `POLICY_CONTRADICTION`. The empty set is never a current policy result and behavior resolution is not entered. Each singleton and the two-route set is resolved and needs no policy default.
 
 BuiltInBehavior, not policy, supplies the zero-onboarding SOFT direct-then-provider preference. UserBehavior cannot enlarge authorization, retarget, alter topology, create review/early-publication authority, change Git mechanics, or suppress a REQUIRED operation.
 
@@ -6307,7 +6316,7 @@ The effective promotion policy is compiled from authoritative provider capabilit
 
 Explicit incompatible authoritative constraints produce `CONTRADICTORY` and block the affected promotion without silent fallback. Repo-committed policy is read from the trusted exact target baseline, so a candidate cannot change the rules governing its own promotion. Historically, ADR-043 assigned zero-onboarding scalar route selection to deterministic built-in policy rules.
 
-ADR-087 amends that current reading: authoritative composition now returns the complete unordered `allowed_routes` set, and non-authorizing BuiltInBehavior supplies the zero-onboarding SOFT preference for direct then provider submission. Constraint composition, trusted target baseline, contradiction signaling, non-prescriptive diagnostics, and the no-runtime-bypass boundary remain unchanged.
+ADR-087 amends that current reading: authoritative composition now returns the complete unordered `allowed_routes` set, and non-authorizing BuiltInBehavior supplies the zero-onboarding SOFT preference for direct then provider submission. ADR-088 makes the current-state domain explicitly nonempty: zero authoritatively admissible routes is `POLICY_CONTRADICTION`, no current policy exists, and behavior resolution is not entered. Constraint composition, trusted target baseline, contradiction signaling, non-prescriptive diagnostics, and the no-runtime-bypass boundary remain unchanged.
 
 Contradictions surface as first-class factual machine-readable blocking diagnostics containing exact incompatible constraints and source provenance. `ruu` does not infer, recommend, rank, or apply remediation; the external Development System/operator decides what to do with the signal.
 
@@ -6999,20 +7008,25 @@ policy_state:
   CONTRADICTORY
   UNKNOWN_INCONSISTENT
 
-allowed_routes ⊆ {
-  DIRECT_TARGET_ADVANCE,
-  PROVIDER_SUBMISSION
-}
+CURRENT(policy_fingerprint, allowed_routes)
+⇒ allowed_routes ∈ {
+    {DIRECT_TARGET_ADVANCE},
+    {PROVIDER_SUBMISSION},
+    {DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}
+  }
 ```
 
-`CURRENT` means authoritative constraints are jointly satisfiable, the complete authorized route set is known for the immutable PromotionTarget context, and required mutable sources have been immediately revalidated for the pending mutation. `{DIRECT_TARGET_ADVANCE, PROVIDER_SUBMISSION}` is fully resolved and unordered.
+`CURRENT` means authoritative constraints are jointly satisfiable, the complete nonempty authorized route set is known for the immutable PromotionTarget context, and required mutable sources have been immediately revalidated for the pending mutation. Each listed route set is fully resolved and unordered.
 
 ```text
 MISSING / UNKNOWN
 → required authoritative information unavailable or unobservable
 
-CONTRADICTORY / POLICY_CONTRADICTION
-→ authoritative governance constraints have no common satisfying assignment
+authoritative governance constraints have no common satisfying route assignment,
+including zero authoritatively admissible routes
+→ CONTRADICTORY / POLICY_CONTRADICTION
+→ EffectivePromotionPolicy absent
+→ behavior resolution not entered
 ```
 
 Technical inability is not policy state. It is evaluated separately as `UNSUPPORTED | UNKNOWN_INCONSISTENT` for the required semantic mechanism.

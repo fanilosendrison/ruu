@@ -507,9 +507,16 @@ The reconciliation descriptor is diagnostic only. A claimed/resolved status from
 
 ### 2.11 Promotion-policy and behavior-resolution diagnostics
 
-When authoritative promotion-policy inputs are mutually incompatible, `ruu` emits factual machine-readable `POLICY_CONTRADICTION` / `policy_state=CONTRADICTORY` evidence with the affected obligation, conflicting dimensions, normalized constraints, and source identities/revisions/fingerprints where available.
+When authoritative promotion-policy inputs are mutually incompatible or their composition leaves zero admissible realization routes, `ruu` emits factual machine-readable `POLICY_CONTRADICTION` / `policy_state=CONTRADICTORY` evidence with the affected obligation, conflicting dimensions, normalized constraints, and source identities/revisions/fingerprints where available.
 
-A valid current policy that cannot satisfy a STRICT personal UserBehavior requirement instead yields `BEHAVIOR_UNSATISFIABLE`. It is not a policy contradiction. Technical inability to realize an authorized required mechanism remains `UNSUPPORTED`; unavailable or unobservable required authority/capability remains `MISSING / UNKNOWN` as applicable.
+```text
+authoritative composition yields allowed_routes = ∅
+→ no CURRENT EffectivePromotionPolicy
+→ POLICY_CONTRADICTION
+→ behavior resolution is not entered
+```
+
+A valid current policy contains one of the two singleton route sets or the two-route set. Only after that nonempty result exists can failure to satisfy a STRICT personal UserBehavior requirement yield `BEHAVIOR_UNSATISFIABLE`. It is not a policy contradiction. Technical inability to realize an authorized required mechanism remains `UNSUPPORTED`; unavailable or unobservable required authority/capability remains `MISSING / UNKNOWN` as applicable.
 
 The External Control Plane MUST preserve these distinctions and make the current localized diagnostic visible. Every diagnostic is factual and non-prescriptive: it contains no recommended fix, ranked next action, or suggested governance/behavior mutation. A downstream claim of resolution is not authority; `ruu` re-observes current governance, behavior inputs, capability, and exact state before progress.
 
@@ -520,6 +527,13 @@ Immediate revalidation may change the authorized route space, personal-behavior 
 ```text
 policy drift
 → recompute EffectivePromotionPolicy.allowed_routes
+
+zero authoritatively admissible routes
+→ POLICY_CONTRADICTION
+→ no current policy and no behavior resolution
+
+nonempty current route set
+→ behavior resolution may proceed
 
 SOFT behavior
 → may select another positively available authorized route according to its ordering
