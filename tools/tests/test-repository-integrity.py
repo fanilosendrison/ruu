@@ -17,7 +17,7 @@ import yaml
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-PROVIDER_COMMIT = "72e6e9615703e4d3293175f023d1d953632c45a8"
+PROVIDER_COMMIT = "c298343efa07d71790b53493ff15494f2fcac671"
 
 
 def load_tool(name: str):
@@ -91,6 +91,7 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
                 "ADR metadata check",
                 "Accepted ADR body immutability",
                 "Shared Governance Provider binding",
+                "Authoritative Ref Monotonicity effective rules",
                 "Retained lineage currentness",
                 "Active manifest currentness",
                 "Qualification layout",
@@ -99,6 +100,14 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
             ],
         )
         self.assertEqual(obligations[-1].argv, (sys.executable, "tools/check-git-whitespace.py"))
+        for obligation in obligations:
+            expected = (
+                frozenset({2})
+                if obligation.name
+                == "Authoritative Ref Monotonicity effective rules"
+                else frozenset()
+            )
+            self.assertEqual(expected, obligation.undetermined_exit_codes)
         self.assertTrue(tool.integrity_profile(REPOSITORY).continue_after_non_satisfied)
 
     def test_whitespace_binding_delegates_to_shared_provider(self) -> None:

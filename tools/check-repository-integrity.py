@@ -98,6 +98,14 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 ),
             ),
             CommandObligation(
+                name="Authoritative Ref Monotonicity effective rules",
+                argv=(
+                    python,
+                    "tools/check-authoritative-ref-monotonicity.py",
+                ),
+                undetermined_exit_codes=frozenset({2}),
+            ),
+            CommandObligation(
                 name="Retained lineage currentness",
                 argv=(python, "tools/generate-qualification-lineage.py"),
             ),
