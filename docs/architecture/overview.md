@@ -2,7 +2,7 @@
 
 > **Status: non-normative architecture map.**
 >
-> This document explains the current architecture through ADR-089 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
+> This document explains the current architecture through ADR-090 and is intended to let a new reader build the right mental model before reading the full specification and decision history. It does **not** introduce requirements, states, identities, or authority rules of its own. If this overview conflicts with [`RUU-SPEC.md`](../specification/ruu-spec.md), [`EXTERNAL-CONTROL-PLANE-CONTRACT.md`](../specification/external-control-plane-contract.md), or a governing ADR, those normative sources control.
 
 ## 1. Product in one sentence
 
@@ -637,11 +637,12 @@ submission_ref
 → provider projection of the current exact logical revision
 ```
 
-For current provider head `H1` and required exact head `H2`, Git equality and ancestry determine the physical effect:
+Ruu first determines whether a new exact logical revision binding is required. For current provider head `H1` and required exact head `H2`, Git equality and ancestry then determine only the physical effect:
 
 ```text
 H1 == H2
-→ no ref effect
+→ REF_NOOP
+→ no ref mutation
 
 H1 ancestor-of H2
 → exact expected-old fast-forward
@@ -652,9 +653,11 @@ H1 not ancestor-of H2
 → fresh current policy authority + contextual technical support
 ```
 
-This is not generic force-push authority. No submission ref owns a standing right to replace future heads, and blind force is never conforming. A non-fast-forward projection change preserves the same open PublicationEpisode when permitted. Logical `submission_revision` monotonicity comes from stable identity plus immutable exact revision/projection history; it does not require successive provider heads to be Git ancestors of one another.
+A new PromotionUnit/candidate/projection binding may require `submission_revision := revision + 1` even when ADR-048 reuses the same exact `H` and the physical effect is `REF_NOOP`. Re-observing the same already-current binding does not increment again.
 
-Normative anchors: [ADR-043](../adr/adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md), [ADR-049](../adr/adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md), [ADR-051](../adr/adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md), [ADR-061](../adr/adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md), [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md), [ADR-065](../adr/adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md), [ADR-066](../adr/adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md), [ADR-087](../adr/adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md), [ADR-088](../adr/adr-088-require-nonempty-current-promotion-authorization-route-space.md), [ADR-089](../adr/adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md).
+This is not generic force-push authority. No submission ref owns a standing right to replace future heads, and blind force is never conforming. A non-fast-forward projection change preserves the same open PublicationEpisode when permitted. Logical `submission_revision` monotonicity comes from stable identity plus immutable exact revision/projection history; it requires neither OID inequality nor Git ancestry between successive provider heads.
+
+Normative anchors: [ADR-043](../adr/adr-043-resolve-promotion-policy-by-authoritative-constraint-composition.md), [ADR-049](../adr/adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md), [ADR-051](../adr/adr-051-normalize-provider-capabilities-as-contextual-semantic-operation-observations.md), [ADR-061](../adr/adr-061-bind-each-convergence-unit-to-an-immutable-pre-authoring-promotion-target.md), [ADR-062](../adr/adr-062-make-promotion-route-independent-and-provider-submissions-projections.md), [ADR-065](../adr/adr-065-prove-final-promotion-realization-by-native-git-or-exact-provider-result-binding.md), [ADR-066](../adr/adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md), [ADR-087](../adr/adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md), [ADR-088](../adr/adr-088-require-nonempty-current-promotion-authorization-route-space.md), [ADR-089](../adr/adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md), [ADR-090](../adr/adr-090-separate-logical-submission-revision-from-ref-effect.md).
 
 ---
 

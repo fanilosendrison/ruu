@@ -876,3 +876,21 @@ required exact H2
 The non-fast-forward effect is fresh, exact EffectivePromotionPolicy authorization for the current nonterminal PublicationEpisode submission ref, combined with contextual `REVISE_SUBMISSION_HEAD` capability and ordinary claim/fence/recovery guards. Blind force is absent from core semantics and no other ref role receives that authority.
 
 Before a replacement removes `H1` as the current projection-ref root, a REQUIRED `SUBMISSION_REVISION_OID_ANCHOR` or another proven sufficient existing root preserves the old exact head through every correctness-critical recovery/proof obligation. The same open PublicationEpisode/provider submission is retained. ADR-050 continues to derive each restack from immutable owned state rather than a prior provider head, head-bound provider facts remain revision-specific, and logical revision monotonicity is independent of Git ancestry between successive provider heads.
+
+## 2026-09-28 — ADR-090 — same-head logical revision with no ref effect
+
+ADR-090 corrects ADR-089's equality branch without changing its FF or non-FF contracts:
+
+```text
+establish whether the exact logical binding changed
+→ derive required H2
+→ classify only the physical ref effect
+
+H1 == H2
+→ REF_NOOP
+→ no submission-ref mutation
+```
+
+When ADR-048 reuses the same exact candidate/head for a distinct PromotionUnit or otherwise newly required candidate/projection binding, Ruu still adopts `submission_revision := revision + 1` exactly once and records the new immutable `promotion_unit_id` / candidate / `C→H` proof. Re-observing the same already-current binding remains a true no-op and cannot increment again.
+
+`REF_NOOP` consumes no expected-old transport, non-FF replacement authority, force-like backend mechanism, or old-head reachability anchor solely for its effect. Existing complete-binding currentness rules determine whether provider facts remain reusable. ADR-042 recovery/adoption, ADR-048 exact candidate reuse, ADR-049 revision-bound identity, ADR-066 route proof, and every other ADR-089 boundary remain unchanged. Issue #52 must model-check both same-head cases and crash/retry exactly-once behavior.
