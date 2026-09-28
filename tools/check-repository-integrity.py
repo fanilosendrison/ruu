@@ -82,6 +82,14 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 argv=(python, "tools/adr-metadata.py", "check"),
             ),
             CommandObligation(
+                name="Accepted ADR body immutability",
+                argv=(
+                    python,
+                    "-m",
+                    "proto_ring.accepted_adr_body",
+                ),
+            ),
+            CommandObligation(
                 name="Shared Governance Provider binding",
                 argv=(
                     python,
