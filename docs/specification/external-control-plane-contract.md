@@ -3,7 +3,7 @@
 - **Status:** Normative companion contract
 - **Introduced by:** ADR-039
 - **Date:** 2026-09-05
-- **Current amendments:** ADR-062 through ADR-087, as applicable
+- **Current amendments:** ADR-062 through ADR-089, as applicable
 
 ## 1. Purpose
 
@@ -630,6 +630,34 @@ PROVIDER
 Webhook/event delivery is not a completeness or global-ordering authority. Authenticated provider payloads MAY be retained as positive provider-scoped historical evidence when exact semantics are demonstrated, but absence of delivery proves nothing, delivery identity is not managed semantic identity, and correctness MUST NOT generically depend on receiving a particular webhook. Cross-source chronology is established only from source-owned exact identities/revisions/operation results with documented semantics; wall-clock ordering is insufficient.
 
 Remote publication/submission artifact deletion or rename-like topology never directly causes local managed-authoring `ABANDON | CONTINUATION`. Historical provider finalization evidence and current remote/target Git topology remain separate facts.
+
+### 2.17A Submission-projection replacement authority boundary
+
+A caller cannot request force, rewrite, or standing non-fast-forward authority. No invocation flag, local config, runtime request, profile, or External Control Plane declaration creates permission to replace a submission ref.
+
+UserBehavior and BuiltInBehavior cannot authorize or select ref mechanics. For one semantic `REVISE_SUBMISSION_HEAD`, authoritative exact Git state determines whether the required effect is `NOOP`, expected-old fast-forward, or `NON_FF_SUBMISSION_PROJECTION_REPLACEMENT`.
+
+Current authoritative governance may authorize one exact required non-fast-forward replacement effect for the submission ref of the current nonterminal PublicationEpisode. That authorization is reconstructed through current `EffectivePromotionPolicy`; it is not persisted on the Submission, episode, ref, or revision as future authority.
+
+```text
+required governance observation = MISSING / UNKNOWN
+→ no non-fast-forward replacement
+```
+
+Absence of an observed prohibition is not proof that no prohibition exists. Technical support for `REVISE_SUBMISSION_HEAD` in the exact required effect context remains separate from authorization; a generic force-push feature fact is insufficient.
+
+The External Control Plane provides no `force=true`, rewrite flag, replacement request, public policy key, or equivalent input. Public repository-governance schema and provider authorization-observation representation remain owned by their separate contracts.
+
+Unexpected external submission-head movement is factual drift/unknown state:
+
+```text
+no durable matching authorized revision Operation/Attempt
++ observed head != expected bound head
+→ DRIFTED / UNKNOWN_INCONSISTENT
+→ never silently adopt as an authorized revision
+```
+
+Old-head reachability, `SUBMISSION_REVISION_OID_ANCHOR`, effect recovery, exactly-once revision adoption, and recovery-resource GC are Ruu-owned coordination state. They preserve exact Git objects and recover owned effects; they do not become external semantic authority, future mutation permission, or authority to reopen a terminal provider state.
 
 ## 3. Guarantees consumed by `ruu`
 

@@ -691,7 +691,7 @@ transition-local prerequisites
 
 Policy may additionally constrain submission-ref mechanics, provider/governance operations, and publication repository/remote mechanics. Provider capability observations establish whether the exact semantic operation required by current state is technically realizable; they never grant authorization.
 
-In a selected `PROVIDER_SUBMISSION` route, one stable logical submission may have a current provider-facing `PublicationEpisode`, and each episode has its own submission ref plus provider submission identity. Exact candidate changes while an episode is open become monotonic submission revisions on that episode; ADR-055 permits a later episode when the previous provider submission is terminal but the same nonterminal logical submission still requires publication.
+In a selected `PROVIDER_SUBMISSION` route, one stable logical submission may have a current provider-facing `PublicationEpisode`, and each episode has its own submission ref plus provider submission identity. Exact candidate changes while an episode is open become monotonic submission revisions on that episode. Each revision derives `NOOP`, an exact expected-old fast-forward effect, or an exact expected-old non-fast-forward projection replacement from the authoritative `H1 → H2` Git relation. Non-fast-forward replacement is a freshly authorized exact effect, never a durable submission-ref class. ADR-055 permits a later episode only when the previous provider submission is terminal but the same nonterminal logical submission still requires publication.
 
 Every episode submission ref remains distinct from internal ConvergenceUnit refs and from refs of other episodes, even when some initially point at the same OID.
 
@@ -706,7 +706,7 @@ CONVERGENCE_UNIT_REF
 
 preserve exact OIDs and are never rebased/history-rewritten by `ruu`.
 
-Provider-facing submission refs may be explicitly rewriteable/restackable when repository policy/provider topology permits it.
+A provider-facing submission ref is the projection of the current exact logical submission revision. For each required `H1 → H2` revision, exact Git equality/ancestry determines `NOOP`, expected-old fast-forward advance, or expected-old non-fast-forward projection replacement. The non-fast-forward effect requires fresh current policy authorization and contextual support for that transition; no ref carries standing rewrite authority.
 
 This gives the system two identity layers:
 
@@ -1352,6 +1352,16 @@ Provider governance authorization facts may constrain the policy. Contextual tec
 technical capability != governance authorization != UserBehavior
 ```
 
+For a required `REVISE_SUBMISSION_HEAD`, exact Git state determines the required ref effect and current policy separately authorizes that exact effect:
+
+```text
+ref update relation = exact Git fact
+authorization = current EffectivePromotionPolicy
+support = contextual capability fact
+```
+
+`NON_FF_SUBMISSION_PROJECTION_REPLACEMENT` is an operation/effect authorization dimension inside the existing policy model. It is not a route, public policy field, UserBehavior, RuntimeConfig, caller request, or durable Submission property. Missing required governance observability yields `MISSING / UNKNOWN` and no replacement. ADR-087/088 route-space and behavior semantics are unchanged.
+
 Execution still requires:
 
 ```text
@@ -1986,7 +1996,7 @@ provider/organization governance source identities + revisions/fingerprints
 provider governance authorization facts required by policy composition
 normalized provider technical capability/current-fact observations
 current derived promotion dependency/topology identity/fingerprint
-submission/ref-update governance dimensions when applicable
+exact pending submission-ref effect authorization facts/provenance/currentness when applicable
 last refresh observation identity
 per-source currentness provenance
 contradictory dimensions and source provenance when applicable
@@ -1996,7 +2006,7 @@ Authoritative governance constraints compose without silent precedence fallback.
 
 Provider governance authorization facts may constrain `allowed_routes`; provider technical capability observations cannot grant authorization. Progression requires `REQUIRED ∩ SUPPORTED ∩ AUTHORIZED` plus exact transition guards.
 
-Local config, caller requests, and personal behavior cannot enlarge policy. Cache presence, age, TTL, or prior successful resolution never establish currentness for a policy-sensitive mutation.
+Local config, caller requests, and personal behavior cannot enlarge policy. Cache presence, age, TTL, prior successful resolution, or prior successful non-fast-forward replacement never establish currentness for a policy-sensitive mutation. Shared state may reconstruct whether one exact pending replacement is currently authorized; it MUST NOT persist standing future rewrite permission on a Submission, PublicationEpisode, SubmissionRef, or revision.
 
 ## 7.4 Convergence-unit and contribution unit mappings
 
@@ -2030,10 +2040,14 @@ promotion_unit_id = content address of immutable canonical PromotionUnitDefiniti
 exact ConvergenceUnit-state member set
 current promotion lifecycle
 separate current promotion-topology relationship/edges derived from adopted dependency provenance and exact predecessor/target state
-submission_id / provider submission identity when applicable
+submission_id
+publication_episode_id
 submission_ref
+provider_submission_identity when applicable
 current_submission_head
 submission_revision
+immutable exact submission-revision/projection history
+SUBMISSION_REVISION_OID_ANCHOR or other sufficient REQUIRED recovery-resource bindings when applicable
 immutable PromotionTarget inherited from member ConvergenceUnits + current target/provider state observed outside PromotionUnit identity
 ```
 
@@ -2590,7 +2604,7 @@ submission ref
 current submission revision/head
 ```
 
-A rewriteable submission revision also requires exact expected-old local/remote/provider state.
+Every submission revision records its exact required effect. A non-fast-forward replacement additionally requires the current nonterminal episode-ref role, REQUIRED old-head reachability, freshly current policy/capability facts, and exact expected-old local/remote/provider state.
 
 ## 12.5 DIRECT target-promotion claim
 
@@ -2721,13 +2735,15 @@ target advances
 → wait unless provider/policy requires update
 ```
 
-For a provider-authorized update/restack:
+For a required provider-facing update/restack:
 
 ```text
-enter explicit submission-update/revision transition
-→ rebuild/rebase/restack submission representation as authorized
-→ invalidate/re-read head-bound evidence
-→ bind new exact submission head/revision
+enter explicit REVISE_SUBMISSION_HEAD transition
+→ derive exact required H2, using ADR-050 EXECUTE_RESTACK_CONTRACT when applicable
+→ classify H1 == H2 / H1 ancestor H2 / non-FF exact relation
+→ require the selected exact effect's current policy/capability/recovery guards
+→ invalidate/re-read head-bound evidence for an actual new H2
+→ bind the new exact submission head/revision exactly once after observation
 ```
 
 Internal convergence-unit source OIDs remain unchanged unless a separate semantic reopen explicitly produces new internal state.
@@ -2791,34 +2807,38 @@ A failed push does not roll back valid local convergence; it becomes explicit `P
 
 ## 15.2 Submission refs
 
-Submission refs exist in PROVIDER_SUBMISSION route.
+Submission refs exist in PROVIDER_SUBMISSION route and have one provider-projection role. They carry no immutable/rewriteable policy class and no standing non-fast-forward authority.
 
-They have two policy classes.
-
-### Immutable submission ref
+For current bound head `H1` and required exact head `H2`:
 
 ```text
-ordinary FF/expected-state publication only
-exact provider submission head binding
-unexpected non-FF movement → DRIFTED/UNKNOWN
+H1 == H2
+→ NOOP
+
+H1 ancestor-of H2
+→ FF_SUBMISSION_REF_ADVANCE
+
+otherwise
+→ NON_FF_SUBMISSION_PROJECTION_REPLACEMENT
 ```
 
-### Rewriteable/restackable submission ref
+`NOOP` retains the current revision. Fast-forward publication uses `AdvanceSubmissionRefExpectedOldFF(submission_ref, expected_old=H1, new=H2)` and requires exact expected-old success, descendant/equal ancestry, mutation of only the intended ref, and authoritative post-observation at `H2`.
 
-A non-fast-forward submission revision is allowed only when:
+Non-fast-forward publication uses `ReplaceSubmissionRefExpectedOld(submission_ref, expected_old=H1, new=H2)` only when all of these hold:
 
 ```text
-repo policy permits rewrite
-AND provider/topology permits/requires it
-AND exact submission ref is classified rewriteable
-AND the current authoritative executor owns the submission operation
-AND expected-old local/remote/provider state is freshly verified
-AND underlying convergence-unit source bindings remain exact
+ref is exactly the current nonterminal PublicationEpisode submission_ref
+current semantic REVISE_SUBMISSION_HEAD requires exact H2
+current EffectivePromotionPolicy authorizes this exact replacement effect
+REVISE_SUBMISSION_HEAD capability supports the exact non-FF context
+REQUIRED H1 reachability is established
+claim/fence/recovery and transition-local prerequisites hold
+current authoritative ref == H1
+exact expected-old comparison succeeds
+post-effect authoritative observation == H2
 ```
 
-Any required force-style remote update must use force-with-lease-equivalent exact expected-old protection.
-
-This authority is confined to that submission ref.
+The effect is impossible for internal, target, recovery, retention, dependency-anchor, terminal/other-episode, and unmanaged refs. Blind force is forbidden. A backend force-with-lease-equivalent mechanism is conforming only as an implementation of this exact effect contract.
 
 ## 15.3 Target refs
 
@@ -2953,7 +2973,7 @@ fixed-point loop does not spin
 
 The reconciliation descriptor is diagnostic, not adoption authority. Any authored result must re-enter the normal pipeline against **current** Git/topology/policy state, acquire current claims/CAS guards, and satisfy the exact transition-local prerequisites for the resulting state before adoption. If the current state has moved, the historical conflict snapshot may become stale/superseded and is re-evaluated rather than trusted.
 
-No external `mark resolved` assertion bypasses current-state proof. Internal contribution-unit/convergence-unit conflicts never authorize rebase/history rewrite. Submission restack conflicts remain subject to the submission-ref rewrite policy.
+No external `mark resolved` assertion bypasses current-state proof. Internal contribution-unit/convergence-unit conflicts never authorize rebase/history rewrite. Submission restack conflicts remain subject to the exact per-transition revision-effect, policy, capability, and recovery contract.
 
 # 17. Crash recovery
 
@@ -2973,10 +2993,11 @@ push completed / metadata stale
 promotion materialization in progress
 DIRECT target advancement attempted/completed / metadata stale
 submission ref materialized / metadata stale
-immutable submission push completed / metadata stale
-owned submission rebase/restack in progress
-submission revision published / metadata stale
-provider-side authorized restack occurred / local metadata stale
+submission expected-old FF effect completed / metadata stale
+owned submission projection/restack revision in progress
+submission non-FF replacement effect observed / adoption metadata stale
+SUBMISSION_REVISION_OID_ANCHOR exists / lifecycle metadata stale
+provider-side restack projection occurred / local metadata stale
 provider submission created/updated / metadata stale
 merge queue state changed / metadata stale
 provider reports MERGED / target observation pending
@@ -3191,8 +3212,7 @@ Possible revision states:
 ```text
 UNMATERIALIZED
 MATERIALIZING
-BOUND_IMMUTABLE(rev,H)
-BOUND_REWRITEABLE(rev,H)
+BOUND(rev,H)
 UPDATE_REQUIRED
 RESTACK_REQUIRED
 REVISING
@@ -3200,32 +3220,38 @@ DRIFTED
 UNKNOWN_INCONSISTENT
 ```
 
-For immutable submissions:
+For a required revision from `BOUND(rev,H1)` to exact `H2`:
 
 ```text
-BOUND_IMMUTABLE(rev,H)
-→ exact head H remains frozen during ordinary review
-```
+H1 == H2
+→ remain BOUND(rev,H1)
+→ no new physical head revision
 
-For authorized rewriteable submissions:
-
-```text
-BOUND_REWRITEABLE(rev,H)
-→ authorized exact revision/update/restack
+H1 ancestor-of H2
 → REVISING
-→ derive exact H2 under the applicable candidate/update/ADR-050 RestackContract
-→ expected-old guarded ADR-049 submission-ref/provider update
+→ exact expected-old FF effect
 → observe local/remote/provider head == H2
-→ increment revision
-→ BOUND_REWRITEABLE(rev+1,H2)
+→ adopt revision exactly once
+→ BOUND(rev+1,H2)
+
+H1 not ancestor-of H2
+→ require current nonterminal episode submission_ref
+→ establish REQUIRED H1 reachability
+→ require fresh policy/capability/claim/fence/recovery guards
+→ REVISING
+→ exact expected-old non-FF projection replacement
+→ observe local/remote/provider head == H2
+→ adopt revision exactly once
+→ BOUND(rev+1,H2)
 ```
 
-For dependency restack specifically, H2 is derived by three-way state transplant from the immutable owned `(old_base_oid, owned_candidate_oid)` anchor onto the current new predecessor/base. A previous restacked provider head is never the semantic source for the next restack.
+For dependency restack specifically, `H2` is derived by three-way state transplant from the immutable owned `(old_base_oid, owned_candidate_oid)` anchor onto the current new predecessor/base. A previous restacked provider head is never the semantic source for the next restack. Logical revision monotonicity does not require Git ancestry monotonicity between provider heads.
 
-Unexpected movement outside an authorized revision transition:
+Unexpected movement without a durable matching authorized revision Operation/Attempt:
 
 ```text
 → DRIFTED / UNKNOWN_INCONSISTENT
+→ no scan-derived adoption
 → fail closed
 ```
 
@@ -3241,7 +3267,7 @@ promotion unit has ambiguous source bindings or target-incoherent member binding
 required promotion policy is missing/stale/contradictory
 derived dependency requires provider topology/capability that is unsupported
 submission head moved without authorized revision transition
-rewrite operation has unknown owner
+current submission revision/replacement authority is unknown
 target/provider result cannot be attributed consistently
 ```
 
@@ -3325,7 +3351,7 @@ promotion unit B / submission B
 promotion unit C / submission C
 ```
 
-Internal convergence refs and provider-facing submission refs are always distinct refs/authority objects under ADR-049, even when they currently point to the same exact OID. Submission rewrite authority never aliases or propagates to an internal convergence-unit ref.
+Internal convergence refs and provider-facing submission refs are always distinct refs/authority objects under ADR-049, even when they currently point to the same exact OID. Non-fast-forward submission-projection effect eligibility never aliases or propagates to an internal ConvergenceUnit ref.
 
 Stable IDs are authoritative; branch names are not.
 
@@ -3484,7 +3510,7 @@ Conceptual flow:
     descendant-only exact-old CAS+FF target advance
 15 for PROVIDER_SUBMISSION realization:
     materialize/update submission refs only when provider projection is currently required/authorized
-    preserve or revise heads according to immutable/rewriteable policy
+    derive exact H1→H2 relation and select NOOP / expected-old FF / exact expected-old non-FF replacement under current guards
     create/update/observe provider submissions
     react to UPDATE_REQUIRED / RESTACK_REQUIRED / CHANGES_REQUESTED / MERGE_QUEUED / provider finalization
     automatically progress machine-authorized provider target integration once all actual prerequisites are satisfied
@@ -3876,7 +3902,7 @@ materialize exact submission revision
      REVIEW_REQUESTED
 → if REVIEW_REQUESTED:
      configured submission-author/ship-ready gate must hold for exact revision
-→ publish according to immutable/rewriteable class
+→ classify the exact current-head→required-head relation and execute only the corresponding expected-old effect under current policy/capability/recovery guards
 → create/update current PublicationEpisode provider submission
 → if prior episode is terminal and ADR-055 continuation is required, create a distinct new episode/provider submission rather than reopening it
 → verify provider head == exact current submission head
@@ -3917,19 +3943,22 @@ Every exact submission revision newly produced by stack materialization/restacki
 
 A lower-layer change/merge/provider event may create `RESTACK_REQUIRED` for dependent submissions.
 
-If the dependency predecessor changes and the submission is authorized to revise:
+If the dependency predecessor changes and the submission requires revision:
 
 ```text
 claim exact submission
-→ revalidate old owned anchor (B0,C0), current predecessor/base B1, current bound head H
+→ revalidate old owned anchor (B0,C0), current predecessor/base B1, current bound head H1
 → derive exact state-transplant result: base=B0, ours=B1, theirs=C0
 → create/observe exact new provider-facing head H2 over B1
 → keep all internal source refs/OIDs and C0 unchanged
-→ validate RestackContract/dependency/current policy+capabilities
-→ publish only submission ref with expected-old H protection
+→ validate RestackContract/dependency
+→ classify exact H1→H2 relation
+→ require current policy authorization + contextual capability for the exact effect
+→ for non-FF, establish REQUIRED H1 reachability before replacement
+→ publish only the current nonterminal episode submission_ref with exact expected-old H1
 → observe provider head == H2
-→ increment submission revision
-→ re-read head-bound evidence
+→ adopt the submission revision exactly once
+→ re-read/re-establish H2-bound provider facts
 ```
 
 Each layer independently carries:
@@ -3975,7 +4004,7 @@ RESTACK_REQUIRED
 → reproject immutable owned `(old_base_oid, owned_candidate_oid)` onto current new base by ADR-050 three-way state transplant
 → no internal source rewrite and no chained restack from prior provider head
 → conflict requiring authoring → RECONCILIATION_REQUIRED / RESTACK_BLOCKED
-→ clean exact new revision requires ADR-049 exact expected-old/publication guards
+→ clean exact new revision derives NOOP / expected-old FF / exact expected-old non-FF replacement and requires the selected effect's current policy/capability/recovery guards
 
 unexpected movement
 → DRIFTED/UNKNOWN
@@ -4769,36 +4798,36 @@ Every provider-submission-route logical submission uses a submission ref distinc
 `submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination; `promotion_unit_id`, exact head OID, and monotonic `submission_revision` may change across authorized revisions.
 
 ---
-## Invariant 55 — Immutable submission heads are exact-frozen
-Ordinary immutable provider-submission review binds an exact submission head until an authorized update transition.
+## Invariant 55 — No submission ref has standing rewrite authority
+A Submission, PublicationEpisode, SubmissionRef, or `BOUND(rev,H)` state records identity and exact revision facts only. Every required update derives a new exact effect and revalidates authority.
 
 ---
-## Invariant 56 — Rewriteable submission authority is explicit and narrow
-Only a policy/provider-authorized submission-ref revision may perform a non-FF expected-old guarded update.
+## Invariant 56 — Exact Git relation mechanically classifies each submission-ref effect
+For current `H1` and required `H2`, equality is `NOOP`, descendant relation is `FF_SUBMISSION_REF_ADVANCE`, and every other relation is `NON_FF_SUBMISSION_PROJECTION_REPLACEMENT`. Policy, behavior, and provider terminology cannot alter this classification.
 
 ---
-## Invariant 57 — Submission rewrite never rewrites internal sources
-ContributionUnit/ConvergenceUnit OIDs and immutable owned promotion anchors remain stable through submission revision/restacking.
+## Invariant 57 — Non-fast-forward replacement is confined to the current nonterminal episode ref
+Only the submission ref of the current nonterminal PublicationEpisode whose exact revision is being realized is structurally eligible. Internal, target, recovery, retention, dependency-anchor, terminal/other-episode, and unmanaged refs are ineligible.
 
 ---
-## Invariant 58 — Authorized restack is an exact state reprojection, not drift
-A predecessor-base change may authorize a revision only through the ADR-050 exact state-transplant contract, exact result validation and ADR-049 revision binding.
+## Invariant 58 — Submission effect authority and support are fresh per transition
+Every FF or non-FF effect requires its ordinary current authorization and contextual support. Prior replacement, persistent state, UserBehavior, RuntimeConfig, caller intent, and absence of observed prohibition never grant a later effect.
 
 ---
-## Invariant 59 — Unexpected submission-head movement fails closed
-Movement outside an authorized revision transition enters DRIFTED/UNKNOWN recovery.
+## Invariant 59 — Every submission-ref mutation requires exact expected-old protection
+Expected-old mismatch performs no mutation. Blind force is forbidden, and authoritative post-effect observation must prove the exact intended head.
 
 ---
-## Invariant 60 — Submission force-style update requires exact expected-old protection
-Force-with-lease-equivalent semantics are confined to authorized submission refs.
+## Invariant 60 — Previous submission heads remain reachable while correctness requires them
+Before non-FF replacement removes `H1` as the current submission-ref root, a REQUIRED `SUBMISSION_REVISION_OID_ANCHOR` or proven sufficient existing REQUIRED root retains it until every H1-bound recovery/proof obligation permits `GC_ELIGIBLE`.
 
 ---
-## Invariant 61 — Global `--force` remains forbidden
-Rewrite authority never generalizes to contribution-unit/convergence-unit/target refs.
+## Invariant 61 — Submission revision never rewrites internal, target, or recovery refs
+ContributionUnit/ConvergenceUnit/base/target refs, immutable owned promotion anchors, and recovery/retention refs never receive non-FF submission-projection authority.
 
 ---
-## Invariant 62 — Head-bound evidence is revision-specific
-Checks/reviews/readiness tied to an old exact submission head are invalidated/re-read after authorized revision.
+## Invariant 62 — Head-bound provider facts and logical revision history are revision-specific
+Checks/reviews/queue/provider observations tied to `H1` do not transfer to `H2`. Each actual new exact head is adopted once, while logical revision monotonicity does not require Git ancestry monotonicity between successive provider heads.
 
 ---
 ## Invariant 63 — Semantic reopen and provider restack are distinct
@@ -4905,16 +4934,16 @@ Concurrent internal operations and recovered executions converge on persistent p
 Crash/timeout after a target-advancement attempt is reconciled from exact authoritative target history and the durable `expected_old/new` operation record. A later descendant of the exact candidate proves the earlier promotion effect occurred; stale journal position alone never causes blind replay.
 
 ---
-## Invariant 75 — Submission rewrite/restack is idempotent/recoverable
-Recovery uses logical submission identity, revision, expected-old state, and actual provider head.
+## Invariant 75 — Submission revision effects are idempotent and recoverable
+Recovery uses logical submission identity, exact revision, durable Operation/Attempt, expected old, required new head/effect, actual remote/provider state, and REQUIRED old-head reachability. Duplicate observation/adoption never increments the revision twice.
 
 ---
-## Invariant 76 — Internal recovery never starts rebase
-Contribution unit/convergence-unit refs treat legacy/external rebase as recovery-only.
+## Invariant 76 — Internal recovery never starts rebase or non-fast-forward replacement
+ContributionUnit/ConvergenceUnit/base/target/recovery refs treat legacy/external rewrite as recovery-only and never inherit submission-projection effect authority.
 
 ---
-## Invariant 77 — Owned submission rebase/restack may be recovered
-Known policy-authorized submission revision state may be resumed/finalized/aborted safely.
+## Invariant 77 — Submission replacement recovery requires prior durable causal intent
+A current-state scan without a durable matching revision Operation/Attempt cannot manufacture a revision transition from final topology. Known exact attempts are recovered by observation; a new causal effect requires fresh current guards.
 
 ---
 ## Invariant 78 — Unknown/inconsistent ownership/topology fails closed
@@ -4946,11 +4975,11 @@ Provider-submission completion may result from merge/squash/rebase-style provide
 
 ---
 ## Invariant 85 — Provider capabilities are explicit technical inputs
-A topology/rewrite workflow proceeds only when the required semantic operation is contextually supported and separately authorized by current policy.
+A provider-projection workflow proceeds only when the required semantic operation and exact ref-effect context are technically supported and separately authorized by current policy.
 
 ---
 ## Invariant 86 — Policy changes invalidate in-flight promotion assumptions
-An in-flight direct/provider-submission/rewrite intention must revalidate policy before irreversible/ref-visible steps.
+An in-flight direct/provider-submission/revision-effect intention must revalidate policy before irreversible/ref-visible steps.
 
 ---
 ## Invariant 87 — Promotion target is not universally `main`
@@ -5622,19 +5651,17 @@ For `selected_target_realization_route=DIRECT_TARGET_ADVANCE`, consumes an alrea
 
 ## 27.17 Submission revision engine
 
-For PROVIDER_SUBMISSION route, owns logical submission identity and exact current revision/head.
-
-It distinguishes immutable submission from policy-authorized rewriteable/restackable submission refs.
+For PROVIDER_SUBMISSION route, owns semantic `REVISE_SUBMISSION_HEAD`, logical submission identity, exact current revision/head, and exactly-once revision adoption. It derives the exact `H1 → H2` relation, selects `NOOP`, expected-old FF, or exact expected-old non-FF replacement, and coordinates Operation/Attempt/recovery-resource/Observation/Adoption state. ADR-050 remains the source of exact restack projection semantics when `EXECUTE_RESTACK_CONTRACT` is required.
 
 ## 27.18 Push engine
 
-Publishes ref classes according to their authority:
+Publishes ref roles according to their exact effect contract:
 
 ```text
-contribution-unit/convergence-unit → FF/expected-state only
-submission immutable    → FF/expected-state only
-submission rewriteable  → exact expected-old non-FF only when explicitly authorized
-target DIRECT            → ADR-052 exact-old CAS+FF contract only
+contribution-unit/convergence-unit → descendant/expected-state only
+submission FF effect → exact expected-old FF only
+submission non-FF replacement → exact expected-old only when current role/policy/capability/recovery guards hold
+target DIRECT → ADR-052 exact-old CAS+FF contract only
 target on PROVIDER_SUBMISSION route → never directly pushed
 ```
 
@@ -5902,57 +5929,53 @@ materialize exact submission representation
 
 If neither `REVIEW_REQUESTED` nor explicit current authority/need for exceptional early publication exists, the provider submission remains absent; `ruu` does not manufacture a draft provider object. `ruu` never directly mutates the target ref in PROVIDER_SUBMISSION route. A distinct human finalizer causes a wait only when authoritative governance explicitly requires that authority.
 
-## 28.5 Immutable submission history
+## 28.5 Submission-ref revision effect classification
 
-For an immutable submission ref:
-
-```text
-EQUAL remote/local
-→ no push
-
-LOCAL_AHEAD + expected remote
-→ ordinary FF push
-
-provider/head update required
-→ create explicit submission-update workflow
-→ only descendant/FF submission update is allowed
-
-unexpected non-FF movement
-→ DRIFTED/UNKNOWN
-```
-
-The exact provider submission head remains frozen during ordinary review/queue ownership.
-
-## 28.6 Rewriteable/restackable submission history
-
-A submission ref may be non-fast-forward rewritten only when:
+For current bound head `H1` and required exact head `H2`:
 
 ```text
-current policy/provider capabilities authorize the exact revision operation
-current logical submission identity is known
-current exact revision/head is known
-expected-old local/remote/provider head is revalidated
-rewrite claim is held
-underlying exact internal owned state remains unchanged/valid
-for RESTACK: current exact unsatisfied dependency and new predecessor/base are known
+H1 == H2
+→ NOOP
+→ remain at the current logical revision
+
+H1 ancestor-of H2
+→ FF_SUBMISSION_REF_ADVANCE
+→ AdvanceSubmissionRefExpectedOldFF(ref,H1,H2)
+
+otherwise
+→ NON_FF_SUBMISSION_PROJECTION_REPLACEMENT
+→ ReplaceSubmissionRefExpectedOld(ref,H1,H2)
 ```
 
-Allowed transition:
+The relation is derived solely from authoritative exact Git objects. `REVISE_SUBMISSION_HEAD` remains the semantic transition; these are physical effect contracts below it.
+
+## 28.6 Exact expected-old non-fast-forward submission projection replacement
+
+A non-fast-forward replacement may execute only when:
 
 ```text
-submission S
-revision r @ H
-
-authorized revise/restack
-→ derive exact H2 under current candidate/update or ADR-050 RestackContract
-→ mechanically validate exact projection/dependency + require exact H2 transition-local publication prerequisites
-→ ADR-049 expected-old guarded submission-ref/provider update
-→ submission revision r+1 @ H2
-→ local/remote/provider head verified
-→ re-read head-bound checks/reviews
+current logical submission/revision/head are exact
+ref is the current nonterminal PublicationEpisode submission_ref
+semantic revision requires exact H2
+current EffectivePromotionPolicy authorizes the exact effect
+contextual REVISE_SUBMISSION_HEAD capability supports the non-FF effect
+REQUIRED H1 reachability exists
+claim/fence/recovery and transition-local prerequisites hold
+current authoritative ref == expected_old H1
 ```
 
-This rewrite authority never propagates to internal refs or target refs.
+Then:
+
+```text
+attempt exact H1 → H2 replacement on only that ref
+→ expected-old mismatch: no mutation
+→ authoritative post-observation == H2
+→ adopt revision r+1 exactly once
+→ re-read/re-establish H2-bound provider facts
+→ retain H1 reachability until every H1-bound correctness obligation permits GC_ELIGIBLE
+```
+
+Forbidden, missing/unknown, or unsupported replacement blocks locally without another episode, provider submission, route, target, topology, synthetic ancestry, internal rewrite, or blind force fallback.
 
 ## 28.7 Derived promotion dependency and stacked provider representation
 
@@ -6382,13 +6405,13 @@ This preserves ADR-047's structural multi-source projection rule while removing 
 
 ## 30.19 Resolved by ADR-049 — stable submission identity/ref lifecycle
 
-ADR-049/055 close submission-ref creation/naming/retention and provider-episode semantics. provider-submission publication always uses provider-facing episode refs distinct from internal refs. `submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination while exact PromotionUnit/head and monotonic logical revision may change. One nonterminal PublicationEpisode owns one provider submission; revisions use exact expected-old guards. If that provider submission becomes terminal while the same nonterminal logical submission later needs another exact publication, a distinct new PublicationEpisode/ref/provider submission is created under first-publication expected-absent/policy/provider guards. Preferred new-episode namespace is `refs/heads/Ruu/submissions/<submission_id>/episodes/<publication_episode_id>` with repository-approved compatible alternatives. Physical episode-ref cleanup is allowed only after that episode's terminal provider/target/recovery state and never carries durable identity/audit authority. ADR-054 closes ConvergenceUnit historical internal-ref lifecycle with `RETIRED → GC_ELIGIBLE` separation and v1 built-in `KEEP`; ADR-060 closes 30.28 by removing the generic development-validation evidence contract.
+ADR-049/055 as amended by ADR-089 close submission-ref creation/naming/retention and provider-episode semantics. Provider-submission publication always uses provider-facing episode refs distinct from internal refs. `submission_id` is stable for one repository-local PromotionGroup projection toward one canonical publication destination while exact PromotionUnit/head and monotonic logical revision may change. One nonterminal PublicationEpisode owns one provider submission. It has no persistent rewrite class: each revision derives `NOOP`, expected-old FF, or exact expected-old non-FF replacement, and a non-FF effect requires fresh role/policy/capability/recovery guards. If that provider submission becomes terminal while the same nonterminal logical submission later needs another exact publication, a distinct new PublicationEpisode/ref/provider submission is created under first-publication expected-absent/policy/provider guards. Preferred new-episode namespace is `refs/heads/Ruu/submissions/<submission_id>/episodes/<publication_episode_id>` with repository-approved compatible alternatives. Physical episode-ref cleanup is allowed only after that episode's terminal provider/target/recovery state and never carries durable identity/audit authority. ADR-054 closes ConvergenceUnit historical internal-ref lifecycle with `RETIRED → GC_ELIGIBLE` separation and v1 built-in `KEEP`; ADR-060 closes 30.28 by removing the generic development-validation evidence contract.
 
 ## 30.20 Resolved by ADR-050 — derived stacked publication and exact-state restacking
 
 ADR-050 closes the restacking semantic core. A stacked provider submission is not requested by a caller: it is the provider projection of an exact promotion dependency that is not yet satisfied by the authoritative target. If the dependency is already target-satisfied, publication is ordinary; if unsatisfied and stack representation is supported/authorized, it is stacked; otherwise the child waits.
 
-When the predecessor exact head moves, restack reprojects the child's immutable owned state `(old_base_oid, owned_candidate_oid)` onto the new exact base with a versioned full three-way state-transplant semantic (`base=old base`, `ours=new base`, `theirs=owned candidate`). Internal refs never move, repeated restacks never chain from prior provider rewrites, conflicts route to `RECONCILIATION_REQUIRED`, every new exact head satisfies the exact transition-local prerequisites of the revision/publication transition, and only the ADR-049 submission ref/revision is rewritten under expected-old guards. Local/provider-native/external-tool execution is pluggable only if the observed result conforms to the same normative transplant contract.
+When the predecessor exact head moves, restack reprojects the child's immutable owned state `(old_base_oid, owned_candidate_oid)` onto the new exact base with a versioned full three-way state-transplant semantic (`base=old base`, `ours=new base`, `theirs=owned candidate`). Internal refs never move, repeated restacks never chain from prior provider heads, conflicts route to `RECONCILIATION_REQUIRED`, and every new exact head satisfies the transition-local prerequisites of the revision/publication transition. ADR-089 then classifies the exact old/new provider-head relation and permits only the corresponding expected-old effect; logical revision monotonicity does not require provider-head ancestry. Local/provider-native/external-tool execution is pluggable only if the observed result conforms to the same normative transplant contract.
 
 ## 30.21 Resolved by ADR-051 — contextual semantic provider capability observations
 
@@ -6738,7 +6761,7 @@ every promotion unit contains exactly one convergence unit
 every promotion unit may contain source states from multiple repositories
 every stack can be supported by every provider
 every provider submission head is forever immutable
-submission rewrite authority applies to internal refs
+non-FF submission-projection replacement authority applies to internal/target/recovery refs
 provider merge preserves source ancestry
 provider draft == internal NOT_READY
 review request == branch existence
@@ -7784,7 +7807,7 @@ provider-submission-policy bypass
 candidate missing a required transition-local prerequisite
 ```
 
-## 33.24 Submission identity/ref class
+## 33.24 Submission identity and exact current episode revision
 
 Provider-submission promotion uses:
 
@@ -7793,23 +7816,13 @@ submission_id
 publication_episode_id
 submission_ref               # scoped to current episode
 provider_submission_identity # scoped to current episode
-submission_class:
-  IMMUTABLE
-  REWRITEABLE
 submission_revision          # monotonic across logical submission
 current_submission_head
+immutable exact revision/projection history
+relevant recovery-resource bindings
 ```
 
-```text
-IMMUTABLE
-→ ordinary FF publication only
-
-REWRITEABLE
-→ policy/provider-authorized exact revision transitions may be non-FF
-```
-
-Internal source refs remain distinct in authority.
-
+There is one submission-ref role and no durable rewrite-authority class. An actual next exact head is handled per transition as `NOOP`, expected-old FF, or exact expected-old non-FF replacement. Internal source refs remain distinct in authority.
 
 Review-request intent is an independent submission/publication axis:
 
@@ -7859,7 +7872,9 @@ PublicationEpisode rule:
 
 ```text
 current episode nonterminal + authorized new exact revision
-→ update same episode/provider submission under exact expected-old guards
+→ preserve the same episode/provider submission
+→ classify the exact old/new head relation
+→ apply the corresponding expected-old FF or authorized non-FF effect
 
 current episode terminal + same logical submission still requires a new exact publication
 + PromotionGroup remains nonterminal
@@ -7959,52 +7974,37 @@ Dependency is never inferred from branch/task/session names or arbitrary ancestr
 ```text
 UNMATERIALIZED
 → MATERIALIZING
-→ require only the exact transition-local prerequisites of the revision/publication transition
-→ BOUND_IMMUTABLE(rev,H)
-or
-→ BOUND_REWRITEABLE(rev,H)
+→ require the exact transition-local prerequisites of the revision/publication transition
+→ BOUND(rev,H)
 ```
 
-For an authorized dependency restack:
+For `BOUND(rev,H1)` plus newly required exact `H2`:
 
 ```text
-BOUND_REWRITEABLE(rev,H)
-+ RESTACK_REQUIRED
-+ immutable owned anchor (B0,C0)
-+ current new predecessor/base B1
+classify exact relation
+
+EQUAL
+→ remain BOUND(rev,H1)
+
+FF
 → REVISING
-→ exact three-way state transplant: base=B0, ours=B1, theirs=C0
-→ produce exact H2 over B1 under RestackContract
-→ promotion/submission-specific validate
-→ expected-old guarded ADR-049 submission-ref publication
-→ provider head == H2
-→ revision := rev + 1
-→ BOUND_REWRITEABLE(rev+1,H2)
+→ AdvanceSubmissionRefExpectedOldFF(ref,H1,H2)
+→ authoritative observation/adoption
+→ BOUND(rev+1,H2)
+
+NON_FF
+→ require current nonterminal episode submission_ref
+→ require REQUIRED H1 reachability
+→ require fresh policy/capability/claim/fence/recovery guards
+→ REVISING
+→ ReplaceSubmissionRefExpectedOld(ref,H1,H2)
+→ authoritative observation/adoption
+→ BOUND(rev+1,H2)
 ```
 
-A later restack uses the current immutable owned child anchor again, not the prior restacked provider head as semantic input.
+For dependency restack, exact `H2` is produced by the ADR-050 state transplant from immutable `(B0,C0)` onto current new base `B1`. A later restack uses that immutable owned child anchor again, not the prior provider head as semantic input. Internal ConvergenceUnit OIDs do not change.
 
-If the old revision was `REVIEW_REQUESTED` and the revision change invalidates the ship-ready/submission-author gate:
-
-```text
-new revision intent
-→ REVIEW_NOT_REQUESTED
-until exact gate is re-established
-```
-
-For immutable:
-
-```text
-authorized update that can be FF/descendant
-→ exact new result must satisfy current transition-local publication prerequisites
-→ publish new exact head
-→ new bound revision
-
-required non-FF restack
-→ BLOCKED_POLICY unless submission class can explicitly transition under policy
-```
-
-Internal convergence-unit OIDs do not change.
+If a material new revision invalidates an exact head-bound ship-ready/review-request fact, that fact is re-established for `H2` according to its existing transition-local contract; it is never inherited merely from `H1`.
 
 ## 33.28 submission/provider lifecycle
 
@@ -8027,12 +8027,15 @@ Canonical meanings:
 
 ```text
 UPDATE_REQUIRED
-→ provider-facing update workflow
+→ semantic REVISE_SUBMISSION_HEAD workflow
+→ derive exact H1→H2 ref effect
 → no implicit contribution unit creation
 
 RESTACK_REQUIRED
 → exact dependency-restack workflow under ADR-050
-→ no internal source rewrite; reproject immutable owned child state onto current new predecessor/base
+→ derive H2 from immutable owned child state on the current new predecessor/base
+→ classify and authorize the exact H1→H2 ref effect
+→ no internal source rewrite
 
 CHANGES_REQUESTED
 → ADR-053 durable review-correction demand
@@ -8080,7 +8083,7 @@ remote submission ref == H
 provider submission head == H
 ```
 
-Ordinary immutable review:
+Ordinary review with no required new exact head:
 
 ```text
 target moves
@@ -8088,11 +8091,13 @@ target moves
 → no automatic head mutation
 ```
 
-Authorized rewriteable revision:
+Authorized actual revision:
 
 ```text
-H → H2
-only through explicit REVISING transition
+H1 → H2
+only through a durable explicit REVISING transition
++ mechanically classified exact expected-old effect
++ authoritative observation/adoption
 ```
 
 Unexpected movement:
@@ -8218,7 +8223,7 @@ as reported/derived from current provider state.
 
 Provider queue/merge-group synthetic commits are not final result proof unless they are the exact final `R` established by the provider and observed in target. `ruu` does not require generic diff/patch/program-semantic equivalence across `C`, `H`, and `R`.
 
-## 33.32 Remote publication by ref class
+## 33.32 Remote publication by ref role and exact effect
 
 ### CONTRIBUTION_UNIT / CONVERGENCE_UNIT
 
@@ -8236,18 +8241,21 @@ UNKNOWN
 → fail closed
 ```
 
-### SUBMISSION IMMUTABLE
+### CURRENT NONTERMINAL PUBLICATIONEPISODE SUBMISSION REF
 
 ```text
-FF/expected-state only
+EQUAL required head
+→ NOOP
+
+required head descendant of current head
+→ exact expected-old FF
+
+required head not descendant of current head
+→ exact expected-old NON_FF_SUBMISSION_PROJECTION_REPLACEMENT
+→ only with current role/policy/capability/recovery guards
 ```
 
-### SUBMISSION REWRITEABLE
-
-```text
-FF normally
-authorized revision may use exact expected-old guarded non-FF update
-```
+No other ref role is eligible for the non-FF submission-projection effect.
 
 ### TARGET
 
@@ -8379,7 +8387,7 @@ semantic authoring required for internal merge/synchronization
 semantic authoring required for promotion materialization
 → RECONCILIATION_REQUIRED(exact sources/destination/conflict facts)
 
-semantic authoring required for owned submission restack/rebase
+semantic authoring required for an owned submission restack projection
 → RECONCILIATION_REQUIRED(exact submission/base/conflict facts)
 
 legacy/external internal-ref rebase
@@ -8403,7 +8411,7 @@ ambiguous convergence-unit identity
 ambiguous promotion sources
 stale/contradictory policy
 unsupported topology requested
-unknown submission rewrite owner
+unknown current submission revision/replacement authority
 provider head drift
 provider says merged but target observation unavailable
 detached HEAD where topology requires branch
@@ -8429,8 +8437,9 @@ push complete / metadata stale
 DIRECT target advanced / metadata stale
 promotion materialization candidate/transient objects created / metadata stale
 provider submission created/updated / metadata stale
-submission revision published / metadata stale
-provider restack happened / local metadata stale
+submission revision effect observed / adoption metadata stale
+SUBMISSION_REVISION_OID_ANCHOR created or retained / lifecycle metadata stale
+provider restack projection happened / local metadata stale
 merge queued / local metadata stale
 provider merged / target observation pending
 Ruu-owned temporary integration/workspace/anchor cleanup partially complete
