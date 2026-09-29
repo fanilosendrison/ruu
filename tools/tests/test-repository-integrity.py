@@ -17,7 +17,7 @@ import yaml
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-PROVIDER_COMMIT = "3bddcd4b49147f022466fdeb4acbf590e68890ce"
+EXECUTABLE_PROVIDER_COMMIT = "870a805265b423bcf08d3d377274a7e55742b878"
 
 
 def load_tool(name: str):
@@ -35,7 +35,7 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
         requirements = (REPOSITORY / "requirements.txt").read_text(encoding="utf-8")
         self.assertIn(
             "proto-ring @ git+https://github.com/fanilosendrison/"
-            f"proto-ring.git@{PROVIDER_COMMIT}\n",
+            f"proto-ring.git@{EXECUTABLE_PROVIDER_COMMIT}\n",
             requirements,
         )
         self.assertNotIn("proto-ring.git@main", requirements)
