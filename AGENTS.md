@@ -241,6 +241,8 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
   `docs/repository-governance/ruu-projection-integrity.md`
 - Shared Governance Provider binding:
   `docs/repository-governance/ruu-shared-governance-provider.md`
+- Exact Evidence Binding:
+  `docs/repository-governance/ruu-exact-evidence-binding.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`
 - Immutable ADR-080 package: `qualification/releases/adr-080-flat/`

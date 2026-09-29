@@ -72,6 +72,9 @@ repository coordinates and work-management configuration
 Projection Integrity retains its own contract pin in
 `docs/repository-governance/ruu-projection-integrity.md`.
 
+Exact Evidence Binding retains its own contract pin in
+`docs/repository-governance/ruu-exact-evidence-binding.md`.
+
 `requirements.txt` retains its own executable-provider pin.
 
 Repository Integrity and the Git whitespace mechanism continue to use the
