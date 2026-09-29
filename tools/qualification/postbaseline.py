@@ -8,6 +8,13 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from proto_ring.exact_evidence_binding import (
+    BindingStatus,
+    EvidenceBinding,
+    EvidenceRequirement,
+    evaluate as evaluate_evidence_binding,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 POST_BASELINE_ROOT = ROOT / "qualification" / "state-space" / "post-baseline"
 SCHEMA = POST_BASELINE_ROOT / "qualification-metadata-v1.schema.json"
@@ -74,6 +81,22 @@ def _safe_relative_path(value: str) -> Path | None:
     return path
 
 
+def _sha_binding_status(
+    evidence_class: str,
+    required_sha256: str,
+    observed_sha256: str,
+) -> BindingStatus:
+    requirement = EvidenceRequirement(
+        admitted_classes=frozenset({evidence_class}),
+        subject_identity=required_sha256.encode("ascii"),
+    )
+    evidence = EvidenceBinding(
+        evidence_class=evidence_class,
+        subject_identity=observed_sha256.encode("ascii"),
+    )
+    return evaluate_evidence_binding(requirement, evidence)
+
+
 def _exact_keys(
     value: dict[str, object],
     expected: set[str],
@@ -125,8 +148,12 @@ def _artifact(
         errors.append(f"{metadata_label}: {role} artifact must not be a symlink")
     elif not path.is_file():
         errors.append(f"{metadata_label}: missing {role} artifact {path_value}")
-    elif sha256(path) != expected:
-        errors.append(f"{metadata_label}: SHA mismatch for {role} artifact {path_value}")
+    else:
+        actual = sha256(path)
+        if _sha_binding_status(role, expected, actual) is not BindingStatus.MATCH:
+            errors.append(
+                f"{metadata_label}: SHA mismatch for {role} artifact {path_value}"
+            )
     return Artifact(path=path, expected_sha256=expected)
 
 
@@ -324,10 +351,11 @@ def discover(root: Path = ROOT) -> Discovery:
                 stdout_hash
             ):
                 errors.append(f"{metadata_label}: replay stdout_sha256 is invalid")
-            elif (
-                recorded_output is not None
-                and stdout_hash != recorded_output.expected_sha256
-            ):
+            elif recorded_output is not None and _sha_binding_status(
+                "recorded_output",
+                stdout_hash,
+                recorded_output.expected_sha256,
+            ) is not BindingStatus.MATCH:
                 errors.append(
                     f"{metadata_label}: replay stdout SHA must match recorded output SHA"
                 )

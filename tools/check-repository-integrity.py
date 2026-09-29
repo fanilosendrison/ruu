@@ -66,6 +66,10 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 argv=(python, "tools/tests/test-projection-integrity.py"),
             ),
             CommandObligation(
+                name="Exact Evidence Binding tests",
+                argv=(python, "tools/tests/test-exact-evidence-binding.py"),
+            ),
+            CommandObligation(
                 name="Historical qualification tests",
                 argv=(python, "tools/tests/test-historical-qualification.py"),
             ),
