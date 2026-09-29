@@ -17,7 +17,7 @@ import yaml
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-PROVIDER_COMMIT = "c298343efa07d71790b53493ff15494f2fcac671"
+PROVIDER_COMMIT = "3bddcd4b49147f022466fdeb4acbf590e68890ce"
 
 
 def load_tool(name: str):
@@ -85,6 +85,7 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
                 "JSON syntax: qualification/state-space/post-baseline/qualification-metadata-v1.schema.json",
                 "ADR metadata tests",
                 "Projection Integrity tests",
+                "Exact Evidence Binding tests",
                 "Historical qualification tests",
                 "Repository Integrity binding tests",
                 "Qualification infrastructure tests",
