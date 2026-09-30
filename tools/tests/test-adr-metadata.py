@@ -12,7 +12,7 @@ from unittest import mock
 
 from proto_ring import adr_metadata as shared_adr_metadata
 from proto_ring import canonical_adr as shared_canonical_adr
-from proto_ring import governance_bootstrap as shared_governance_bootstrap
+from proto_ring import repository_governance_model as shared_repository_governance_model
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "tools" / "adr-metadata.py"
@@ -28,11 +28,35 @@ def write_repository_governance(fixture_root: Path) -> None:
     (fixture_root / "AGENTS.md").write_text(
         "---\n"
         "repository_governance:\n"
-        "  architecture_decisions:\n"
-        "    profile_path: docs/adr/adr-profile.yaml\n"
+        "  model_version: 1\n"
+        "  provider:\n"
+        '    id: "proto-ring"\n'
+        "    binding:\n"
+        '      capability: "shared_governance_provider"\n'
+        '      route: "binding"\n'
+        "  capabilities:\n"
+        "    architecture_decisions:\n"
+        "      configuration: {}\n"
+        "      routes:\n"
+        '        profile: "docs/adr/adr-profile.yaml"\n'
+        "    shared_governance_provider:\n"
+        "      configuration:\n"
+        "        required: true\n"
+        "      routes:\n"
+        '        binding: "docs/repository-governance/test-shared-governance-provider.md"\n'
         "---\n"
         "# Test repository directives\n",
         encoding="utf-8",
+    )
+    binding = (
+        fixture_root
+        / "docs"
+        / "repository-governance"
+        / "test-shared-governance-provider.md"
+    )
+    binding.parent.mkdir(parents=True, exist_ok=True)
+    binding.write_text(
+        "# Test Shared Governance Provider binding target\n", encoding="utf-8"
     )
 
 
@@ -93,7 +117,7 @@ class AdrMetadataTests(unittest.TestCase):
     def test_shared_primitives_are_bound_to_pinned_provider(self) -> None:
         requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8")
         self.assertIn(
-            "proto-ring.git@870a805265b423bcf08d3d377274a7e55742b878",
+            "proto-ring.git@07fa4e96dc2f762e5fbc99a8a3ffc820d5336b93",
             requirements,
         )
         bindings = {
@@ -112,22 +136,28 @@ class AdrMetadataTests(unittest.TestCase):
                 self.assertIs(getattr(adr_metadata, name), shared)
 
     def test_profile_path_resolution_delegates_to_shared_provider(self) -> None:
-        bootstrap = shared_governance_bootstrap.load(ROOT)
+        model = shared_repository_governance_model.load(ROOT)
+        self.assertEqual(model.model_version, 1)
+        self.assertEqual(model.provider.id, "proto-ring")
         self.assertEqual(
-            "docs/adr/adr-profile.yaml",
-            bootstrap.repository_governance["architecture_decisions"][
-                "profile_path"
-            ],
+            model.provider.binding.capability, "shared_governance_provider"
+        )
+        self.assertEqual(model.provider.binding.route, "binding")
+        profile = model.capabilities["architecture_decisions"].routes["profile"]
+        self.assertEqual(profile.declared_path, "docs/adr/adr-profile.yaml")
+        self.assertEqual(profile.target, (ROOT / "docs/adr/adr-profile.yaml").resolve())
+        shared_provider = model.capabilities["shared_governance_provider"]
+        self.assertEqual(shared_provider.configuration, {"required": True})
+        binding = shared_provider.routes["binding"]
+        self.assertEqual(
+            binding.declared_path,
+            "docs/repository-governance/ruu-shared-governance-provider.md",
         )
         self.assertEqual(
-            {
-                "required": True,
-                "binding_path": (
-                    "docs/repository-governance/"
-                    "ruu-shared-governance-provider.md"
-                ),
-            },
-            bootstrap.repository_governance["shared_governance_provider"],
+            binding.target,
+            (
+                ROOT / "docs/repository-governance/ruu-shared-governance-provider.md"
+            ).resolve(),
         )
 
         with tempfile.TemporaryDirectory() as temporary:
@@ -135,31 +165,35 @@ class AdrMetadataTests(unittest.TestCase):
             (repository / "AGENTS.md").write_text(
                 "---\n"
                 "repository_governance:\n"
-                "  architecture_decisions:\n"
-                '    profile_path: "docs/adr/adr-profile.yaml"\n'
-                "  shared_governance_provider:\n"
-                "    required: true\n"
-                '    binding_path: "binding.md"\n'
+                "  model_version: 1\n"
+                "  provider:\n"
+                '    id: "proto-ring"\n'
+                "    binding:\n"
+                '      capability: "shared_governance_provider"\n'
+                '      route: "binding"\n'
+                "  capabilities:\n"
+                "    architecture_decisions:\n"
+                "      configuration: {}\n"
+                "      routes:\n"
+                '        profile: "docs/adr/adr-profile.yaml"\n'
+                "    shared_governance_provider:\n"
+                "      configuration:\n"
+                "        required: true\n"
+                "      routes:\n"
+                '        binding: "binding.md"\n'
                 "---\n"
                 "# Directives\n\n"
                 "repository_governance:\n"
                 "  fake: true\n",
                 encoding="utf-8",
             )
-            fixture_bootstrap = shared_governance_bootstrap.load(repository)
-        self.assertEqual(
-            {
-                "architecture_decisions": {
-                    "profile_path": "docs/adr/adr-profile.yaml"
-                },
-                "shared_governance_provider": {
-                    "required": True,
-                    "binding_path": "binding.md",
-                },
-            },
-            fixture_bootstrap.repository_governance,
-        )
-        self.assertNotIn("fake", fixture_bootstrap.repository_governance)
+            profile_target = repository / "docs/adr/adr-profile.yaml"
+            profile_target.parent.mkdir(parents=True)
+            profile_target.write_text("test profile\n", encoding="utf-8")
+            (repository / "binding.md").write_text("test binding\n", encoding="utf-8")
+            fixture_model = shared_repository_governance_model.load(repository)
+        self.assertEqual(fixture_model.model_version, 1)
+        self.assertNotIn("fake", fixture_model.capabilities)
 
         self.assertIs(
             adr_metadata.configured_profile_path,

@@ -17,7 +17,7 @@ import yaml
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-EXECUTABLE_PROVIDER_COMMIT = "870a805265b423bcf08d3d377274a7e55742b878"
+EXECUTABLE_PROVIDER_COMMIT = "07fa4e96dc2f762e5fbc99a8a3ffc820d5336b93"
 
 
 def load_tool(name: str):
