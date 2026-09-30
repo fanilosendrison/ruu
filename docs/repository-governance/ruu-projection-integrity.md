@@ -97,6 +97,14 @@ AGENTS.md frontmatter.repository_governance.capabilities.shared_governance_provi
     → owns repository-operational routing to the local Shared Governance
       Provider binding
 
+AGENTS.md frontmatter.repository_governance.capabilities.governance_authority.routes.profile
+    → owns repository-operational routing to the governance-authority profile
+
+docs/repository-governance/ruu-governance-authority.md
+    → owns the structured repository-governance source, responsibility, role,
+      and precedence declaration
+    → does not become Ruu product-semantic, qualification, or evidence authority
+
 AGENTS.md
     → owns repository authorization, qualification, and validation guardrails
 

@@ -75,7 +75,12 @@ Projection Integrity retains its own contract pin in
 Exact Evidence Binding retains its own contract pin in
 `docs/repository-governance/ruu-exact-evidence-binding.md`.
 
-`requirements.txt` retains its own executable-provider pin.
+Governance Authority has its own immutable contract-authority pin in
+`ruu-governance-authority.md`.
+
+`requirements.txt` retains its own executable-provider pin. The Governance
+Authority contract pin and this executable-provider pin remain independent.
+Neither pin upgrades or determines the other.
 
 Repository Integrity and the Git whitespace mechanism continue to use the
 existing package pin.

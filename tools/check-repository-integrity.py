@@ -102,6 +102,10 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 ),
             ),
             CommandObligation(
+                name="Governance Authority profile",
+                argv=(python, "tools/check-governance-authority.py"),
+            ),
+            CommandObligation(
                 name="Authoritative Ref Monotonicity effective rules",
                 argv=(
                     python,

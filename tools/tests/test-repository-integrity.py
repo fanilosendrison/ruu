@@ -17,7 +17,7 @@ import yaml
 from proto_ring.repository_integrity import CommandObligation
 
 REPOSITORY = Path(__file__).resolve().parents[2]
-EXECUTABLE_PROVIDER_COMMIT = "07fa4e96dc2f762e5fbc99a8a3ffc820d5336b93"
+EXECUTABLE_PROVIDER_COMMIT = "305d968c50db17cce43199ae3fa78d64da2aabdb"
 
 
 def load_tool(name: str):
@@ -92,6 +92,7 @@ class RepositoryIntegrityBindingTests(unittest.TestCase):
                 "ADR metadata check",
                 "Accepted ADR body immutability",
                 "Shared Governance Provider binding",
+                "Governance Authority profile",
                 "Authoritative Ref Monotonicity effective rules",
                 "Retained lineage currentness",
                 "Active manifest currentness",

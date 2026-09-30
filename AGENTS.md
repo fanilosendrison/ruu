@@ -22,6 +22,10 @@ repository_governance:
         required: true
       routes:
         binding: "docs/repository-governance/ruu-shared-governance-provider.md"
+    governance_authority:
+      configuration: {}
+      routes:
+        profile: "docs/repository-governance/ruu-governance-authority.md"
 ---
 
 # Ruu repository directives
@@ -49,6 +53,10 @@ This file is the operational map for agents working in the Ruu repository. Follo
   `docs/repository-governance/ruu-shared-governance-provider.md`.
 
 ## Authority order
+
+The routed governance-authority profile is the canonical machine-readable
+repository-governance mapping. This prose remains agent-facing guidance; the
+underlying specification, contract, and ADR authorities remain unchanged.
 
 Use the following precedence when sources appear inconsistent:
 
