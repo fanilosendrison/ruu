@@ -79,7 +79,7 @@ qualification/state-space/ retained families and qualification/git-smoke/
 qualification/state-space/post-baseline/ registrations
     → own post-baseline qualification artifact registration and replay binding
 
-AGENTS.md frontmatter.repository_governance.architecture_decisions.profile_path
+AGENTS.md frontmatter.repository_governance.capabilities.architecture_decisions.routes.profile
     → owns repository-operational routing to canonical ADR profile
 
 docs/adr/adr-profile.yaml
@@ -93,7 +93,7 @@ docs/repository-governance/ruu-shared-governance-provider.md
     → mechanically validated projection of ADR-085 for mandatory adoption and
       Shared Governance Provider contract identity
 
-AGENTS.md frontmatter.repository_governance.shared_governance_provider
+AGENTS.md frontmatter.repository_governance.capabilities.shared_governance_provider.routes.binding
     → owns repository-operational routing to the local Shared Governance
       Provider binding
 

@@ -6,11 +6,22 @@ domain: "ruu"
 severity: "strict"
 name: "Ruu repository agent directives"
 repository_governance:
-  architecture_decisions:
-    profile_path: "docs/adr/adr-profile.yaml"
-  shared_governance_provider:
-    required: true
-    binding_path: "docs/repository-governance/ruu-shared-governance-provider.md"
+  model_version: 1
+  provider:
+    id: "proto-ring"
+    binding:
+      capability: "shared_governance_provider"
+      route: "binding"
+  capabilities:
+    architecture_decisions:
+      configuration: {}
+      routes:
+        profile: "docs/adr/adr-profile.yaml"
+    shared_governance_provider:
+      configuration:
+        required: true
+      routes:
+        binding: "docs/repository-governance/ruu-shared-governance-provider.md"
 ---
 
 # Ruu repository directives
