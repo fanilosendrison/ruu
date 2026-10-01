@@ -70,6 +70,10 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
                 argv=(python, "tools/tests/test-exact-evidence-binding.py"),
             ),
             CommandObligation(
+                name="Governed Objects profile tests",
+                argv=(python, "tools/tests/test-governed-objects.py"),
+            ),
+            CommandObligation(
                 name="Historical qualification tests",
                 argv=(python, "tools/tests/test-historical-qualification.py"),
             ),
@@ -104,6 +108,10 @@ def canonical_obligations(root: Path = ROOT) -> tuple[CommandObligation, ...]:
             CommandObligation(
                 name="Governance Authority profile",
                 argv=(python, "tools/check-governance-authority.py"),
+            ),
+            CommandObligation(
+                name="Governed Objects profile",
+                argv=(python, "tools/check-governed-objects.py"),
             ),
             CommandObligation(
                 name="Authoritative Ref Monotonicity effective rules",
