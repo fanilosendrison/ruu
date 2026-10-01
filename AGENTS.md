@@ -26,6 +26,10 @@ repository_governance:
       configuration: {}
       routes:
         profile: "docs/repository-governance/ruu-governance-authority.md"
+    governed_objects:
+      configuration: {}
+      routes:
+        profile: "docs/repository-governance/ruu-governed-objects.md"
 ---
 
 # Ruu repository directives
