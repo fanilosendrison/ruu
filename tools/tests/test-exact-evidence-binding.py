@@ -21,7 +21,7 @@ from proto_ring.exact_evidence_binding import (
 
 ROOT = Path(__file__).resolve().parents[2]
 POSTBASELINE_PATH = ROOT / "tools" / "qualification" / "postbaseline.py"
-EXECUTABLE_PROVIDER_COMMIT = "305d968c50db17cce43199ae3fa78d64da2aabdb"
+EXECUTABLE_PROVIDER_COMMIT = "2b3f335aa0d658cda1e6e0e851263d6fe56d71c2"
 EXACT_EVIDENCE_CONTRACT_COMMIT = "3bddcd4b49147f022466fdeb4acbf590e68890ce"
 BINDING_PATH = (
     ROOT / "docs" / "repository-governance" / "ruu-exact-evidence-binding.md"
