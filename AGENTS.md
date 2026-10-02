@@ -6,22 +6,17 @@ domain: "ruu"
 severity: "strict"
 name: "Ruu repository agent directives"
 repository_governance:
-  model_version: 1
+  model_version: 2
   provider:
     id: "proto-ring"
     binding:
       capability: "shared_governance_provider"
-      route: "binding"
+      route: "registry"
   capabilities:
     architecture_decisions:
       configuration: {}
       routes:
         profile: "docs/adr/adr-profile.yaml"
-    shared_governance_provider:
-      configuration:
-        required: true
-      routes:
-        binding: "docs/repository-governance/ruu-shared-governance-provider.md"
     governance_authority:
       configuration: {}
       routes:
@@ -30,6 +25,27 @@ repository_governance:
       configuration: {}
       routes:
         profile: "docs/repository-governance/ruu-governed-objects.md"
+    shared_governance_provider:
+      configuration:
+        required: true
+      routes:
+        registry: "docs/repository-governance/ruu-governance-bindings.md"
+    projection_integrity:
+      configuration: {}
+      routes:
+        registry: "docs/repository-governance/ruu-projection-integrity.md"
+    repository_integrity:
+      configuration: {}
+      routes:
+        profile: "docs/repository-governance/ruu-repository-integrity.md"
+    evidence_requirements:
+      configuration: {}
+      routes:
+        registry: "docs/repository-governance/ruu-evidence-requirements.md"
+    authoritative_ref_monotonicity:
+      configuration: {}
+      routes:
+        binding: "docs/repository-governance/ruu-authoritative-ref-monotonicity.md"
 ---
 
 # Ruu repository directives
@@ -53,8 +69,8 @@ This file is the operational map for agents working in the Ruu repository. Follo
   change adds or modifies mechanically derivable mutable repository state.
 - When the user mentions an Issue, Project work, backlog work, or a review finding, apply the shared GitHub Engineering Projects operational protocol, then read `docs/repository-governance/ruu-engineering.md` before acting.
 - Before adding, modifying, replacing, or designing any repository-governance
-  mechanism, read and apply
-  `docs/repository-governance/ruu-shared-governance-provider.md`.
+  mechanism, read and apply the routed Governance Binding Registry at
+  `docs/repository-governance/ruu-governance-bindings.md`.
 
 ## Authority order
 
@@ -192,7 +208,7 @@ Git smoke replay requires Git 2.28.0 or newer. An older Git installation is an u
 
 ## Tool responsibilities
 
-- `tools/check-repository-integrity.py` owns Ruu's ordered current-state validation membership and binds it to the pinned proto-ring Repository Integrity substrate; it does not own qualification replay.
+- `docs/repository-governance/ruu-repository-integrity.md` owns Ruu's ordered current-state validation membership. `tools/check-repository-integrity.py` is its thin routed evaluator and does not own qualification replay.
 - `tools/check-git-whitespace.py` binds Ruu's whitespace obligation to the pinned `proto_ring.git_whitespace` mechanism; it contains no independent whitespace policy.
 - `tools/tests/test-projection-integrity.py` guards the immutable shared Projection Integrity binding and validates the derivable fields in Ruu's maintained ADR history directly against canonical ADR frontmatter.
 - `tools/adr-metadata.py` validates active ADR metadata and renders only the generated ADR index; it never rewrites source ADRs or qualification snapshots.
@@ -260,12 +276,14 @@ The Git smoke command must fail as unsupported when Git is older than 2.28.0. Th
 - Ruu Engineering Project profile: `docs/repository-governance/ruu-engineering.md`
 - Discovery classification profile:
   `docs/repository-governance/ruu-discovery-classification.md`
-- Projection Integrity binding:
+- Projection Registry:
   `docs/repository-governance/ruu-projection-integrity.md`
-- Shared Governance Provider binding:
-  `docs/repository-governance/ruu-shared-governance-provider.md`
-- Exact Evidence Binding:
-  `docs/repository-governance/ruu-exact-evidence-binding.md`
+- Governance Binding Registry:
+  `docs/repository-governance/ruu-governance-bindings.md`
+- Evidence Requirements Registry:
+  `docs/repository-governance/ruu-evidence-requirements.md`
+- Repository Integrity profile:
+  `docs/repository-governance/ruu-repository-integrity.md`
 - Retired design-backlog history: `docs/history/design-backlog-through-adr-081.md`
 - Qualification policy and replay limitations: `qualification/README.md`
 - Immutable ADR-080 package: `qualification/releases/adr-080-flat/`

@@ -156,9 +156,10 @@ The runner canonicalizes temporary-path output so retained path comparisons rema
 ## Repository Integrity and Qualification
 
 Ruu Repository Integrity evaluates current repository coherence through the
-immutably pinned proto-ring substrate. Ruu owns the ordered obligation profile
-in `tools/check-repository-integrity.py`, including the shared whitespace
-binding in `tools/check-git-whitespace.py`.
+immutably pinned proto-ring substrate. Ruu owns the ordered persistent profile
+in `docs/repository-governance/ruu-repository-integrity.md`;
+`tools/check-repository-integrity.py` is the thin routed evaluator. The shared
+whitespace mechanism remains bound through `tools/check-git-whitespace.py`.
 
 Qualification remains a separate Ruu-owned evidence layer. The top-level
 qualification sequence requires Repository Integrity for the current repository

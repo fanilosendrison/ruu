@@ -5,10 +5,6 @@ asset_type: governed-object-profile
 domain: ruu-repository-governance
 severity: strict
 name: Ruu Governed Objects profile
-governed_objects_contract:
-  repository: fanilosendrison/proto-ring
-  commit: 275a92523e37b30fabd060ec92df2706bb70ef80
-  path: docs/contracts/governed-objects.md
 governed_objects:
   model_version: 1
   interfaces:
@@ -552,14 +548,20 @@ governed_objects:
           - product_semantics
           - accepted_decisions
           relations: []
+        ADR-091:
+          responsibilities:
+          - adr_metadata
+          - product_semantics
+          - accepted_decisions
+          relations: []
 ---
 
 # Ruu Governed Objects profile
 
-This consumer-owned profile enumerates the initial generic governed-object
-surface adopted by Ruu. The immutable contract pin identifies only the
-proto-ring representation contract; Ruu authority remains in the sources mapped
-by the Governance Authority profile.
+This consumer-owned profile enumerates the generic governed-object surface
+adopted by Ruu. Ruu authority remains in the sources mapped by the Governance
+Authority profile; the Governance Binding Registry owns the applicable generic
+contract identity.
 
 The initial catalog contains only canonical ADR identities. It intentionally
 contains no product-semantic bodies and no generic ADR relations. Existing
@@ -568,5 +570,5 @@ ADR-specific contracts continue to own canonical ADR relations, including
 
 Numbered specification sections, architectural constraints, qualification
 obligations, and repository obligations are not admitted as governed-object
-identities by this profile. This profile does not establish catalog currentness
-and does not create a validation, evidence, or projection registry.
+identities by this profile. Catalog currentness is declared by the routed
+Projection Registry and proved by its Ruu-owned validation.

@@ -109,6 +109,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-088](adr-088-require-nonempty-current-promotion-authorization-route-space.md) | Require nonempty current promotion authorization route space | accepted | 2026-09-28 | complete | Nonempty current EffectivePromotionPolicy route-space invariant<br>Zero-route authoritative-composition classification<br>Policy-contradiction boundary before behavior resolution |
 | [ADR-089](adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md) | Confine non-fast-forward submission updates to exact expected-old projection replacement | accepted | 2026-09-28 | complete | Submission-head semantic revision and exact Git ref-effect layering<br>Submission-ref fast-forward versus non-fast-forward effect classification<br>Exact expected-old non-fast-forward provider-projection replacement<br>Non-fast-forward ref-role and policy-authority confinement<br>Previous submission-head reachability and recovery-resource lifecycle<br>Logical submission-revision monotonicity versus provider-head Git ancestry |
 | [ADR-090](adr-090-separate-logical-submission-revision-from-ref-effect.md) | Separate logical submission revision from ref effect | accepted | 2026-09-28 | complete | Logical submission-revision need versus physical submission-ref effect classification<br>Same-head logical revision adoption<br>Exactly-once recovery for no-ref-effect revision transitions<br>Per-revision projection history when successive revisions share one head |
+| [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) | Adopt structured proto-ring governance | accepted | 2026-10-02 | complete | Repository Governance Model v2 adoption<br>Structured governance registry and profile ownership<br>Executable proto-ring provider authority and currentness<br>Ruu governance and qualification authority preservation<br>Obsolete active governance carrier retirement |
 
 ## Recorded outgoing relations
 
@@ -332,6 +333,8 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-090](adr-090-separate-logical-submission-revision-from-ref-effect.md) | confirms | [ADR-048](adr-048-materialize-repository-local-multi-source-promotion-units-by-canonical-pairwise-merging.md) |
 | [ADR-090](adr-090-separate-logical-submission-revision-from-ref-effect.md) | confirms | [ADR-049](adr-049-separate-stable-submission-identity-and-refs-from-internal-exact-state.md) |
 | [ADR-090](adr-090-separate-logical-submission-revision-from-ref-effect.md) | confirms | [ADR-066](adr-066-bind-promotion-success-to-route-conformant-candidate-submission-result-target-chains.md) |
+| [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) | confirms | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
+| [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) | confirms | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) |
 
 ## Derived incoming relations
 
@@ -550,7 +553,9 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-081](adr-081-manage-exact-authoring-dependencies-before-promotion.md) | amended by | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) |
 | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | amended by | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
 | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | amended by | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) |
+| [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | confirmed by | [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | amended by | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) |
+| [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | confirmed by | [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) |
 | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amended by | [ADR-088](adr-088-require-nonempty-current-promotion-authorization-route-space.md) |
 | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | confirmed by | [ADR-089](adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md) |
 | [ADR-088](adr-088-require-nonempty-current-promotion-authorization-route-space.md) | confirmed by | [ADR-089](adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md) |
