@@ -6,7 +6,6 @@ from __future__ import annotations
 from pathlib import Path
 import unittest
 
-import yaml
 from proto_ring import governance_authority, governed_objects
 from proto_ring import repository_governance_model
 
@@ -17,9 +16,6 @@ PROFILE_PATH = (
     / "repository-governance"
     / "ruu-governed-objects.md"
 )
-CONTRACT_COMMIT = "275a92523e37b30fabd060ec92df2706bb70ef80"
-
-
 def load_profiles():
     model = repository_governance_model.load(ROOT)
     authority_route = model.capabilities["governance_authority"].routes["profile"]
@@ -30,7 +26,7 @@ def load_profiles():
 
 
 class GovernedObjectsProfileTests(unittest.TestCase):
-    def test_profile_pins_contract_and_is_routed_exactly(self) -> None:
+    def test_profile_is_routed_exactly(self) -> None:
         model, _authority, catalog = load_profiles()
         route = model.capabilities["governed_objects"].routes["profile"]
 
@@ -40,19 +36,7 @@ class GovernedObjectsProfileTests(unittest.TestCase):
         )
         self.assertEqual(PROFILE_PATH.resolve(), route.target)
         self.assertEqual(PROFILE_PATH.resolve(), catalog.carrier)
-
-        _prefix, frontmatter, _body = PROFILE_PATH.read_text(
-            encoding="utf-8"
-        ).split("---", 2)
-        metadata = yaml.safe_load(frontmatter)
-        self.assertEqual(
-            {
-                "repository": "fanilosendrison/proto-ring",
-                "commit": CONTRACT_COMMIT,
-                "path": "docs/contracts/governed-objects.md",
-            },
-            metadata["governed_objects_contract"],
-        )
+        self.assertNotIn("governed_objects_contract", PROFILE_PATH.read_text())
 
     def test_governance_authority_owns_only_profile_route(self) -> None:
         _model, authority, _catalog = load_profiles()
@@ -71,7 +55,7 @@ class GovernedObjectsProfileTests(unittest.TestCase):
 
         self.assertEqual({"architecture_decisions"}, set(catalog.interfaces))
         self.assertEqual(
-            {f"ADR-{number:03d}" for number in range(1, 91)},
+            {f"ADR-{number:03d}" for number in range(1, 92)},
             set(catalog.interfaces["architecture_decisions"].objects),
         )
 

@@ -117,7 +117,7 @@ class AdrMetadataTests(unittest.TestCase):
     def test_shared_primitives_are_bound_to_pinned_provider(self) -> None:
         requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8")
         self.assertIn(
-            "proto-ring.git@2b3f335aa0d658cda1e6e0e851263d6fe56d71c2",
+            "proto-ring.git@890ed560e61e205067bdf3628e419302613ef06e",
             requirements,
         )
         bindings = {
@@ -137,27 +137,25 @@ class AdrMetadataTests(unittest.TestCase):
 
     def test_profile_path_resolution_delegates_to_shared_provider(self) -> None:
         model = shared_repository_governance_model.load(ROOT)
-        self.assertEqual(model.model_version, 1)
+        self.assertEqual(model.model_version, 2)
         self.assertEqual(model.provider.id, "proto-ring")
         self.assertEqual(
             model.provider.binding.capability, "shared_governance_provider"
         )
-        self.assertEqual(model.provider.binding.route, "binding")
+        self.assertEqual(model.provider.binding.route, "registry")
         profile = model.capabilities["architecture_decisions"].routes["profile"]
         self.assertEqual(profile.declared_path, "docs/adr/adr-profile.yaml")
         self.assertEqual(profile.target, (ROOT / "docs/adr/adr-profile.yaml").resolve())
         shared_provider = model.capabilities["shared_governance_provider"]
         self.assertEqual(shared_provider.configuration, {"required": True})
-        binding = shared_provider.routes["binding"]
+        registry = shared_provider.routes["registry"]
         self.assertEqual(
-            binding.declared_path,
-            "docs/repository-governance/ruu-shared-governance-provider.md",
+            registry.declared_path,
+            "docs/repository-governance/ruu-governance-bindings.md",
         )
         self.assertEqual(
-            binding.target,
-            (
-                ROOT / "docs/repository-governance/ruu-shared-governance-provider.md"
-            ).resolve(),
+            registry.target,
+            (ROOT / "docs/repository-governance/ruu-governance-bindings.md").resolve(),
         )
 
         with tempfile.TemporaryDirectory() as temporary:

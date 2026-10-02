@@ -1,87 +1,83 @@
 #!/usr/bin/env python3
+"""Tests for Ruu's routed post-baseline evidence requirements."""
+
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import inspect
-import json
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import unittest
 from unittest import mock
 
-import yaml
-from proto_ring.exact_evidence_binding import (
-    BindingStatus,
-    EvidenceBinding,
-    EvidenceRequirement,
-    evaluate,
-)
+from proto_ring import evidence_requirements
+from proto_ring.exact_evidence_binding import BindingStatus
 
 ROOT = Path(__file__).resolve().parents[2]
-POSTBASELINE_PATH = ROOT / "tools" / "qualification" / "postbaseline.py"
-EXECUTABLE_PROVIDER_COMMIT = "2b3f335aa0d658cda1e6e0e851263d6fe56d71c2"
-EXACT_EVIDENCE_CONTRACT_COMMIT = "3bddcd4b49147f022466fdeb4acbf590e68890ce"
-BINDING_PATH = (
-    ROOT / "docs" / "repository-governance" / "ruu-exact-evidence-binding.md"
-)
+TOOLS = ROOT / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
-
-def load_postbaseline():
-    spec = importlib.util.spec_from_file_location(
-        "postbaseline_exact_evidence_binding",
-        POSTBASELINE_PATH,
-    )
-    if spec is None or spec.loader is None:
-        raise RuntimeError("cannot load post-baseline qualification module")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-postbaseline = load_postbaseline()
+from qualification import postbaseline  # noqa: E402
+from qualification import postbaseline_evidence_requirements as policies  # noqa: E402
 
 
 class ExactEvidenceBindingTests(unittest.TestCase):
-    def test_requirements_pin_exact_provider(self) -> None:
-        requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8")
-        self.assertIn(
-            "proto-ring @ git+https://github.com/fanilosendrison/"
-            f"proto-ring.git@{EXECUTABLE_PROVIDER_COMMIT}",
-            requirements.splitlines(),
-        )
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.policies = policies.load(ROOT)
 
-    def test_local_binding_pins_exact_contract(self) -> None:
-        text = BINDING_PATH.read_text(encoding="utf-8")
-        _prefix, frontmatter, _body = text.split("---", 2)
-        metadata = yaml.safe_load(frontmatter)
+    def test_registry_has_exact_distinct_requirements(self) -> None:
+        artifact = self.policies.artifact
+        recorded = self.policies.recorded_output
+        self.assertEqual("post_baseline_artifact_binding", artifact.id)
+        self.assertEqual("post_baseline_recorded_output_binding", recorded.id)
+        self.assertIs(
+            evidence_requirements.EvidenceClassKind.SOURCE,
+            artifact.evidence_classes.kind,
+        )
         self.assertEqual(
-            {
-                "repository": "fanilosendrison/proto-ring",
-                "commit": EXACT_EVIDENCE_CONTRACT_COMMIT,
-                "path": "docs/contracts/exact-evidence-binding.md",
-            },
-            metadata["exact_evidence_binding"]["contract"],
+            frozenset({"recorded_output"}),
+            recorded.evidence_classes.explicit_classes,
         )
+        for requirement in (artifact, recorded):
+            self.assertIs(
+                evidence_requirements.InstantiationKind.SOURCE,
+                requirement.instances.kind,
+            )
+            self.assertFalse(requirement.context.required)
+            self.assertIsNone(requirement.target)
 
-    def test_postbaseline_imports_shared_objects(self) -> None:
-        self.assertIs(postbaseline.BindingStatus, BindingStatus)
-        self.assertIs(postbaseline.EvidenceRequirement, EvidenceRequirement)
-        self.assertIs(postbaseline.EvidenceBinding, EvidenceBinding)
-        self.assertIs(postbaseline.evaluate_evidence_binding, evaluate)
-
-    def test_identical_exact_sha_matches(self) -> None:
+    def test_exact_sha_binding_matches_and_mismatches(self) -> None:
         digest = "a" * 64
         self.assertIs(
-            postbaseline._sha_binding_status("report", digest, digest),
+            policies.binding_status(self.policies.artifact, "report", digest, digest),
             BindingStatus.MATCH,
         )
-
-    def test_different_exact_sha_mismatches(self) -> None:
         self.assertIs(
-            postbaseline._sha_binding_status("report", "a" * 64, "b" * 64),
+            policies.binding_status(
+                self.policies.artifact, "report", "a" * 64, "b" * 64
+            ),
+            BindingStatus.MISMATCH,
+        )
+
+    def test_recorded_output_uses_its_distinct_requirement(self) -> None:
+        digest = "a" * 64
+        self.assertIs(
+            policies.binding_status(
+                self.policies.recorded_output,
+                "recorded_output",
+                digest,
+                digest,
+            ),
+            BindingStatus.MATCH,
+        )
+        self.assertIs(
+            policies.binding_status(
+                self.policies.recorded_output, "report", digest, digest
+            ),
             BindingStatus.MISMATCH,
         )
 
@@ -94,98 +90,43 @@ class ExactEvidenceBindingTests(unittest.TestCase):
                 postbaseline.sha256(artifact),
             )
         self.assertIn("hashlib.sha256", inspect.getsource(postbaseline.sha256))
-        self.assertNotIn("hashlib", inspect.getsource(postbaseline._sha_binding_status))
+        self.assertNotIn("hashlib", inspect.getsource(policies.binding_status))
 
-    def test_artifact_treats_undetermined_as_existing_sha_mismatch(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            directory = root / "qualification"
-            directory.mkdir()
-            path = directory / "report.md"
-            path.write_text("report\n", encoding="utf-8")
-            expected = postbaseline.sha256(path)
-            errors: list[str] = []
-            registered: set[str] = set()
-            with mock.patch.object(
-                postbaseline,
-                "_sha_binding_status",
-                return_value=BindingStatus.UNDETERMINED,
-            ):
-                postbaseline._artifact(
-                    {"path": path.name, "sha256": expected},
-                    "report",
-                    directory,
-                    "qualification/qualification-metadata.json",
-                    root,
-                    errors,
-                    registered,
-                )
-        self.assertIn(
-            "qualification/qualification-metadata.json: "
-            "SHA mismatch for report artifact report.md",
-            errors,
+    def test_live_discovery_consumes_both_requirements(self) -> None:
+        original = policies.binding_status
+        with mock.patch.object(policies, "binding_status", wraps=original) as binding:
+            discovery = postbaseline.discover(ROOT)
+        self.assertEqual((), discovery.errors)
+        self.assertGreaterEqual(len(discovery.qualifications), 1)
+        requirement_ids = {call.args[0].id for call in binding.call_args_list}
+        self.assertEqual(
+            {
+                "post_baseline_artifact_binding",
+                "post_baseline_recorded_output_binding",
+            },
+            requirement_ids,
         )
 
-    def test_replay_stdout_registration_uses_shared_binding_adapter(self) -> None:
+    def test_discovery_fails_closed_when_registry_is_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            post_root = root / "qualification/state-space/post-baseline"
-            version_root = post_root / "v046"
-            version_root.mkdir(parents=True)
-            (post_root / "qualification-metadata-v1.schema.json").write_text(
-                "{}\n", encoding="utf-8"
+            fixture = Path(temporary) / "repository"
+            shutil.copytree(
+                ROOT,
+                fixture,
+                ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__", "*.pyc"),
             )
-            contents = {
-                "report": ("state-space-audit-v46.md", "# State-Space Audit v46\n"),
-                "executable": ("state-space-audit-v46.py", "#!/usr/bin/env python3\n"),
-                "recorded_output": ("state-space-audit-v46.txt", "PASS\n"),
-            }
-            artifacts = {}
-            for role, (name, content) in contents.items():
-                path = version_root / name
-                path.write_text(content, encoding="utf-8")
-                if role == "executable":
-                    path.chmod(0o755)
-                artifacts[role] = {
-                    "path": name,
-                    "sha256": postbaseline.sha256(path),
-                }
-            stdout_sha = artifacts["recorded_output"]["sha256"]
-            metadata = {
-                "$schema": "../qualification-metadata-v1.schema.json",
-                "schema_version": 1,
-                "qualification_id": "state-space-v046",
-                "qualification_kind": "state-space",
-                "provenance": "POST_BASELINE",
-                "baseline": "ADR-080",
-                "version": 46,
-                "artifacts": artifacts,
-                "supporting_artifacts": [],
-                "replay": {
-                    "expected_exit_code": 0,
-                    "runner": "python3",
-                    "stdout_sha256": stdout_sha,
-                },
-            }
-            (version_root / "qualification-metadata.json").write_text(
-                json.dumps(metadata), encoding="utf-8"
-            )
-            original = postbaseline._sha_binding_status
-            with mock.patch.object(
-                postbaseline,
-                "_sha_binding_status",
-                wraps=original,
-            ) as binding_status:
-                discovery = postbaseline.discover(root)
-
-        self.assertEqual((), discovery.errors)
-        binding_status.assert_any_call("recorded_output", stdout_sha, stdout_sha)
+            registry = fixture / "docs/repository-governance/ruu-evidence-requirements.md"
+            registry.unlink()
+            discovery = postbaseline.discover(fixture)
+        self.assertEqual((), discovery.qualifications)
+        self.assertIn("cannot load evidence requirements", discovery.errors[0])
 
     def test_adoption_does_not_restore_generic_development_validation(self) -> None:
-        source = POSTBASELINE_PATH.read_text(encoding="utf-8")
+        source = (ROOT / "tools/qualification/postbaseline.py").read_text()
+        source += (ROOT / "tools/qualification/postbaseline_evidence_requirements.py").read_text()
         self.assertNotIn("DevelopmentValidationEvidence", source)
         self.assertNotIn("DevelopmentValidationDemand", source)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
