@@ -28,7 +28,12 @@ jobs:
           python-version: "3.12.8"
 
       - name: Install validation dependencies
-        run: python3 -m pip install --requirement requirements.txt
+        run: |
+          python3 -m pip install --requirement requirements.txt
+          python3 -m pip check
+
+      - name: Verify exact proto-ring provider pin
+        run: python3 tools/check-proto-ring-provider.py
 
       - name: Require supported Git
         run: python3 tools/replay-git-smokes.py --check-version
@@ -44,3 +49,6 @@ jobs:
 
       - name: Replay Git smoke suites
         run: python3 tools/replay-git-smokes.py
+
+      - name: Check Git whitespace
+        run: git diff --check
