@@ -8,12 +8,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from proto_ring.exact_evidence_binding import (
-    BindingStatus,
-    EvidenceBinding,
-    EvidenceRequirement,
-    evaluate as evaluate_evidence_binding,
-)
+from proto_ring.evidence_requirements import PersistentEvidenceRequirement
+from proto_ring.exact_evidence_binding import BindingStatus
+from qualification import postbaseline_evidence_requirements
 
 ROOT = Path(__file__).resolve().parents[2]
 POST_BASELINE_ROOT = ROOT / "qualification" / "state-space" / "post-baseline"
@@ -40,7 +37,6 @@ METADATA_KEYS = {
 }
 PRIMARY_ROLES = {"report", "executable", "recorded_output"}
 
-
 @dataclass(frozen=True)
 class Artifact:
     path: Path
@@ -65,10 +61,8 @@ class Discovery:
     registered_paths: frozenset[str]
     errors: tuple[str, ...]
 
-
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
 
 def _relative(path: Path, root: Path) -> str:
     return path.relative_to(root).as_posix()
@@ -82,19 +76,17 @@ def _safe_relative_path(value: str) -> Path | None:
 
 
 def _sha_binding_status(
+    requirement: PersistentEvidenceRequirement,
     evidence_class: str,
     required_sha256: str,
     observed_sha256: str,
 ) -> BindingStatus:
-    requirement = EvidenceRequirement(
-        admitted_classes=frozenset({evidence_class}),
-        subject_identity=required_sha256.encode("ascii"),
+    return postbaseline_evidence_requirements.binding_status(
+        requirement,
+        evidence_class,
+        required_sha256,
+        observed_sha256,
     )
-    evidence = EvidenceBinding(
-        evidence_class=evidence_class,
-        subject_identity=observed_sha256.encode("ascii"),
-    )
-    return evaluate_evidence_binding(requirement, evidence)
 
 
 def _exact_keys(
@@ -121,6 +113,7 @@ def _artifact(
     root: Path,
     errors: list[str],
     registered: set[str],
+    requirement: PersistentEvidenceRequirement,
 ) -> Artifact | None:
     label = f"{metadata_label}: {role}"
     if not isinstance(value, dict):
@@ -150,7 +143,9 @@ def _artifact(
         errors.append(f"{metadata_label}: missing {role} artifact {path_value}")
     else:
         actual = sha256(path)
-        if _sha_binding_status(role, expected, actual) is not BindingStatus.MATCH:
+        if _sha_binding_status(
+            requirement, role, expected, actual
+        ) is not BindingStatus.MATCH:
             errors.append(
                 f"{metadata_label}: SHA mismatch for {role} artifact {path_value}"
             )
@@ -178,6 +173,12 @@ def discover(root: Path = ROOT) -> Discovery:
     qualifications: list[Qualification] = []
     seen_ids: set[str] = set()
     seen_versions: set[int] = set()
+
+    try:
+        policies = postbaseline_evidence_requirements.load(root)
+    except ValueError as error:
+        errors.append(f"post-baseline: cannot load evidence requirements: {error}")
+        return Discovery(tuple(), frozenset(), tuple(errors))
 
     if schema.is_symlink():
         errors.append("post-baseline: qualification metadata schema must not be a symlink")
@@ -265,6 +266,7 @@ def discover(root: Path = ROOT) -> Discovery:
                 root,
                 errors,
                 registered,
+                policies.artifact,
             )
             for role in sorted(PRIMARY_ROLES)
             if role in artifacts
@@ -296,6 +298,7 @@ def discover(root: Path = ROOT) -> Discovery:
                     root,
                     errors,
                     registered,
+                    policies.artifact,
                 )
                 if artifact is not None:
                     if STATE_ARTIFACT_PATTERN.fullmatch(artifact.path.name):
@@ -352,6 +355,7 @@ def discover(root: Path = ROOT) -> Discovery:
             ):
                 errors.append(f"{metadata_label}: replay stdout_sha256 is invalid")
             elif recorded_output is not None and _sha_binding_status(
+                policies.recorded_output,
                 "recorded_output",
                 stdout_hash,
                 recorded_output.expected_sha256,
