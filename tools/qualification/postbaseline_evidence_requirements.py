@@ -5,12 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from proto_ring import (
-    evidence_requirements,
-    governance_authority,
-    governed_objects,
-    repository_governance_model,
-)
+from proto_ring import evidence_requirements, repository_governance_state
 from proto_ring.exact_evidence_binding import (
     BindingStatus,
     EvidenceBinding,
@@ -57,21 +52,13 @@ def load(root: Path) -> PostBaselineEvidencePolicies:
     """Load and constrain the routed requirements used by Ruu metadata discovery."""
 
     try:
-        model = repository_governance_model.load(root)
-        authority_route = model.capabilities["governance_authority"].routes["profile"]
-        authority = governance_authority.load(root, authority_route)
-        objects_route = model.capabilities["governed_objects"].routes["profile"]
-        objects = governed_objects.load(root, objects_route, authority)
-        registry_route = model.capabilities["evidence_requirements"].routes["registry"]
-        registry = evidence_requirements.load(root, registry_route, authority, objects)
-    except (
-        KeyError,
-        OSError,
-        evidence_requirements.EvidenceRequirementsError,
-        governance_authority.GovernanceAuthorityError,
-        governed_objects.GovernedObjectsError,
-        repository_governance_model.RepositoryGovernanceModelError,
-    ) as error:
+        state = repository_governance_state.load(root)
+        registry = state.evidence_requirements
+        if registry is None:
+            raise PostBaselineEvidenceRequirementsError(
+                "evidence_requirements capability is required"
+            )
+    except repository_governance_state.RepositoryGovernanceStateError as error:
         raise PostBaselineEvidenceRequirementsError(str(error)) from error
     try:
         artifact = registry.requirements["post_baseline_artifact_binding"]
