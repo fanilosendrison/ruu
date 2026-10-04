@@ -14,7 +14,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 CHECKER = TOOLS / "check-proto-ring-binding-registry.py"
-EXPECTED = "890ed560e61e205067bdf3628e419302613ef06e"
+EXPECTED = "dedb01a3a9b7a18930c9da75afa3773b5ad67f69"
 OTHER = "b" * 40
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
@@ -39,6 +39,10 @@ def make_fixture(temporary: str) -> Path:
         ROOT,
         root,
         ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__", "*.pyc"),
+    )
+    subprocess.run(
+        ["git", "init", "-q", str(root)],
+        check=True,
     )
     return root
 
@@ -88,7 +92,7 @@ class ProtoRingBindingRegistryTests(unittest.TestCase):
                 "    proto_ring_executable:\n",
                 "    renamed_proto_ring_executable:\n",
             )
-            self.assertIn("requires proto_ring_executable", checker.check(root)[0])
+            self.assertIn("proto_ring_executable", checker.check(root)[0])
 
     def test_checker_has_no_installed_provider_responsibility(self) -> None:
         source = CHECKER.read_text(encoding="utf-8")

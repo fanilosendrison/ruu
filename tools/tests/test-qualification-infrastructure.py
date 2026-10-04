@@ -35,6 +35,10 @@ class QualificationInfrastructureTests(unittest.TestCase):
             self.root,
             ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__"),
         )
+        subprocess.run(
+            ["git", "init", "-q", str(self.root)],
+            check=True,
+        )
         post_baseline = self.root / "qualification/state-space/post-baseline"
         metadata_paths = post_baseline.glob(
             "v[0-9][0-9][0-9]/qualification-metadata.json"
