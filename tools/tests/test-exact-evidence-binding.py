@@ -7,6 +7,7 @@ import hashlib
 import inspect
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -114,6 +115,10 @@ class ExactEvidenceBindingTests(unittest.TestCase):
                 ROOT,
                 fixture,
                 ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__", "*.pyc"),
+            )
+            subprocess.run(
+                ["git", "init", "-q", str(fixture)],
+                check=True,
             )
             registry = fixture / "docs/repository-governance/ruu-evidence-requirements.md"
             registry.unlink()
