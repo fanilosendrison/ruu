@@ -32,6 +32,15 @@ continuous-convergence value, and why the accepted Product Intent requires a
 version-coordination system with Ruu's responsibilities or an equivalent. It
 creates no product semantics and is not an input to normative derivation.
 
+### Competitive research
+
+- [Ruu / Ruu Cloud Competitive Autonomous-Versioning Watch](research/competitive-watch/README.md)
+
+The competitive watch is a non-normative, dated research archive for comparing
+available alternatives with Ruu Core and Ruu Cloud responsibilities. It does
+not create Product Intent, requirements, architecture, or implementation
+obligations.
+
 ### Non-normative architecture
 
 - [Problem statement](architecture/problem-statement.md)
