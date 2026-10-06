@@ -13,4 +13,10 @@ Ruu is Git-based version control designed for concurrent agentic software develo
 
 This repository currently contains the active architecture corpus and its qualification evidence; it does not yet contain a production implementation.
 
+The non-normative [Ruu Product Rationale](docs/product/ruu-product-rationale.md)
+explains the user problem, intended value, pain removed, continuous-convergence
+value, and capabilities that motivate the existing Product Intent. It creates
+no Ruu product semantics and is not an independent input to normative
+derivation.
+
 Repository structure, architectural authority, contribution rules, and mandatory validation are defined in [AGENTS.md](AGENTS.md). The [annotated ADR history](docs/adr/README.md) explains accepted decisions, the [generated ADR index](docs/adr/index.md) projects canonical metadata, and the [ADR metadata profile](docs/adr/adr-profile.yaml) pins their machine-readable representation and validation contract. The [Governance Binding Registry](docs/repository-governance/ruu-governance-bindings.md) binds Ruu to exact generic proto-ring contracts, while the [Evidence Requirements Registry](docs/repository-governance/ruu-evidence-requirements.md) declares persistent post-baseline evidence mappings. Ruu-specific authority remains local.
