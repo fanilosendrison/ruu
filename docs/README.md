@@ -23,6 +23,15 @@ with product semantics.
 These documents define current requirements, invariants, state semantics, and
 authority boundaries.
 
+### Non-normative product rationale
+
+- [Ruu Product Rationale](product/ruu-product-rationale.md)
+
+The Product Rationale explains the user problem, intended value, pain removed,
+continuous-convergence value, and why the accepted Product Intent requires a
+version-coordination system with Ruu's responsibilities or an equivalent. It
+creates no product semantics and is not an input to normative derivation.
+
 ### Non-normative architecture
 
 - [Problem statement](architecture/problem-statement.md)
@@ -74,11 +83,12 @@ records. They never substitute for normative specifications or accepted ADRs.
 1. Problem statement.
 2. Architecture overview.
 3. Product intent in the Ruu specification.
-4. External Control Plane contract.
-5. ADR-070 and ADR-078 for the governing product experience.
-6. ADR-074 through ADR-080 for the current observation model.
-7. ADR-081 for exact authoring dependencies before source promotion.
-8. Earlier ADRs when implementation details require their decision history.
+4. Ruu Product Rationale for non-normative user-value explanation.
+5. External Control Plane contract.
+6. ADR-070 and ADR-078 for the governing product experience.
+7. ADR-074 through ADR-080 for the current observation model.
+8. ADR-081 for exact authoring dependencies before source promotion.
+9. Earlier ADRs when implementation details require their decision history.
 
 For repository work, apply the shared GitHub Engineering Projects protocol and
 read the Ruu Engineering profile before handling an Issue or creating a durable
