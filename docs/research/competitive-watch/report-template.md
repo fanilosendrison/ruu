@@ -94,6 +94,26 @@ le user ou le coding agent de choisir branches, worktrees, lanes, views, bases,
 ordre des repos, ordre de merge, stacks, refresh, retries ou topologie de
 publication.
 
+### Autonomie locale, dépendances obligatoires et substitution commerciale
+
+Pour chaque acteur pertinent, distinguer explicitement : moteur de versioning
+réellement exécuté sur la machine ; CLI/extension locale adossée à un service ;
+SCM côté serveur ; distribution gratuite ou payante ; nécessité d'un compte ou
+d'une forge particulière ; fonctionnement avec des harnesses tiers ; support
+des repositories sans remote ; continuité locale sans réseau.
+
+Évaluer séparément (a) la substitution technique aux garanties de Ruu Core,
+(b) la possibilité de remplacer commercialement Ruu Cloud par une expérience
+native jugée suffisante, et (c) la capacité d'acquisition d'utilisateurs locaux
+avant tout besoin de coordination multi-hôtes. Un produit gratuit ne prouve
+pas l'équivalence ; une fonctionnalité propriétaire ne prouve pas l'absence de
+substitution commerciale. Dire `indéterminé` sans preuve disponible.
+
+Ces observations doivent provenir exclusivement des champs existants de
+`report.json` : `actors[].summary`, évaluations R1/R2/R9 (et C5/C6/C7 le
+cas échéant), preuves associées, et `positioning_implications`. Cette
+section n'ajoute aucun champ au schéma ni aucune cinquième note technique.
+
 ## 6. Convergence, fraîcheur, exact dependencies et recovery Core
 
 {{core_convergence_freshness_exact_dependencies_and_recovery}}
@@ -137,7 +157,9 @@ technique concurrente.
 {{positioning_implications}}
 
 Ces implications restent de la recherche. Elles ne modifient aucune autorité
-produit Ruu ou Ruu Cloud.
+produit Ruu ou Ruu Cloud. Faire ressortir distinctement l'avantage ou le risque
+lié à la distribution, au prix et au coût de changement, sans convertir ces
+éléments en preuve d'équivalence technique.
 
 ## 11. Couverture, retards et investigations ouvertes
 

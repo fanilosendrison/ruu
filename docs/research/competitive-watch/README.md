@@ -42,7 +42,8 @@ The methodology defines the exact semantic boundary behind that benchmark.
 
 - [Methodology](methodology.md) defines the comparison benchmark, Core and
   Cloud axes, permanent radar, open discovery, technical inspection, ratings,
-  evidence discipline, scenarios, and historical interpretation.
+  evidence discipline, scenarios, historical interpretation, and cross-cutting
+  local-deployment/distribution/commercial-substitution assessments.
 - [Execution](execution.md) defines cadence, coverage operations, publication,
   additive chat delivery, and failure handling without creating a scheduler.
 - [Watchlist](watchlist.json) initializes discovery seeds and topics. It is not

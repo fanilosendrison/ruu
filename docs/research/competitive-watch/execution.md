@@ -63,7 +63,7 @@ Every report pins:
 - `fanilosendrison/ruu` and an exact commit;
 - `fanilosendrison/ruu-cloud` and an exact commit;
 - the report schema version and immutable schema source;
-- methodology version `1.0.0` and immutable methodology source; and
+- methodology version `1.1.0` (or the newer installed version) and immutable methodology source; and
 - the independently observed Ruu Cloud baseline status.
 
 Before publication:
@@ -110,6 +110,15 @@ and do not advance source cursors as if archival succeeded.
 A report cannot know the commit that will publish itself. The publication
 receipt stays outside the immutable report. Never amend a report after
 publication merely to insert its publishing commit.
+
+## Cross-cutting substitution reporting
+
+Every new report applies the methodology's local deployment/distribution profile
+to relevant components. Capture verified conditions in the existing JSON fields,
+and render the local-vs-hosted distinction and commercial-substitution analysis
+without inventing new data or averaging the four technical ratings.
+The methodology update does not change the report schema version, past report
+IDs, source cursors, retained roster or historical evaluation outcomes.
 
 ## Additive chat delivery
 

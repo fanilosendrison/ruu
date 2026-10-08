@@ -9,7 +9,7 @@ name: "Ruu / Ruu Cloud Competitive Watch Methodology"
 
 # Ruu / Ruu Cloud Competitive Watch Methodology
 
-Methodology version: 1.0.0
+Methodology version: 1.1.0
 
 This version identifies the research method, not a Ruu or Ruu Cloud product
 version. The method governs competitive-watch operations only. Its axes are
@@ -240,9 +240,70 @@ cross-repository intelligence
 For every use, identify who produces the exact required signal, what is missing,
 and whether the composition is actually available.
 
+## Cross-cutting deployment, adoption and commercial-substitution profile
+
+This profile is mandatory for each scoped competitor/component assessment, but
+is **not** an additional Ruu technical guarantee, fifth technical rating,
+or revision to any Product Intent. It separates where an alternative operates
+from what it actually guarantees. Record `unknown` rather than infer absence.
+
+Evaluate and evidence each dimension separately:
+
+1. **Local installation and routine invisibility.** Can a developer install
+   once on their own machine, start a supported pre-existing coding harness,
+   and obtain pre-edit isolation plus safe version progression without
+   repeating setup or manually planning Git topology? Distinguish an actual
+   local version-control engine from a local CLI that merely invokes a hosted
+   agent, server SCM, provider API, or vendor account.
+2. **Local autonomy and external prerequisites.** Identify whether a local
+   repository without a configured remote remains usable, whether a GitLab/
+   GitHub account or vendor service is mandatory, which operations need
+   network access, and exactly what remains correct offline. Do not demand
+   offline remote publication or multi-host authority: only evaluate the
+   local scope for which the competitor claims independent functionality.
+3. **Harness, model, provider and repository independence.** Check supported
+   harness adapters, whether the user can retain their chosen coding harness
+   and model, whether multiple local repositories are supported, and whether
+   GitHub, GitLab and bare Git remotes remain interchangeable. A local app
+   that works only with its own agent or forge must not be called universal.
+4. **Cost, licence and feature boundaries.** Record verified free functions,
+   mandatory subscriptions, paid credits/usage, hosting/compute expenses,
+   enterprise restrictions and which correctness capabilities are gated.
+   Distinguish free of charge, source available, fair-code and OSI-approved
+   open source; neither the product name nor a repository's visibility proves
+   licence or entitlement. Do not conflate Ruu Core's intended complete
+   free/fair-code model with a verified shipped offering.
+5. **Distribution and switching costs.** Compare separately the ease of
+   individual adoption, pre-installed/bundled forge distribution, the need
+   to migrate SCM or agent workflows, enterprise procurement, and the path
+   from individual local adoption to team-wide Cloud adoption. Claims about
+   adoption or pricing require dated evidence.
+6. **Commercial substitution independently of technical equivalence.**
+   Determine whether a vendor-native, bundled or sufficiently-good partial
+   solution could remove a buyer's reason to pay for Ruu Cloud, even while
+   falling short of Ruu's exact-state guarantees. Conversely, a technically
+   equivalent local and provider-independent engine is a direct Core
+   substitute even if its provider offers no managed Cloud product.
+   Do not derive commercial-threat likelihood from a four-dimensional
+   technical rating, and never treat free price as proof of technical parity.
+
+For GitLab and GitHub, explicitly distinguish their remotely hosted SCM and
+agent platform from any genuinely local, third-party-harness-independent
+versioning engine. A local CLI, extension, sandbox or checkout alone does not
+establish the latter. Inspect actual dependency paths and product prerequisites.
+
+Within the existing JSON schema, place source-bounded deployment findings
+in the component's `summary` and R1/R2/R9 axis `scope`, `evidence_ids`
+and `remaining_gaps`; use C5/C6/C7 for independently relevant Cloud
+conditions. Record economic/distribution implications in
+`positioning_implications`, with evidence or marked uncertainty in the
+report narrative. The report renderer must not add unrepresented findings.
+Keep the four existing technical ratings unchanged; do not invent a fifth
+rating, alter `report.schema.json` silently, or retroactively modify reports.
+
 ## Discriminating scenarios
 
-Retain exactly these scenarios as analysis questions:
+Retain exactly these fourteen scenarios as analysis questions:
 
 1. 40 agents touch unknown subsets of 17 repositories; the user does not
    pre-plan version topology.
@@ -281,6 +342,20 @@ Retain exactly these scenarios as analysis questions:
 12. A competitor tracks agent read-sets and detects reasoning staleness.
     Determine first whether this belongs to semantic Development-System
     validation rather than Ruu's versioning responsibility.
+
+13. A developer installs a versioning tool once on their machine, then
+    uses two different supported coding harnesses on several local repositories,
+    including one without any Git remote. No provider account or hosted service
+    is available. Inspect pre-edit integration, overlapping concurrent work,
+    checkpointing, convergence and local crash recovery, and record every
+    manual setup/version-topology step still required.
+
+14. A GitLab/GitHub user has access to a bundled agent platform and server
+    SCM feature. Compare its ordinary user-level substitution against the
+    same developer using a third-party harness on a different forge or an
+    unhosted Git repository. Distinguish a hosted workflow with local CLI
+    access from an autonomous local version-control engine; assess commercial
+    substitution separately from exact technical equivalence.
 
 These scenarios are research questions. They are not new normative Ruu or Ruu
 Cloud requirements.
