@@ -55,7 +55,7 @@ class GovernedObjectsProfileTests(unittest.TestCase):
 
         self.assertEqual({"architecture_decisions"}, set(catalog.interfaces))
         self.assertEqual(
-            {f"ADR-{number:03d}" for number in range(1, 92)},
+            {f"ADR-{number:03d}" for number in range(1, 94)},
             set(catalog.interfaces["architecture_decisions"].objects),
         )
 

@@ -2,7 +2,7 @@
 
 # 0. Product intent — governing user experience
 
-This section is normative, ratified by **ADR-070**, and strengthened by **ADR-078**, **ADR-081**, and **ADR-086**. It states the product outcome that the technical invariants below exist to serve. If a lower-level architectural rule admits several interpretations, the interpretation that preserves this product intent while satisfying the applicable safety invariants is required. If a prior technical clause directly conflicts, ADR-070 supersedes that clause to the minimum extent necessary. A future change to this product promise must explicitly amend ADR-070 and update this section in the same decision.
+This section is normative, ratified by **ADR-070**, and strengthened by **ADR-078**, **ADR-081**, **ADR-086**, **ADR-092**, and **ADR-093**. It states the product outcome that the technical invariants below exist to serve. If a lower-level architectural rule admits several interpretations, the interpretation that preserves this product intent while satisfying the applicable safety invariants is required. If a prior technical clause directly conflicts, ADR-070 supersedes that clause to the minimum extent necessary. A future change to this product promise must explicitly amend ADR-070 and update this section in the same decision.
 
 ## 0.1 Product definition: agentic version control built on Git
 
@@ -113,6 +113,59 @@ Realization-specific adapters and plumbing MAY exist below the common surface co
 An implementation that requires a global authoring-substrate mode while several conforming surfaces could coexist is non-conformant.
 
 The linked-worktree, VM, container, sandbox, microVM, and copy-on-write examples remain non-exhaustive illustrations. They do not define Ruu product types, do not create support tiers, and do not privilege any mechanism.
+
+## 0.2C Capability-based cognitive execution without a mandatory workflow engine
+
+Ruu MUST provide the cognitive execution capabilities required by its
+explicitly governed operations while remaining one coherent version-control
+product. For authored checkpoint messages, this includes an admissible
+continuation of the associated existing main agent and user-selectable
+alternatives under ADR-093. Ordinary supported-harness use MUST NOT require
+the user to operate a separate workflow orchestrator.
+
+No named execution runtime is part of the Product Intent. In particular,
+**Turnlock is an optional candidate realization**, as are compatible
+harness-native facilities, bounded direct LLM calls, independent agents,
+external services, and other conforming combinations. A general workflow
+engine MUST NOT be required solely because one candidate offers one.
+The governing requirement is externally realizable capability and
+conformance, not the chosen vendor, library, or orchestration substrate.
+
+Ruu's own current-state reconciler remains the sole authority for global
+obligations, Git/provider transition legality, run fencing, claims/CAS,
+recovery, and exact-state adoption. An external workflow or cognitive
+provider can execute an admitted request and return a result but does not
+replace the reconciler's state, imply semantic readiness, or authorize Git
+mutations. A request that waits for cognition MUST NOT indefinitely hold
+the global convergence lock; unrelated mechanical progress remains valid,
+including in headless sessions.
+
+## 0.2D Main-agent-first configurable commit messages
+
+For a new authored dirty-surface checkpoint that requires a Git commit,
+Ruu MUST obtain the commit message without requiring the user to
+compose routine Git messages. The default producer is **the actual main
+agent of the candidate's associated reachable supported interactive
+authoring session**, not a fresh agent impersonating its continuation.
+
+The user MUST be able to choose an independent subagent, a bounded direct
+LLM call, or any other compatible external system/service instead. This
+is an open capability contract, not a closed vendor or adapter taxonomy;
+the choice conveys no authority to edit the checkpoint, choose Git
+parents, advance refs, or override repository/provider governance.
+
+A session merely triggering the global sweep does not become the
+authoritative authoring session for unrelated checkpoints. If main-agent
+continuation is unavailable or inadmissible and no explicitly selected
+eligible alternative exists, the missing message becomes a localized
+recoverable prerequisite while unrelated convergence continues.
+
+The message and all OID-affecting metadata for a new authored checkpoint
+are frozen for the exact candidate/operation before commit creation, so
+crash/retry never silently changes the intended commit. Ruu preserves
+existing native commits unchanged and uses deterministic, canonical
+metadata for technical or synthetic commits instead of nondeterministic
+message generation.
 
 ## 0.3 Invoke anywhere: CWD is not orchestration truth
 
@@ -5532,6 +5585,26 @@ The record model may retain a finite dependency set, but more than one independe
 ## Invariant 216 — Dependency adoption and reconciliation are idempotent
 Crash, retry, duplicate observation, concurrent compression, and repeated sweeps preserve one immutable dependency identity/OID and at most one authoritative source projection under current run and row-version fences.
 
+---
+## Invariant 217 — Cognitive execution mechanisms are not Git authority
+A selected cognitive provider or optional workflow engine may execute admitted requests, but only Ruu current-state reconciliation, exact Git observation, fencing, claims/CAS, and Ruu-owned effect adoption authorize managed Git/provider transitions. No specific execution engine is mandatory; workflow cursors and agent outputs are never adoption authority.
+
+---
+## Invariant 218 — Cognitive waits cannot monopolize Ruu convergence
+A main-agent/subagent/LLM/external-system wait cannot retain Ruu's global run lock or an unbounded ref-mutation claim. A missing cognitive output is a localized recoverable obligation; unrelated mechanically legal work continues.
+
+---
+## Invariant 219 — Main-agent-first message provider is user-selectable
+For a new authored dirty checkpoint with an admissible associated interactive main agent, that continuing agent is the default message producer. Users can select a subagent, raw LLM, or arbitrary compatible external service. Mere trigger origin cannot reassign unrelated session provenance.
+
+---
+## Invariant 220 — Message providers have no Git or semantic authoring authority
+A message producer receives authorized exact-candidate context and returns text. It cannot select checkpoint membership, parents, Git refs, semantic completion, corrections, tests, or publication governance.
+
+---
+## Invariant 221 — Authored message metadata is frozen; technical OIDs stay deterministic
+The selected message and other OID-affecting metadata must be durably bound to the exact authored checkpoint candidate/operation before commit effect. Retry uses the same decision or recovers the observed effect. Clean native commits are never rewritten and canonical technical/synthetic commits retain deterministic metadata.
+
 # 27. Architectural implications
 
 ## 27.1 Repository/bootstrap and contribution-unit provisioners — outside the convergence engine
@@ -5598,7 +5671,17 @@ Reads authoritative Git graph/worktree/index/ref facts and classifies exact ance
 
 Commits only the exact ContributionUnit checkpoint candidate selected by the checkpoint candidate-membership contract, under current mutation authority/claim/CAS and ADR-059 exact-state guards.
 
-An LLM may generate commit messages but receives no ref-mutation authority.
+For a new authored dirty-surface checkpoint, the message comes from the
+ADR-093 user-selectable provider. The associated continuing main agent
+is the interactive default where available and admissible; compatible
+alternatives include independent agents, direct LLM inference, and
+arbitrary external systems. The selected provider returns text only,
+never Git or semantic-development authority. Ruu freezes all
+OID-affecting metadata for that exact candidate/operation before commit
+creation, preserves decisions across retries, and revalidates exact
+parent/tree and mutation authority after cognitive waits. Existing
+native commits and deterministic technical/synthetic commits do not
+use this generative-message path.
 
 The commit engine never runs repository tests/lint/build/review. It commits only when the ADR-059 candidate and current mutation-authority/claim predicate is satisfied; development validation is not a Git-side prerequisite.
 
@@ -5608,7 +5691,7 @@ Provides isolated merge/conflict state for `ConvergenceBase→convergence-unit` 
 
 ## 27.11 ConvergenceEngine / global reconciler
 
-Owns the top-level current-state reconciliation loop. Every sweep re-enumerates the complete known nonterminal managed-obligation universe, refreshes the exact state needed by those obligations, delegates classification to specialized reconcilers, schedules non-conflicting progressable operations, and repeats until the current global fixed point.
+Owns the authoritative top-level current-state reconciliation loop regardless of whether an optional conforming external execution mechanism is used under ADR-092. Every sweep re-enumerates the complete known nonterminal managed-obligation universe, refreshes the exact state needed by those obligations, delegates classification to specialized reconcilers, schedules non-conflicting progressable operations, and repeats until the current global fixed point.
 
 The internal Git graph remains:
 
