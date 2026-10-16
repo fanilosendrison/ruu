@@ -153,7 +153,7 @@ class StructuredGovernanceTests(unittest.TestCase):
         assert objects is not None
         self.assertEqual({"architecture_decisions"}, set(objects.interfaces))
         self.assertEqual(
-            {f"ADR-{number:03d}" for number in range(1, 92)},
+            {f"ADR-{number:03d}" for number in range(1, 94)},
             set(objects.interfaces["architecture_decisions"].objects),
         )
 

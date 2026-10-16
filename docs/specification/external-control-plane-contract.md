@@ -3,7 +3,7 @@
 - **Status:** Normative companion contract
 - **Introduced by:** ADR-039
 - **Date:** 2026-09-05
-- **Current amendments:** ADR-062 through ADR-090, as applicable
+- **Current amendments:** ADR-062 through ADR-093, as applicable
 
 ## 1. Purpose
 
@@ -11,7 +11,14 @@
 
 The External Control Plane is a **role**, not a required product, daemon, service, database, agent harness, or single process. It may be implemented by any combination of user-facing tooling, an orchestrator, an agent runtime, a provisioner, repository policy, or another component, provided the contract below is satisfied. **Architectural externality does not imply a second user-installed product:** under ADR-078, a Ruu distribution may supply integrations for supported coding harnesses that implement this role and its pre-edit provisioning automatically.
 
-`ruu` depends on this contract, not on Turnlock, `/go`, Pi, Claude Code, any particular agent, or any particular storage/backend implementation. A particular product distribution may nevertheless ship adapters for those harnesses so the user-facing workflow remains zero-preflight.
+Ruu does not require a named workflow runtime. Under ADR-092, Turnlock,
+a supported harness-native mechanism, an independent cognitive
+executor, or a compatible external service may realize an admitted
+execution capability without receiving Git/provider authority. The
+External Control Plane remains an abstract semantic authority role,
+not a workflow-derived Git truth source. A supported Ruu harness
+integration may implement the required ECP provisioning invisibly
+and keep the user-facing workflow zero-preflight.
 
 The boundary is:
 
@@ -50,6 +57,38 @@ For already-managed work, neither the caller's CWD nor the identity of the sessi
 This simplicity does not relax authority boundaries: the External Control Plane still owns semantic decisions and mutation handoff; `ruu` still fails closed on genuinely unknown/inconsistent authority or irreducible semantic conflict.
 
 ADR-070 also governs the dependency direction between core version control and provider publication. Provider submissions, review state, merge queues, protected-target APIs, and other hosting-specific objects are realization/projection facts over core exact Git/version state; they are not the source of core version identity or convergence truth when those facts can be established provider-independently.
+
+### 1.2 Capability-based cognitive execution and commit-message resources
+
+ADR-092 allows conforming execution resources, not a mandatory
+orchestration engine. A supported harness-native continuation, Turnlock
+integration, independent agent, raw model call, or other compatible
+external system may fulfill an admitted cognitive request. Neither
+Ruu nor the user is required to operate a separate workflow
+orchestrator for ordinary convergence.
+
+Ruu Core still owns the global current-state reconciler,
+CoordinationStore, run fencing, claims/CAS, exact effect journal,
+Git/provider observation, and crash recovery. A workflow cursor
+or model output is never Ruu reconciliation authority.
+
+Under ADR-093, the supported harness/External Control Plane supplies
+the authoritative association between an authored checkpoint and the
+originating session's actual main-agent lineage, when reachable and
+admissible. Only a conforming *continuation* mechanism may realize
+that default; a newly spawned model is not interchangeable.
+The ECP may supply scoped work-intent context and the user may
+choose an independent subagent, raw LLM inference, or any other
+compatible message-producing system. The session triggering a global
+sweep does not automatically own all involved ContributionUnits.
+
+The producer returns candidate message text only. Ruu durably fixes
+selected bytes and all OID-affecting metadata to the exact operation
+before a Git commit attempt. After an external wait, the reconciler
+independently revalidates exact parent/tree and mutation authority.
+The global run lock is not held across unbounded cognitive work;
+unavailable producers remain localized nonterminal obligations
+without silently selecting an unrelated session or service.
 
 ## 2. Responsibilities owned by the External Control Plane
 
@@ -700,6 +739,7 @@ exact local-Git / remote-Git / provider observation and revalidation under sourc
 fine-grained resource claims / CAS guards under the current fenced executor
 transition-local external-fact binding/currentness checks
 managed checkpoint adoption of an exact clean native tip, or checkpoint creation for a dirty surface, only at a frozen safely claimable handoff
+candidate-bound commit-message result capture and durable OID-affecting metadata freeze for new authored checkpoints, without transferring ref-mutation authority
 AuthoringDependency exact-object/source-lineage verification, recoverable anchor creation, durable adoption, target/same-group/source-handoff reconciliation, and localized realization blocking
 ContributionUnit candidate attribution by valid mutation-authority boundary (not process identity)
 ContributionUnit ↔ ConvergenceUnit synchronization/integration
@@ -728,6 +768,7 @@ Every global sweep that services outstanding convergence demand remains global o
 
 ```text
 what a task/feature/product intent means
+what semantic prose a selected external message producer returns for an authored checkpoint
 which agent/session/process is the producer identity
 whether an agent turn is finished
 why a ContributionUnit should exist

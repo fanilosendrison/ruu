@@ -155,6 +155,39 @@ Normative anchors: [EXTERNAL-CONTROL-PLANE-CONTRACT.md](../specification/externa
 
 ---
 
+### 3.1 Cognitive execution mechanisms are replaceable; Git authority is not
+
+ADR-092 requires externally realizable cognitive capabilities without
+mandating Turnlock or even a general workflow engine. A conforming
+Ruu integration may use a harness-native main-agent continuation,
+Turnlock workflow, direct LLM inference, an independent agent, an
+external service, or a suitable combination. Turnlock is an
+evaluated candidate, not a normative runtime dependency.
+
+The Ruu current-state reconciler retains the only authority over
+global obligations, legal Git/provider progression, exact effect
+journaling, claims/CAS, and managed adoption. An external execution
+mechanism can fulfill a request and raise fresh convergence demand,
+but its internal workflow history is never exact Git truth or
+a recovery root.
+
+ADR-093 makes authored dirty-checkpoint message generation configurable.
+The associated reachable genuine main-agent lineage is the default
+for interactive work; users can instead choose a subagent, raw LLM, or
+any compatible external producer. Ruu freezes the selected message
+to the exact checkpoint candidate/operation. Existing native commits
+remain intact and technical/synthetic commits remain deterministic.
+
+Unbounded cognitive work occurs outside the global run lock.
+Missing providers are localized while headless mechanical convergence
+and unrelated obligations continue. Invocation origin is not a
+substitute for source-session association.
+
+Normative anchors: [ADR-092](../adr/adr-092-allow-capability-based-cognitive-execution-without-mandatory-workflow-runtime.md),
+[ADR-093](../adr/adr-093-make-commit-message-providers-user-selectable-with-main-agent-default.md).
+
+---
+
 ## 4. Pre-edit authoring topology
 
 ### 4.1 ConvergenceBase and PromotionTarget are different concepts
