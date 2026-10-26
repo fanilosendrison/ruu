@@ -209,7 +209,7 @@ Git smoke replay requires Git 2.28.0 or newer. An older Git installation is an u
 ## Tool responsibilities
 
 - `docs/repository-governance/ruu-repository-integrity.md` owns Ruu's ordered current-state validation membership. `tools/check-repository-integrity.py` is its thin routed evaluator and does not own qualification replay.
-- `tools/check-git-whitespace.py` binds Ruu's whitespace obligation to the pinned `proto_ring.git_whitespace` mechanism; it contains no independent whitespace policy.
+- `tools/check-git-whitespace.py` binds Ruu's whitespace obligation to the native `git-whitespace.validate` compatibility operation; it contains no independent whitespace policy.
 - `tools/tests/test-projection-integrity.py` guards the immutable shared Projection Integrity binding and validates the derivable fields in Ruu's maintained ADR history directly against canonical ADR frontmatter.
 - `tools/adr-metadata.py` validates active ADR metadata and renders only the generated ADR index; it never rewrites source ADRs or qualification snapshots.
 - `tools/generate-qualification-lineage.py` generates only the retained path-aware lineage from the immutable snapshot.
@@ -224,12 +224,20 @@ Do not duplicate these responsibilities in ad hoc scripts.
 
 ## Mandatory validation
 
-Create an isolated Python 3 environment and install the pinned dependencies before validation:
+Create an isolated Python 3 environment, install Ruu's pinned Python dependencies, and explicitly prepare and verify the native provider before validation:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install --requirement requirements.txt
+
+.venv/bin/python -m pip install \
+  --requirement requirements.txt
+
+.venv/bin/python tools/prepare-proto-ring-provider.py
+
+.venv/bin/python tools/check-proto-ring-provider.py
 ```
+
+Provider preparation is bootstrap, not Repository Integrity.
 
 When ADR metadata changes and the profile requires the generated index, regenerate it first:
 
@@ -240,8 +248,9 @@ When ADR metadata changes and the profile requires the generated index, regenera
 After any intentional change, regenerate active metadata in this order:
 
 ```bash
-python3 tools/generate-qualification-lineage.py
-python3 tools/generate-current-manifest.py
+.venv/bin/python tools/generate-qualification-lineage.py
+
+.venv/bin/python tools/generate-current-manifest.py
 ```
 
 Repository Integrity is observational. Regeneration is preparation, not part of
@@ -250,9 +259,12 @@ then run Repository Integrity followed by the distinct qualification replays:
 
 ```bash
 .venv/bin/python tools/check-repository-integrity.py
-python3 tools/replay-historical-qualification.py latest
-python3 tools/replay-post-baseline-qualification.py
-python3 tools/replay-git-smokes.py
+
+.venv/bin/python tools/replay-historical-qualification.py latest
+
+.venv/bin/python tools/replay-post-baseline-qualification.py
+
+.venv/bin/python tools/replay-git-smokes.py
 ```
 
 The Ruu-owned profile invoked by `tools/check-repository-integrity.py` includes

@@ -3,359 +3,25 @@ from __future__ import annotations
 
 import argparse
 from datetime import date as calendar_date
-import json
 from pathlib import Path
 import re
-import subprocess
 import sys
 from typing import Any
 
 import yaml
-from proto_ring.canonical_adr import configured_profile_path
-from proto_ring.adr_metadata import (
-    AdrMetadataError,
-    decision_body_bytes,
-    h1_text as _h1,
-    load_json,
-    load_yaml,
-    parse_adr,
-    preserved_payload_bytes,
-    relation_target_errors,
-    repository_path,
-    require_mapping as _require_mapping,
-    require_string as _require_string,
-    require_string_list as _require_string_list,
-    schema_errors,
-    sha256_hex,
+from adr_metadata_migration import _migration_evidence_errors
+from adr_metadata_profile import RELATION_TYPES, load_profile
+from adr_metadata_rendering import render_index
+from adr_metadata_validation import _derived_identity, _h1_name, _load_schemas
+from proto_ring_adr_boundary import (
+    AdrMetadataError, configured_profile_path, decision_body_bytes,
+    h1_text as _h1, load_json, load_yaml, parse_adr, preserved_payload_bytes,
+    relation_target_errors, repository_path, require_mapping as _require_mapping,
+    require_string as _require_string, require_string_list as _require_string_list,
+    schema_errors, sha256_hex,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE_VERSION = "0.1.0"
-RELATION_TYPES = ("clarifies", "amends", "supersedes", "confirms")
-
-
-def load_profile(root: Path) -> dict[str, Any]:
-    profile_path = configured_profile_path(root)
-    profile = _require_mapping(load_yaml(profile_path), str(profile_path))
-    if profile.get("profile_version") != PROFILE_VERSION:
-        raise AdrMetadataError(
-            f"{profile_path} must use profile_version {PROFILE_VERSION}"
-        )
-
-    canonical = _require_mapping(profile.get("canonical_schema"), "canonical_schema")
-    for key in (
-        "id",
-        "repository",
-        "source_path",
-        "source_commit",
-        "sha256",
-        "vendored_path",
-    ):
-        _require_string(canonical.get(key), f"canonical_schema.{key}")
-    if not re.fullmatch(r"[0-9a-f]{40}", canonical["source_commit"]):
-        raise AdrMetadataError("canonical_schema.source_commit must be a full Git SHA")
-    if not re.fullmatch(r"[0-9a-f]{64}", canonical["sha256"]):
-        raise AdrMetadataError("canonical_schema.sha256 must be lowercase SHA-256")
-    if not canonical["repository"].startswith("https://"):
-        raise AdrMetadataError("canonical_schema.repository must use HTTPS")
-
-    overlay = _require_mapping(profile.get("local_overlay"), "local_overlay")
-    _require_string(overlay.get("id"), "local_overlay.id")
-    overlay_hash = _require_string(overlay.get("sha256"), "local_overlay.sha256")
-    if not re.fullmatch(r"[0-9a-f]{64}", overlay_hash):
-        raise AdrMetadataError("local_overlay.sha256 must be lowercase SHA-256")
-    _require_string(overlay.get("path"), "local_overlay.path")
-
-    repository = _require_mapping(profile.get("repository"), "repository")
-    for key in (
-        "display_name",
-        "domain",
-        "adr_directory",
-        "filename_pattern",
-        "id_pattern",
-        "preferred_h1_separator",
-    ):
-        _require_string(repository.get(key), f"repository.{key}")
-    if not isinstance(repository.get("id_width"), int) or repository["id_width"] < 1:
-        raise AdrMetadataError("repository.id_width must be a positive integer")
-    if repository.get("require_contiguous_ids") is not True:
-        raise AdrMetadataError("repository.require_contiguous_ids must be true")
-    if repository.get("retain_allocated_ids") is not True:
-        raise AdrMetadataError("repository.retain_allocated_ids must be true")
-    separators = _require_string_list(
-        repository.get("h1_separators"), "repository.h1_separators"
-    )
-    if repository["preferred_h1_separator"] not in separators:
-        raise AdrMetadataError(
-            "repository.preferred_h1_separator must be listed in h1_separators"
-        )
-    if not isinstance(repository.get("preferred_h1_from"), int) or repository[
-        "preferred_h1_from"
-    ] < 1:
-        raise AdrMetadataError("repository.preferred_h1_from must be a positive integer")
-    if repository.get("reject_future_dates") is not True:
-        raise AdrMetadataError("repository.reject_future_dates must be true")
-    non_adr = _require_string_list(
-        repository.get("non_adr_markdown"), "repository.non_adr_markdown"
-    )
-    if any(Path(name).name != name or not name.endswith(".md") for name in non_adr):
-        raise AdrMetadataError(
-            "repository.non_adr_markdown entries must be Markdown basenames"
-        )
-    try:
-        re.compile(repository["filename_pattern"])
-        re.compile(repository["id_pattern"])
-    except re.error as error:
-        raise AdrMetadataError(f"repository regex is invalid: {error}") from error
-
-    legacy = _require_mapping(profile.get("legacy"), "legacy")
-    _require_string_list(legacy.get("unstructured"), "legacy.unstructured")
-    _require_string_list(legacy.get("null_dates"), "legacy.null_dates")
-
-    generated_index = _require_mapping(profile.get("generated_index"), "generated_index")
-    _require_string(generated_index.get("path"), "generated_index.path")
-    if not isinstance(generated_index.get("required"), bool):
-        raise AdrMetadataError("generated_index.required must be boolean")
-
-    migration = _require_mapping(profile.get("migration_evidence"), "migration_evidence")
-    _require_string(migration.get("path"), "migration_evidence.path")
-    if not isinstance(migration.get("required"), bool):
-        raise AdrMetadataError("migration_evidence.required must be boolean")
-    _require_string_list(migration.get("ids"), "migration_evidence.ids")
-    baseline = migration.get("baseline_commit")
-    if migration["required"]:
-        if not isinstance(baseline, str) or not re.fullmatch(r"[0-9a-f]{40}", baseline):
-            raise AdrMetadataError(
-                "migration_evidence.baseline_commit must be a full Git SHA when required"
-            )
-    elif baseline is not None:
-        raise AdrMetadataError(
-            "migration_evidence.baseline_commit must be null when evidence is optional"
-        )
-
-    commands = _require_mapping(profile.get("commands"), "commands")
-    _require_string(commands.get("check"), "commands.check")
-    _require_string(commands.get("render"), "commands.render")
-    return profile
-
-
-def _h1_name(heading: str, adr_id: str, separators: list[str]) -> tuple[str, str]:
-    matches = [separator for separator in separators if heading.startswith(adr_id + separator)]
-    if len(matches) != 1:
-        raise AdrMetadataError(
-            f"H1 must use {adr_id} followed by one allowed separator, found {heading!r}"
-        )
-    separator = matches[0]
-    name = heading[len(adr_id + separator) :]
-    if not name:
-        raise AdrMetadataError("H1 decision name must not be empty")
-    return separator, name
-
-
-def _derived_identity(
-    path: Path, filename_pattern: re.Pattern[str], id_width: int
-) -> tuple[str, str, int]:
-    match = filename_pattern.fullmatch(path.name)
-    if match is None:
-        raise AdrMetadataError("filename does not match repository.filename_pattern")
-    number_text = match.group("number")
-    slug = match.group("slug")
-    if len(number_text) != id_width:
-        raise AdrMetadataError(f"filename number must use exactly {id_width} digits")
-    number = int(number_text)
-    if number < 1:
-        raise AdrMetadataError("ADR number must be positive")
-    return f"ADR-{number_text}", slug, number
-
-
-def _load_schemas(
-    root: Path, profile: dict[str, Any]
-) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
-    errors: list[str] = []
-    canonical = profile["canonical_schema"]
-    try:
-        vendored_path = repository_path(root, canonical["vendored_path"])
-        vendored_bytes = vendored_path.read_bytes()
-    except (AdrMetadataError, OSError) as error:
-        return {}, {}, [f"canonical schema: {error}"]
-
-    actual_hash = sha256_hex(vendored_bytes)
-    if actual_hash != canonical["sha256"]:
-        errors.append(
-            "vendored canonical schema SHA-256 mismatch: "
-            f"expected {canonical['sha256']}, found {actual_hash}"
-        )
-    try:
-        base = json.loads(vendored_bytes.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
-        errors.append(f"vendored canonical schema is invalid JSON: {error}")
-        base = {}
-    if not isinstance(base, dict):
-        errors.append("vendored canonical schema must be a JSON object")
-        base = {}
-    if base.get("$id") != canonical["id"]:
-        errors.append(
-            "vendored canonical schema $id mismatch: "
-            f"expected {canonical['id']}, found {base.get('$id')}"
-        )
-
-    try:
-        overlay_path = repository_path(root, profile["local_overlay"]["path"])
-        overlay_bytes = overlay_path.read_bytes()
-        overlay = json.loads(overlay_bytes.decode("utf-8"))
-    except (AdrMetadataError, OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
-        errors.append(f"local overlay: {error}")
-        overlay_bytes = b""
-        overlay = {}
-    if not isinstance(overlay, dict):
-        errors.append("local overlay schema must be a JSON object")
-        overlay = {}
-    overlay_hash = sha256_hex(overlay_bytes)
-    if overlay_hash != profile["local_overlay"]["sha256"]:
-        errors.append(
-            "local overlay SHA-256 mismatch: expected "
-            f"{profile['local_overlay']['sha256']}, found {overlay_hash}"
-        )
-    if not overlay:
-        errors.append("local overlay must be a non-empty JSON Schema")
-    if overlay.get("$id") != profile["local_overlay"]["id"]:
-        errors.append(
-            "local overlay $id mismatch: expected "
-            f"{profile['local_overlay']['id']}, found {overlay.get('$id')}"
-        )
-
-    properties = overlay.get("properties")
-    required = overlay.get("required")
-    if not isinstance(properties, dict):
-        properties = {}
-    if not isinstance(required, list):
-        required = []
-    expected_constraints = {
-        "adr_profile_version": ("const", profile["profile_version"]),
-        "domain": ("const", profile["repository"]["domain"]),
-        "id": ("pattern", profile["repository"]["id_pattern"]),
-    }
-    for field, (keyword, expected) in expected_constraints.items():
-        constraint = properties.get(field)
-        if not isinstance(constraint, dict) or constraint.get(keyword) != expected:
-            errors.append(f"local overlay {field} constraint mismatch")
-        if field not in required:
-            errors.append(f"local overlay must require {field}")
-    return base, overlay, errors
-
-
-def _git_baseline_blob(root: Path, commit: str, relative_path: str) -> bytes:
-    result = subprocess.run(
-        ["git", "-C", str(root), "show", f"{commit}:{relative_path}"],
-        check=False,
-        capture_output=True,
-    )
-    if result.returncode != 0:
-        detail = result.stderr.decode("utf-8", errors="replace").strip()
-        raise AdrMetadataError(
-            f"baseline commit {commit} cannot provide {relative_path}: {detail}"
-        )
-    return result.stdout
-
-
-def _migration_evidence_errors(
-    root: Path,
-    profile: dict[str, Any],
-    records_by_id: dict[str, dict[str, Any]],
-) -> list[str]:
-    section = profile["migration_evidence"]
-    if not section["required"]:
-        return []
-    errors: list[str] = []
-    try:
-        path = repository_path(root, section["path"])
-        evidence = _require_mapping(load_yaml(path), section["path"])
-    except AdrMetadataError as error:
-        return [f"migration evidence: {error}"]
-
-    baseline = section["baseline_commit"]
-    if evidence.get("schema_version") != 1:
-        errors.append("migration evidence must use schema_version 1")
-    if evidence.get("profile_version") != profile["profile_version"]:
-        errors.append("migration evidence profile_version mismatch")
-    if evidence.get("baseline_commit") != baseline:
-        errors.append("migration evidence baseline_commit does not match profile")
-
-    ancestor = subprocess.run(
-        ["git", "-C", str(root), "merge-base", "--is-ancestor", baseline, "HEAD"],
-        check=False,
-        capture_output=True,
-    )
-    if ancestor.returncode != 0:
-        detail = ancestor.stderr.decode("utf-8", errors="replace").strip()
-        errors.append(
-            f"migration baseline commit {baseline} is unavailable or not an ancestor"
-            + (f": {detail}" if detail else "")
-        )
-
-    expected = set(section["ids"])
-    entries = evidence.get("records")
-    if not isinstance(entries, list):
-        return errors + ["migration evidence records must be a list"]
-
-    seen: set[str] = set()
-    for entry in entries:
-        if not isinstance(entry, dict):
-            errors.append("migration evidence record must be a mapping")
-            continue
-        adr_id = entry.get("id")
-        if not isinstance(adr_id, str):
-            errors.append("migration evidence record id must be a string")
-            continue
-        if adr_id in seen:
-            errors.append(f"duplicate migration evidence record {adr_id}")
-        seen.add(adr_id)
-        record = records_by_id.get(adr_id)
-        if record is None:
-            errors.append(f"migration evidence references missing {adr_id}")
-            continue
-        if entry.get("path") != record["relative_path"]:
-            errors.append(f"migration evidence {adr_id} path mismatch")
-            continue
-
-        try:
-            baseline_bytes = _git_baseline_blob(
-                root, baseline, record["relative_path"]
-            )
-            baseline_payload = preserved_payload_bytes(baseline_bytes)
-            current_payload = preserved_payload_bytes(record["data"])
-            baseline_body = decision_body_bytes(baseline_bytes)
-        except AdrMetadataError as error:
-            errors.append(f"migration evidence {adr_id}: {error}")
-            continue
-
-        if current_payload != baseline_payload:
-            errors.append(
-                f"migration evidence {adr_id}: H1-to-EOF payload differs from baseline"
-            )
-
-        expected_hashes = {
-            "baseline_file_sha256": sha256_hex(baseline_bytes),
-            "baseline_payload_sha256": sha256_hex(baseline_payload),
-            "migrated_payload_sha256": sha256_hex(current_payload),
-            "before_decision_body_sha256": sha256_hex(baseline_body),
-            "after_decision_body_sha256": sha256_hex(record["body"]),
-        }
-        for field, expected_hash in expected_hashes.items():
-            if entry.get(field) != expected_hash:
-                errors.append(
-                    f"migration evidence {adr_id} {field} does not match actual bytes"
-                )
-
-    if seen != expected:
-        missing = sorted(expected - seen)
-        extra = sorted(seen - expected)
-        if missing:
-            errors.append("migration evidence missing IDs: " + ", ".join(missing))
-        if extra:
-            errors.append("migration evidence has unexpected IDs: " + ", ".join(extra))
-    return errors
-
 
 def collect_errors(root: Path, *, check_generated: bool = True) -> list[str]:
     root = root.resolve()
@@ -530,147 +196,6 @@ def collect_errors(root: Path, *, check_generated: bool = True) -> list[str]:
             errors.append(f"generated ADR index: {error}")
     return errors
 
-
-def _structured_records(root: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    profile = load_profile(root)
-    adr_directory = repository_path(root, profile["repository"]["adr_directory"])
-    filename_pattern = re.compile(profile["repository"]["filename_pattern"])
-    id_width = profile["repository"]["id_width"]
-    records: list[dict[str, Any]] = []
-    for path in sorted(adr_directory.glob("adr-*.md")):
-        adr_id, _, number = _derived_identity(path, filename_pattern, id_width)
-        try:
-            metadata, body = parse_adr(path)
-        except AdrMetadataError as error:
-            raise AdrMetadataError(
-                f"cannot render while {adr_id} is unstructured: {error}"
-            ) from error
-        records.append(
-            {
-                "id": adr_id,
-                "number": number,
-                "path": path,
-                "relative_path": path.relative_to(root).as_posix(),
-                "metadata": metadata,
-                "body": body,
-            }
-        )
-    records.sort(key=lambda record: record["number"])
-    return profile, records
-
-
-def _markdown_cell(value: str) -> str:
-    return value.replace("\\", "\\\\").replace("|", "\\|").replace("\n", "<br>")
-
-
-def render_index(root: Path) -> str:
-    profile, records = _structured_records(root.resolve())
-    repository = profile["repository"]
-    domain = repository["domain"]
-    display_name = repository["display_name"]
-    incomplete = any(
-        record["metadata"]["relation_completeness"] == "legacy-partial"
-        for record in records
-    )
-    lines = [
-        "---",
-        'okf_version: "1.0"',
-        'kind: "KnowledgeAsset"',
-        'asset_type: "generated-architecture-decision-index"',
-        f'domain: "{domain}"',
-        'severity: "strict"',
-        f'name: "Generated {display_name} Architecture Decision Record index"',
-        "---",
-        "",
-        f"# Generated {display_name} Architecture Decision Record index",
-        "",
-        "> Generated by `tools/adr-metadata.py`. Do not edit manually.",
-        "> Source frontmatter stores outgoing relations; incoming relations below",
-        "> are derived only from those recorded assertions.",
-    ]
-    if incomplete:
-        lines.extend(
-            [
-                "> The relation graph is incomplete while any ADR is marked",
-                "> `legacy-partial`; retained historical prose remains necessary context.",
-            ]
-        )
-    lines.extend(
-        [
-            "",
-            "## Decisions",
-            "",
-            "| ID | Decision | Status | Date | Relation coverage | Governs |",
-            "|---|---|---|---|---|---|",
-        ]
-    )
-    path_by_id = {record["id"]: record["path"].name for record in records}
-    for record in records:
-        metadata = record["metadata"]
-        date = metadata["date"] if metadata["date"] is not None else "Unknown"
-        governed_scopes = "<br>".join(
-            _markdown_cell(scope) for scope in metadata["governs"]
-        ) or "—"
-        lines.append(
-            f"| [{record['id']}]({record['path'].name}) | "
-            f"{_markdown_cell(metadata['name'])} | {metadata['status']} | {date} | "
-            f"{metadata['relation_completeness']} | {governed_scopes} |"
-        )
-
-    outgoing: list[tuple[str, str, str]] = []
-    incoming: list[tuple[str, str, str]] = []
-    inverse = {
-        "clarifies": "clarified by",
-        "amends": "amended by",
-        "supersedes": "superseded by",
-        "confirms": "confirmed by",
-    }
-    for record in records:
-        relations = record["metadata"]["relations"]
-        for relation_type in RELATION_TYPES:
-            for target in relations[relation_type]:
-                outgoing.append((record["id"], relation_type, target))
-                incoming.append((target, inverse[relation_type], record["id"]))
-
-    lines.extend(
-        [
-            "",
-            "## Recorded outgoing relations",
-            "",
-            "| Source | Relation | Target |",
-            "|---|---|---|",
-        ]
-    )
-    if outgoing:
-        for source, relation, target in sorted(outgoing):
-            lines.append(
-                f"| [{source}]({path_by_id[source]}) | {relation} | "
-                f"[{target}]({path_by_id[target]}) |"
-            )
-    else:
-        lines.append("| — | — | — |")
-
-    lines.extend(
-        [
-            "",
-            "## Derived incoming relations",
-            "",
-            "| Target | Relation | Source |",
-            "|---|---|---|",
-        ]
-    )
-    if incoming:
-        for target, relation, source in sorted(incoming):
-            lines.append(
-                f"| [{target}]({path_by_id[target]}) | {relation} | "
-                f"[{source}]({path_by_id[source]}) |"
-            )
-    else:
-        lines.append("| — | — | — |")
-    lines.append("")
-    return "\n".join(lines)
-
-
 def check_command(root: Path) -> int:
     errors = collect_errors(root)
     if errors:
@@ -682,7 +207,6 @@ def check_command(root: Path) -> int:
     legacy_count = len(profile["legacy"]["unstructured"])
     print(f"ADR metadata: OK ({len(records)} structured, {legacy_count} unstructured)")
     return 0
-
 
 def _structured_records_if_possible(
     root: Path,
@@ -699,7 +223,6 @@ def _structured_records_if_possible(
             metadata, body = parse_adr(path)
             records.append({"path": path, "metadata": metadata, "body": body})
     return profile, records
-
 
 def render_command(root: Path) -> int:
     errors = collect_errors(root, check_generated=False)
@@ -719,13 +242,11 @@ def render_command(root: Path) -> int:
     print(f"Rendered {output_path.relative_to(root)}")
     return 0
 
-
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate and render Ruu ADR metadata")
     parser.add_argument("command", choices=("check", "render"))
     parser.add_argument("--root", type=Path, default=ROOT)
     return parser.parse_args(argv)
-
 
 def main(argv: list[str] | None = None) -> int:
     arguments = parse_args(argv)

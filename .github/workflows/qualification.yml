@@ -32,6 +32,9 @@ jobs:
           python3 -m pip install --requirement requirements.txt
           python3 -m pip check
 
+      - name: Prepare exact native Proto-Ring provider
+        run: python3 tools/prepare-proto-ring-provider.py
+
       - name: Verify exact proto-ring provider pin
         run: python3 tools/check-proto-ring-provider.py
 

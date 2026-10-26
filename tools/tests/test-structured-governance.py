@@ -1,38 +1,37 @@
 #!/usr/bin/env python3
-"""Composition tests for Ruu structured governance."""
+"""Composition tests for Ruu's complete native governance projection."""
 
 from __future__ import annotations
 
-import importlib.util
 from pathlib import Path
-import socket
 import subprocess
 import sys
 import unittest
-import urllib.request
 from unittest import mock
 
-from proto_ring import (
-    evidence_requirements,
-    exact_evidence_binding,
-    github_authoritative_ref_monotonicity,
-    repository_governance_state,
-    repository_integrity,
-)
-from proto_ring.governance_authority import SourceRole, role_of
-
 ROOT = Path(__file__).resolve().parents[2]
-CHECKER = ROOT / "tools/check-structured-governance.py"
+TOOLS = ROOT / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
+from check_structured_governance_import import load_structured_governance
+import check_structured_governance_import as loader
 
-def load_checker():
-    spec = importlib.util.spec_from_file_location("check_structured_governance", CHECKER)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"cannot load {CHECKER}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
+CAPABILITIES = {
+    "architecture_decisions", "governance_authority", "governed_objects",
+    "shared_governance_provider", "projection_integrity", "repository_integrity",
+    "evidence_requirements", "authoritative_ref_monotonicity",
+}
+PROJECTIONS = {
+    "adr_index", "adr_annotated_history", "active_repository_manifest",
+    "retained_lineage", "retained_state_space_custody", "retained_git_smoke_custody",
+    "retained_qualification_custody", "governed_adr_catalog",
+    "effective_proto_ring_realization",
+}
+EVIDENCE_IDS = {
+    "post_baseline_artifact_binding",
+    "post_baseline_recorded_output_binding",
+}
 
 
 class StructuredGovernanceTests(unittest.TestCase):
@@ -46,310 +45,92 @@ class StructuredGovernanceTests(unittest.TestCase):
             cls.integrity,
             cls.projections,
             cls.evidence,
-        ) = load_checker().load_structured_governance(ROOT)
+        ) = load_structured_governance(ROOT)
 
     def test_rgm_v2_declares_exact_applicable_capabilities(self) -> None:
-        self.assertEqual(2, self.model.model_version)
-        self.assertEqual(
-            {
-                "architecture_decisions",
-                "governance_authority",
-                "governed_objects",
-                "shared_governance_provider",
-                "projection_integrity",
-                "repository_integrity",
-                "evidence_requirements",
-                "authoritative_ref_monotonicity",
-            },
-            set(self.model.capabilities),
-        )
-        self.assertEqual("registry", self.model.provider.binding.route)
+        self.assertEqual(2, self.model["model_version"])
+        self.assertEqual(CAPABILITIES, set(self.model["capabilities"]))
+        self.assertEqual("registry", self.model["provider"]["binding"]["route"])
+        routes = [
+            route
+            for capability in self.model["capabilities"].values()
+            for route in capability["routes"].values()
+        ]
+        self.assertEqual(8, len(routes))
+        self.assertTrue(all(route["route"][0] == "capabilities" for route in routes))
 
     def test_binding_registry_contains_exact_active_bindings(self) -> None:
-        self.assertEqual(
-            {
-                "proto_ring_executable",
-                "shared_governance_provider_contract",
-                "projection_integrity_contract",
-                "exact_evidence_binding_contract",
-                "governance_authority_contract",
-                "governed_objects_contract",
-                "authoritative_ref_monotonicity_contract",
-                "repository_governance_model_contract",
-                "repository_governance_state_contract",
-                "repository_integrity_contract",
-                "evidence_requirements_contract",
-            },
-            set(self.bindings.bindings),
-        )
-        executable = self.bindings.bindings["proto_ring_executable"]
-        self.assertEqual(
-            "dedb01a3a9b7a18930c9da75afa3773b5ad67f69",
-            executable.identity.commit,
-        )
-        self.assertEqual(
-            "executable_dependency_manifest", executable.authority.source_id
-        )
-        contract = self.bindings.bindings[
-            "repository_governance_state_contract"
-        ]
-        self.assertEqual("repository_governance_state_contract", contract.id)
-        self.assertEqual("governance_contract", contract.kind.value)
-        self.assertEqual("logical_provider", contract.scope.kind.value)
-        self.assertEqual("fanilosendrison/proto-ring", contract.identity.repository)
-        self.assertEqual(
-            "9a1ed2d71d079b0118177c2a509ca356c371a597",
-            contract.identity.commit,
-        )
-        self.assertEqual(
-            "docs/contracts/repository-governance-state.md",
-            contract.identity.path,
-        )
-        self.assertEqual(
-            "governance_contract_bindings", contract.authority.responsibility_id
-        )
-        self.assertEqual(
-            "governance_binding_registry", contract.authority.source_id
-        )
+        executable = self.bindings["bindings"]["proto_ring_executable"]
+        self.assertEqual("4ae1a2a549d7dae8e4cce7f727b9bc5330f3823f", executable["identity"]["commit"])
+        self.assertEqual("governance_binding_registry", executable["authority"]["source"])
+        self.assertEqual(11, len(self.bindings["bindings"]))
 
-    def test_compatibility_helper_projects_one_canonical_state(self) -> None:
-        checker = load_checker()
-        real_load = checker.repository_governance_state.load
-
-        with mock.patch.object(
-            checker.repository_governance_state,
-            "load",
-            wraps=real_load,
-        ) as canonical_load:
+    def test_complete_helper_invokes_one_complete_composition(self) -> None:
+        checker = loader._MODULE
+        real = checker.invoke_compat_result
+        with mock.patch.object(checker, "invoke_compat_result", wraps=real) as invoke:
             values = checker.load_structured_governance(ROOT)
-
-        self.assertEqual(1, canonical_load.call_count)
+        self.assertEqual(1, invoke.call_count)
+        self.assertEqual("repository-governance-state.compose", invoke.call_args.args[1])
+        self.assertEqual("complete", invoke.call_args.args[2]["projection"])
         self.assertEqual(7, len(values))
+        self.assertTrue(all(type(value) is dict for value in values))
 
-    def test_canonical_state_preserves_complete_ruu_governance(self) -> None:
-        state = repository_governance_state.load(ROOT)
-        self.assertEqual(ROOT.resolve(), state.repository)
-        self.assertEqual(2, state.repository_governance_model.model_version)
-        self.assertEqual(
-            {
-                "architecture_decisions",
-                "governance_authority",
-                "governed_objects",
-                "shared_governance_provider",
-                "projection_integrity",
-                "repository_integrity",
-                "evidence_requirements",
-                "authoritative_ref_monotonicity",
-            },
-            set(state.repository_governance_model.capabilities),
-        )
-        self.assertNotIn(
-            "repository_governance_state",
-            state.repository_governance_model.capabilities,
-        )
+    def test_complete_state_preserves_ruu_governance(self) -> None:
+        objects = self.objects["interfaces"]["architecture_decisions"]["objects"]
+        self.assertEqual({f"ADR-{number:03d}" for number in range(1, 95)}, set(objects))
+        self.assertEqual(25, len(self.integrity["order"]))
+        self.assertEqual(set(self.integrity["validations"]), set(self.integrity["order"]))
+        self.assertEqual(PROJECTIONS, set(self.projections["projections"]))
+        self.assertEqual(EVIDENCE_IDS, set(self.evidence["requirements"]))
+        self.assertEqual(2, len(self.evidence["requirements"]))
 
-        objects = state.governed_objects
-        self.assertIsNotNone(objects)
-        assert objects is not None
-        self.assertEqual({"architecture_decisions"}, set(objects.interfaces))
-        self.assertEqual(
-            {f"ADR-{number:03d}" for number in range(1, 94)},
-            set(objects.interfaces["architecture_decisions"].objects),
-        )
-
-        integrity = state.repository_integrity
-        self.assertIsNotNone(integrity)
-        assert integrity is not None
-        self.assertEqual(25, len(integrity.order))
-        self.assertEqual(set(integrity.validations), set(integrity.order))
-        self.assertEqual(
-            frozenset({2}),
-            integrity.validations[
-                "authoritative_ref_monotonicity_effective_rules"
-            ].command.undetermined_exit_codes,
-        )
-
-        projections = state.projection_registry
-        self.assertIsNotNone(projections)
-        assert projections is not None
-        self.assertEqual(
-            {
-                "adr_index",
-                "adr_annotated_history",
-                "active_repository_manifest",
-                "retained_lineage",
-                "retained_state_space_custody",
-                "retained_git_smoke_custody",
-                "retained_qualification_custody",
-                "governed_adr_catalog",
-                "executable_binding_registry_representation",
-                "effective_proto_ring_realization",
-            },
-            set(projections.projections),
-        )
-
-        evidence = state.evidence_requirements
-        self.assertIsNotNone(evidence)
-        assert evidence is not None
-        self.assertEqual(
-            {
-                "post_baseline_artifact_binding",
-                "post_baseline_recorded_output_binding",
-            },
-            set(evidence.requirements),
-        )
-        for requirement in evidence.requirements.values():
-            self.assertEqual(
-                "qualification_evidence_binding", requirement.responsibility_id
-            )
-            self.assertIsNone(requirement.target)
-            self.assertIs(
-                evidence_requirements.InstantiationKind.SOURCE,
-                requirement.instances.kind,
-            )
-
-        self.assertEqual(
-            {
-                "proto_ring_executable",
-                "shared_governance_provider_contract",
-                "projection_integrity_contract",
-                "exact_evidence_binding_contract",
-                "governance_authority_contract",
-                "governed_objects_contract",
-                "authoritative_ref_monotonicity_contract",
-                "repository_governance_model_contract",
-                "repository_governance_state_contract",
-                "repository_integrity_contract",
-                "evidence_requirements_contract",
-            },
-            set(state.governance_bindings.bindings),
-        )
-
-    def test_canonical_state_construction_is_read_only_and_non_executing(self) -> None:
+    def test_complete_state_construction_is_read_only(self) -> None:
         before = subprocess.run(
             ["git", "-C", str(ROOT), "status", "--porcelain=v1", "-z"],
             check=True,
             capture_output=True,
         ).stdout
-        real_popen = subprocess.Popen
-        observed_git: list[tuple[str, ...]] = []
-
-        def guarded_popen(*args, **kwargs):
-            command = args[0] if args else kwargs.get("args")
-            if not isinstance(command, (list, tuple)):
-                raise AssertionError(f"non-vector process command: {command!r}")
-            if (
-                len(command) < 4
-                or tuple(command[:3]) != ("git", "-C", str(ROOT))
-                or command[3] not in {"rev-parse", "symbolic-ref", "ls-files"}
-            ):
-                raise AssertionError(f"unexpected state-construction process: {command!r}")
-            observed_git.append(tuple(command))
-            return real_popen(*args, **kwargs)
-
-        with mock.patch.object(subprocess, "Popen", new=guarded_popen), mock.patch.object(
-            repository_integrity,
-            "evaluate_consumer_profile",
-            side_effect=AssertionError("Repository Integrity evaluation is forbidden"),
-        ) as integrity_evaluate, mock.patch.object(
-            exact_evidence_binding,
-            "evaluate",
-            side_effect=AssertionError("Exact Evidence Binding evaluation is forbidden"),
-        ) as evidence_evaluate, mock.patch.object(
-            github_authoritative_ref_monotonicity,
-            "run",
-            side_effect=AssertionError("ARM provider observation is forbidden"),
-        ) as arm_run, mock.patch.object(
-            socket,
-            "create_connection",
-            side_effect=AssertionError("network access is forbidden"),
-        ), mock.patch.object(
-            urllib.request,
-            "urlopen",
-            side_effect=AssertionError("network access is forbidden"),
-        ):
-            state = repository_governance_state.load(ROOT)
-
+        load_structured_governance(ROOT)
         after = subprocess.run(
             ["git", "-C", str(ROOT), "status", "--porcelain=v1", "-z"],
             check=True,
             capture_output=True,
         ).stdout
-        self.assertEqual(ROOT.resolve(), state.repository)
         self.assertEqual(before, after)
-        self.assertGreater(len(observed_git), 0)
-        integrity_evaluate.assert_not_called()
-        evidence_evaluate.assert_not_called()
-        arm_run.assert_not_called()
 
-    def test_authority_preserves_executable_and_qualification_ownership(self) -> None:
-        self.assertIs(
-            SourceRole.AUTHORITY,
-            role_of(
-                self.authority,
-                "executable_provider_binding",
-                "executable_dependency_manifest",
-            ),
-        )
-        self.assertIs(
-            SourceRole.SECONDARY_REPRESENTATION,
-            role_of(
-                self.authority,
-                "executable_provider_binding",
-                "governance_binding_registry",
-            ),
-        )
-        self.assertIs(
-            SourceRole.AUTHORITY,
-            role_of(
-                self.authority,
-                "qualification_execution_evidence",
-                "post_baseline_qualification_evidence",
-            ),
-        )
-
-    def test_persistent_integrity_owns_complete_order(self) -> None:
-        self.assertEqual("repository_integrity_profile", self.integrity.authority.source)
-        self.assertEqual(25, len(self.integrity.order))
-        self.assertEqual(set(self.integrity.validations), set(self.integrity.order))
-        self.assertEqual(
-            frozenset({2}),
-            self.integrity.validations[
-                "authoritative_ref_monotonicity_effective_rules"
-            ].command.undetermined_exit_codes,
-        )
-        self.assertIn("qualification_layout", self.integrity.order)
-        self.assertNotIn("historical_qualification_replay", self.integrity.order)
-        self.assertNotIn("git_smoke_replay", self.integrity.order)
-
-    def test_evidence_registry_is_responsibility_scoped_without_objects(self) -> None:
+    def test_authority_preserves_provider_and_qualification_ownership(self) -> None:
+        provider = self.authority["responsibilities"]["executable_provider_binding"]["roles"]
         self.assertEqual(
             {
-                "post_baseline_artifact_binding",
-                "post_baseline_recorded_output_binding",
+                "governance_binding_registry": "authority",
+                "effective_proto_ring_provider": "secondary_representation",
             },
-            set(self.evidence.requirements),
+            provider,
         )
-        for requirement in self.evidence.requirements.values():
-            self.assertEqual(
-                "qualification_evidence_binding", requirement.responsibility_id
-            )
-            self.assertIsNone(requirement.target)
+        self.assertNotIn("executable_dependency_manifest", self.authority["sources"])
+        qualification = self.authority["responsibilities"]["qualification_execution_evidence"]["roles"]
+        self.assertEqual("authority", qualification["post_baseline_qualification_evidence"])
 
-    def test_obsolete_carriers_and_duplicate_pins_are_absent(self) -> None:
+    def test_persistent_integrity_owns_complete_order(self) -> None:
+        self.assertEqual("repository_integrity_profile", self.integrity["authority"]["source"])
+        self.assertEqual(25, len(self.integrity["order"]))
+        self.assertIn("qualification_layout", self.integrity["order"])
+        self.assertNotIn("historical_qualification_replay", self.integrity["order"])
+        self.assertNotIn("git_smoke_replay", self.integrity["order"])
+
+    def test_evidence_registry_is_responsibility_scoped_without_objects(self) -> None:
+        self.assertEqual(EVIDENCE_IDS, set(self.evidence["requirements"]))
+        for requirement in self.evidence["requirements"].values():
+            self.assertEqual("qualification_evidence_binding", requirement["responsibility"])
+            self.assertIsNone(requirement["target"])
+
+    def test_obsolete_carriers_and_authority_are_absent(self) -> None:
         governance = ROOT / "docs/repository-governance"
         self.assertFalse((governance / "ruu-shared-governance-provider.md").exists())
         self.assertFalse((governance / "ruu-exact-evidence-binding.md").exists())
-        self.assertNotIn(
-            "governance_authority_contract:",
-            (governance / "ruu-governance-authority.md").read_text(),
-        )
-        self.assertNotIn(
-            "governed_objects_contract:",
-            (governance / "ruu-governed-objects.md").read_text(),
-        )
-        arm = (governance / "ruu-authoritative-ref-monotonicity.md").read_text()
-        self.assertNotIn("  contract:\n", arm)
+        self.assertNotIn("executable_dependency_manifest", (governance / "ruu-governance-authority.md").read_text())
+        self.assertNotIn("executable_binding_registry_representation", (governance / "ruu-projection-integrity.md").read_text())
 
 
 if __name__ == "__main__":

@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
 """Validate the routed Ruu Governed Objects profile."""
 
-from __future__ import annotations
-
 from pathlib import Path
 import sys
 
-from proto_ring import governed_objects, repository_governance_state
-
+from proto_ring_executable_binding import ProtoRingExecutableError, invoke_compat_result
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def main() -> int:
+def check(root: Path = ROOT) -> list[str]:
     try:
-        state = repository_governance_state.load(ROOT)
-        objects = state.governed_objects
-        if objects is None:
-            raise governed_objects.GovernedObjectsError(
-                "governed_objects capability is required"
-            )
-    except (
-        repository_governance_state.RepositoryGovernanceStateError,
-        governed_objects.GovernedObjectsError,
-    ) as error:
-        print(f"ERROR: governed objects: {error}", file=sys.stderr)
-        return 1
+        value = invoke_compat_result(
+            root, "repository-governance-state.compose", {"repository": str(root)}
+        )
+    except ProtoRingExecutableError as error:
+        return [str(error)]
+    return [] if value["components"].get("governed_objects") is True else [
+        "canonical governance state has no Governed Objects profile"
+    ]
 
+
+def main() -> int:
+    errors = check()
+    if errors:
+        for error in errors:
+            print(f"ERROR: governed objects: {error}", file=sys.stderr)
+        return 1
     print("governed objects: OK")
     return 0
 

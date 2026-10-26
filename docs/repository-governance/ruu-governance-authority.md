@@ -52,8 +52,6 @@ governance_authority:
       repository_target: "tools/generate-current-manifest.py"
     governance_binding_registry:
       repository_target: "docs/repository-governance/ruu-governance-bindings.md"
-    executable_dependency_manifest:
-      repository_target: "requirements.txt"
     effective_proto_ring_provider: {}
     projection_registry:
       repository_target: "docs/repository-governance/ruu-projection-integrity.md"
@@ -158,8 +156,7 @@ governance_authority:
       precedence: []
     executable_provider_binding:
       roles:
-        executable_dependency_manifest: authority
-        governance_binding_registry: secondary_representation
+        governance_binding_registry: authority
         effective_proto_ring_provider: secondary_representation
       precedence: []
     projection_registry_declaration:

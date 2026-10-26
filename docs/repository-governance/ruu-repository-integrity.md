@@ -96,7 +96,7 @@ repository_integrity:
       responsibility: repository_validation_membership_order
       prerequisites: []
       instances: {kind: single}
-      command: {kind: command, environment: ruu_python, arguments: [-m, proto_ring.accepted_adr_body], undetermined_exit_codes: []}
+      command: {kind: command, environment: ruu_python, arguments: [tools/check-accepted-adr-body.py], undetermined_exit_codes: []}
     proto_ring_binding_registry_currentness:
       responsibility: repository_validation_membership_order
       prerequisites: []

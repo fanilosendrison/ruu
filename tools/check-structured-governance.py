@@ -1,36 +1,53 @@
 #!/usr/bin/env python3
-"""Validate Ruu's routed structured governance declarations."""
+"""Consume Ruu's complete routed governance state through native proto-ring."""
 
 from __future__ import annotations
 
 from pathlib import Path
 import sys
 
-from proto_ring import repository_governance_state
+from proto_ring_executable_binding import ProtoRingExecutableError, invoke_compat_result
 
 ROOT = Path(__file__).resolve().parents[1]
+_COMPONENTS = (
+    "repository_governance_model",
+    "governance_authority",
+    "governed_objects",
+    "governance_bindings",
+    "repository_integrity",
+    "projection_registry",
+    "evidence_requirements",
+)
 
 
-def load_structured_governance(root: Path = ROOT):
-    """Project Ruu declarations from one canonical RepositoryGovernanceState."""
+def load_structured_governance(root: Path = ROOT) -> tuple[dict[str, object], ...]:
+    """Return the seven plain complete-state components in historical tuple order."""
 
-    state = repository_governance_state.load(root)
-    return (
-        state.repository_governance_model,
-        state.governance_authority,
-        state.governed_objects,
-        state.governance_bindings,
-        state.repository_integrity,
-        state.projection_registry,
-        state.evidence_requirements,
+    value = invoke_compat_result(
+        root,
+        "repository-governance-state.compose",
+        {"repository": str(root), "projection": "complete"},
     )
+    state = value["state"]
+    components = tuple(state[name] for name in _COMPONENTS)
+    if not all(isinstance(component, dict) for component in components):
+        raise ProtoRingExecutableError("complete governance state requires seven components")
+    return components
+
+
+def check(root: Path = ROOT) -> list[str]:
+    try:
+        load_structured_governance(root)
+    except ProtoRingExecutableError as error:
+        return [str(error)]
+    return []
 
 
 def main() -> int:
-    try:
-        load_structured_governance()
-    except repository_governance_state.RepositoryGovernanceStateError as error:
-        print(f"ERROR: structured governance: {error}", file=sys.stderr)
+    errors = check()
+    if errors:
+        for error in errors:
+            print(f"ERROR: structured governance: {error}", file=sys.stderr)
         print("structured governance: FAILED", file=sys.stderr)
         return 1
     print("structured governance: OK")

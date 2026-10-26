@@ -566,6 +566,12 @@ governed_objects:
           - product_semantics
           - accepted_decisions
           relations: []
+        ADR-094:
+          responsibilities:
+          - adr_metadata
+          - product_semantics
+          - accepted_decisions
+          relations: []
 ---
 
 # Ruu Governed Objects profile

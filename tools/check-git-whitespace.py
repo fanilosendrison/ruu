@@ -1,31 +1,62 @@
 #!/usr/bin/env python3
-"""Bind Ruu's whitespace obligation to the pinned proto-ring provider."""
+"""Validate Git whitespace through native proto-ring."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
+import subprocess
+import sys
 from typing import Mapping
 
-from proto_ring import git_whitespace
+from proto_ring_executable_binding import ProtoRingExecutableError, invoke_compat_result
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def check(repository: Path, *, env: Mapping[str, str]) -> list[str]:
-    """Evaluate Ruu's whitespace obligation through the shared mechanism."""
+def _local_diagnostics(root: Path, domains: list[str]) -> list[str]:
+    commands = {
+        "unstaged": ["git", "-C", str(root), "diff", "--check"],
+        "staged": ["git", "-C", str(root), "diff", "--cached", "--check"],
+    }
+    diagnostics: list[str] = []
+    for domain in domains:
+        command = commands.get(domain)
+        if command is None:
+            diagnostics.append(f"whitespace domain: {domain}")
+            continue
+        result = subprocess.run(command, check=False, capture_output=True, text=True)
+        lines = [line for line in result.stdout.splitlines() if line]
+        diagnostics.extend(lines or [f"whitespace domain: {domain}"])
+    return diagnostics
 
-    return git_whitespace.check(repository, env=env)
+
+def check(repository: Path = ROOT, *, env: Mapping[str, str] = os.environ) -> list[str]:
+    try:
+        value = invoke_compat_result(
+            ROOT,
+            "git-whitespace.validate",
+            {"repository": str(repository), "environment": dict(env)},
+        )
+    except ProtoRingExecutableError as error:
+        return [str(error)]
+    status, domains = value.get("status"), value.get("domains")
+    if status == "PASS" and domains == []:
+        return []
+    if status == "NON_PASS" and isinstance(domains, list) and all(
+        isinstance(domain, str) for domain in domains
+    ):
+        return _local_diagnostics(repository, domains or ["unspecified"])
+    return ["provider returned an invalid Git whitespace status"]
 
 
 def main() -> int:
-    errors = check(ROOT, env=os.environ)
+    errors = check()
     if errors:
         print("git whitespace check: FAILED")
         for error in errors:
             print(error)
         return 1
-
     print("git whitespace check: OK")
     return 0
 

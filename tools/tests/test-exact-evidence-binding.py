@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for Ruu's routed post-baseline evidence requirements."""
+"""Tests for Ruu-owned post-baseline policy over native exact binding."""
 
 from __future__ import annotations
 
@@ -12,9 +12,6 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
-
-from proto_ring import evidence_requirements
-from proto_ring.exact_evidence_binding import BindingStatus
 
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
@@ -35,93 +32,77 @@ class ExactEvidenceBindingTests(unittest.TestCase):
         recorded = self.policies.recorded_output
         self.assertEqual("post_baseline_artifact_binding", artifact.id)
         self.assertEqual("post_baseline_recorded_output_binding", recorded.id)
-        self.assertIs(
-            evidence_requirements.EvidenceClassKind.SOURCE,
-            artifact.evidence_classes.kind,
-        )
-        self.assertEqual(
-            frozenset({"recorded_output"}),
-            recorded.evidence_classes.explicit_classes,
-        )
+        self.assertEqual("source", artifact.evidence_classes.kind)
+        self.assertEqual(frozenset({"recorded_output"}), recorded.evidence_classes.classes)
         for requirement in (artifact, recorded):
-            self.assertIs(
-                evidence_requirements.InstantiationKind.SOURCE,
-                requirement.instances.kind,
-            )
+            self.assertEqual("source", requirement.instances.kind)
             self.assertFalse(requirement.context.required)
             self.assertIsNone(requirement.target)
 
     def test_exact_sha_binding_matches_and_mismatches(self) -> None:
         digest = "a" * 64
-        self.assertIs(
-            policies.binding_status(self.policies.artifact, "report", digest, digest),
-            BindingStatus.MATCH,
-        )
-        self.assertIs(
-            policies.binding_status(
-                self.policies.artifact, "report", "a" * 64, "b" * 64
-            ),
-            BindingStatus.MISMATCH,
+        self.assertEqual("MATCH", policies.binding_status(self.policies.artifact, "report", digest, digest))
+        self.assertEqual(
+            "MISMATCH",
+            policies.binding_status(self.policies.artifact, "report", "a" * 64, "b" * 64),
         )
 
     def test_recorded_output_uses_its_distinct_requirement(self) -> None:
         digest = "a" * 64
-        self.assertIs(
-            policies.binding_status(
-                self.policies.recorded_output,
-                "recorded_output",
-                digest,
-                digest,
-            ),
-            BindingStatus.MATCH,
+        self.assertEqual(
+            "MATCH",
+            policies.binding_status(self.policies.recorded_output, "recorded_output", digest, digest),
         )
-        self.assertIs(
-            policies.binding_status(
-                self.policies.recorded_output, "report", digest, digest
-            ),
-            BindingStatus.MISMATCH,
+        self.assertEqual(
+            "MISMATCH",
+            policies.binding_status(self.policies.recorded_output, "report", digest, digest),
         )
+
+    def test_ascii_sha_identity_is_hex_encoded_text(self) -> None:
+        digest = "a" * 64
+        with mock.patch.object(
+            policies,
+            "invoke_compat_result",
+            return_value={"status": "MATCH"},
+        ) as invoke:
+            self.assertEqual(
+                "MATCH",
+                policies.binding_status(self.policies.artifact, "report", digest, digest),
+            )
+        payload = invoke.call_args.args[2]
+        self.assertEqual(digest.encode("ascii").hex(), payload["requirement"]["subject_hex"])
+        self.assertEqual(digest.encode("ascii").hex(), payload["binding"]["subject_hex"])
+        self.assertNotEqual(digest, payload["requirement"]["subject_hex"])
 
     def test_ruu_keeps_sha256_construction_local(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             artifact = Path(temporary) / "artifact.txt"
             artifact.write_bytes(b"Ruu-owned bytes\n")
-            self.assertEqual(
-                hashlib.sha256(artifact.read_bytes()).hexdigest(),
-                postbaseline.sha256(artifact),
-            )
+            self.assertEqual(hashlib.sha256(artifact.read_bytes()).hexdigest(), postbaseline.sha256(artifact))
         self.assertIn("hashlib.sha256", inspect.getsource(postbaseline.sha256))
         self.assertNotIn("hashlib", inspect.getsource(policies.binding_status))
 
-    def test_live_discovery_consumes_both_requirements(self) -> None:
-        original = policies.binding_status
-        with mock.patch.object(policies, "binding_status", wraps=original) as binding:
+    def test_live_discovery_makes_exactly_five_native_calls(self) -> None:
+        original = policies.invoke_compat_result
+        calls: list[dict[str, object]] = []
+
+        def observe(root, operation, payload):
+            if operation == "exact-evidence-binding.evaluate":
+                calls.append(payload)
+            return original(root, operation, payload)
+
+        with mock.patch.object(policies, "invoke_compat_result", side_effect=observe):
             discovery = postbaseline.discover(ROOT)
         self.assertEqual((), discovery.errors)
-        self.assertGreaterEqual(len(discovery.qualifications), 1)
-        requirement_ids = {call.args[0].id for call in binding.call_args_list}
-        self.assertEqual(
-            {
-                "post_baseline_artifact_binding",
-                "post_baseline_recorded_output_binding",
-            },
-            requirement_ids,
-        )
+        self.assertEqual(5, len(calls))
+        self.assertTrue(all(call["mode"] == "evaluate_binding" for call in calls))
 
     def test_discovery_fails_closed_when_registry_is_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixture = Path(temporary) / "repository"
-            shutil.copytree(
-                ROOT,
-                fixture,
-                ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__", "*.pyc"),
-            )
-            subprocess.run(
-                ["git", "init", "-q", str(fixture)],
-                check=True,
-            )
-            registry = fixture / "docs/repository-governance/ruu-evidence-requirements.md"
-            registry.unlink()
+            shutil.copytree(ROOT, fixture, ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__", "*.pyc"))
+            subprocess.run(["git", "init", "-q", str(fixture)], check=True)
+            (fixture / "docs/repository-governance/ruu-evidence-requirements.md").unlink()
             discovery = postbaseline.discover(fixture)
         self.assertEqual((), discovery.qualifications)
         self.assertIn("cannot load evidence requirements", discovery.errors[0])

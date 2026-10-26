@@ -8,9 +8,10 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from proto_ring.evidence_requirements import PersistentEvidenceRequirement
-from proto_ring.exact_evidence_binding import BindingStatus
 from qualification import postbaseline_evidence_requirements
+from qualification.postbaseline_evidence_requirements import (
+    PersistentEvidenceRequirementPolicy,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 POST_BASELINE_ROOT = ROOT / "qualification" / "state-space" / "post-baseline"
@@ -76,11 +77,11 @@ def _safe_relative_path(value: str) -> Path | None:
 
 
 def _sha_binding_status(
-    requirement: PersistentEvidenceRequirement,
+    requirement: PersistentEvidenceRequirementPolicy,
     evidence_class: str,
     required_sha256: str,
     observed_sha256: str,
-) -> BindingStatus:
+) -> str:
     return postbaseline_evidence_requirements.binding_status(
         requirement,
         evidence_class,
@@ -113,7 +114,7 @@ def _artifact(
     root: Path,
     errors: list[str],
     registered: set[str],
-    requirement: PersistentEvidenceRequirement,
+    requirement: PersistentEvidenceRequirementPolicy,
 ) -> Artifact | None:
     label = f"{metadata_label}: {role}"
     if not isinstance(value, dict):
@@ -143,9 +144,7 @@ def _artifact(
         errors.append(f"{metadata_label}: missing {role} artifact {path_value}")
     else:
         actual = sha256(path)
-        if _sha_binding_status(
-            requirement, role, expected, actual
-        ) is not BindingStatus.MATCH:
+        if _sha_binding_status(requirement, role, expected, actual) != "MATCH":
             errors.append(
                 f"{metadata_label}: SHA mismatch for {role} artifact {path_value}"
             )
@@ -359,7 +358,7 @@ def discover(root: Path = ROOT) -> Discovery:
                 "recorded_output",
                 stdout_hash,
                 recorded_output.expected_sha256,
-            ) is not BindingStatus.MATCH:
+            ) != "MATCH":
                 errors.append(
                     f"{metadata_label}: replay stdout SHA must match recorded output SHA"
                 )

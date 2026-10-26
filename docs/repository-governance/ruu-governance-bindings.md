@@ -16,10 +16,10 @@ governance_bindings:
         kind: logical_provider
       identity:
         repository: fanilosendrison/proto-ring
-        commit: dedb01a3a9b7a18930c9da75afa3773b5ad67f69
+        commit: 4ae1a2a549d7dae8e4cce7f727b9bc5330f3823f
       authority:
         responsibility: executable_provider_binding
-        source: executable_dependency_manifest
+        source: governance_binding_registry
     shared_governance_provider_contract:
       kind: governance_contract
       scope:
@@ -142,7 +142,7 @@ governance_bindings:
 # Ruu Governance Binding Registry
 
 This registry owns active immutable proto-ring governance-contract bindings and
-the structured representation of Ruu's executable-provider identity.
-`requirements.txt` remains authority for that executable identity. Ruu product,
-specification, external-control-plane, qualification, evidence, history, and
-replay semantics remain local.
+the active exact executable-provider identity. The Governance Binding Registry
+owns active exact executable-provider identity. Ruu product, specification,
+external-control-plane, qualification, evidence, history, and replay semantics
+remain local.

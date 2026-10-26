@@ -35,8 +35,25 @@ class QualificationInfrastructureTests(unittest.TestCase):
             self.root,
             ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__"),
         )
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
         subprocess.run(
-            ["git", "init", "-q", str(self.root)],
+            ["git", "-C", str(self.root), "config", "user.email", "test@example.invalid"],
+            check=True,
+        )
+        subprocess.run(
+            ["git", "-C", str(self.root), "config", "user.name", "Ruu Test"],
+            check=True,
+        )
+        subprocess.run(
+            ["git", "-C", str(self.root), "config", "maintenance.auto", "false"],
+            check=True,
+        )
+        subprocess.run(
+            ["git", "-C", str(self.root), "config", "gc.auto", "0"], check=True
+        )
+        subprocess.run(["git", "-C", str(self.root), "add", "."], check=True)
+        subprocess.run(
+            ["git", "-C", str(self.root), "commit", "-qm", "fixture"],
             check=True,
         )
         post_baseline = self.root / "qualification/state-space/post-baseline"

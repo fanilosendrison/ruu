@@ -112,6 +112,7 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) | Adopt structured proto-ring governance | accepted | 2026-10-02 | complete | Repository Governance Model v2 adoption<br>Structured governance registry and profile ownership<br>Executable proto-ring provider authority and currentness<br>Ruu governance and qualification authority preservation<br>Obsolete active governance carrier retirement |
 | [ADR-092](adr-092-allow-capability-based-cognitive-execution-without-mandatory-workflow-runtime.md) | Allow capability-based cognitive execution without mandatory workflow runtime | accepted | 2026-10-16 | complete | Cognitive capability requirements without engine/vendor mandate<br>External execution and Ruu current-state convergence authority separation<br>Session continuity, asynchronous waits, and headless progression<br>Exact state recovery and cross-runtime conformance |
 | [ADR-093](adr-093-make-commit-message-providers-user-selectable-with-main-agent-default.md) | Make commit-message providers user-selectable with main-agent default | accepted | 2026-10-16 | complete | Main-agent-first commit-message generation<br>Open external message provider capability and user selection<br>Candidate-bound metadata freezing and retry recovery<br>Deterministic technical-commit and existing-commit preservation |
+| [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) | Adopt native proto-ring compatibility execution boundary | accepted | 2026-10-20 | complete | Native proto-ring executable-provider execution boundary<br>Authority for the exact executable proto-ring provider identity<br>Managed realization of the immutable proto-ring compatibility executable<br>Removal of Python proto-ring from active Ruu validation execution<br>Preservation of Ruu qualification, replay, evidence, and historical authority |
 
 ## Recorded outgoing relations
 
@@ -349,6 +350,9 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-093](adr-093-make-commit-message-providers-user-selectable-with-main-agent-default.md) | clarifies | [ADR-042](adr-042-use-a-reconciler-driven-coordination-store-with-os-owned-runs-and-append-only-effect-journal.md) |
 | [ADR-093](adr-093-make-commit-message-providers-user-selectable-with-main-agent-default.md) | clarifies | [ADR-048](adr-048-materialize-repository-local-multi-source-promotion-units-by-canonical-pairwise-merging.md) |
 | [ADR-093](adr-093-make-commit-message-providers-user-selectable-with-main-agent-default.md) | clarifies | [ADR-078](adr-078-make-zero-preflight-coding-harness-integration-part-of-the-governing-product-intent.md) |
+| [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) | amends | [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) |
+| [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) | confirms | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
+| [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) | confirms | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) |
 
 ## Derived incoming relations
 
@@ -580,9 +584,12 @@ name: "Generated Ruu Architecture Decision Record index"
 | [ADR-082](adr-082-adopt-validated-okf-architecture-decision-record-metadata.md) | amended by | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) |
 | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | amended by | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) |
 | [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | confirmed by | [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) |
+| [ADR-083](adr-083-allow-shared-governance-implementation-without-transferring-repository-authority.md) | confirmed by | [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) |
 | [ADR-084](adr-084-replace-mandatory-linked-worktrees-with-contribution-unit-authoring-surfaces.md) | amended by | [ADR-086](adr-086-require-substrate-independent-heterogeneous-authoring-surfaces.md) |
 | [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | confirmed by | [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) |
+| [ADR-085](adr-085-require-proto-ring-for-applicable-generic-repository-governance.md) | confirmed by | [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) |
 | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | amended by | [ADR-088](adr-088-require-nonempty-current-promotion-authorization-route-space.md) |
 | [ADR-087](adr-087-separate-promotion-authorization-space-from-non-authorizing-user-behavior.md) | confirmed by | [ADR-089](adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md) |
 | [ADR-088](adr-088-require-nonempty-current-promotion-authorization-route-space.md) | confirmed by | [ADR-089](adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md) |
 | [ADR-089](adr-089-confine-non-fast-forward-submission-updates-to-exact-expected-old-projection-replacement.md) | amended by | [ADR-090](adr-090-separate-logical-submission-revision-from-ref-effect.md) |
+| [ADR-091](adr-091-adopt-structured-proto-ring-governance.md) | amended by | [ADR-094](adr-094-adopt-native-proto-ring-compatibility-execution-boundary.md) |

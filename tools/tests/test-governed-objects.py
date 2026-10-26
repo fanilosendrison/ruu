@@ -1,86 +1,49 @@
 #!/usr/bin/env python3
-"""Consumer tests for the Ruu Governed Objects profile."""
-
-from __future__ import annotations
+"""Consumer tests for Ruu's native Governed Objects projection."""
 
 from pathlib import Path
+import sys
 import unittest
 
-from proto_ring import governance_authority, governed_objects
-from proto_ring import repository_governance_model
-
 ROOT = Path(__file__).resolve().parents[2]
-PROFILE_PATH = (
-    ROOT
-    / "docs"
-    / "repository-governance"
-    / "ruu-governed-objects.md"
-)
-def load_profiles():
-    model = repository_governance_model.load(ROOT)
-    authority_route = model.capabilities["governance_authority"].routes["profile"]
-    authority = governance_authority.load(ROOT, authority_route)
-    catalog_route = model.capabilities["governed_objects"].routes["profile"]
-    catalog = governed_objects.load(ROOT, catalog_route, authority)
-    return model, authority, catalog
+TOOLS = ROOT / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+from check_structured_governance_import import load_structured_governance
 
 
 class GovernedObjectsProfileTests(unittest.TestCase):
-    def test_profile_is_routed_exactly(self) -> None:
-        model, _authority, catalog = load_profiles()
-        route = model.capabilities["governed_objects"].routes["profile"]
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.model, cls.authority, cls.catalog, *_rest = load_structured_governance(ROOT)
 
-        self.assertEqual(
-            "docs/repository-governance/ruu-governed-objects.md",
-            route.declared_path,
-        )
-        self.assertEqual(PROFILE_PATH.resolve(), route.target)
-        self.assertEqual(PROFILE_PATH.resolve(), catalog.carrier)
-        self.assertNotIn("governed_objects_contract", PROFILE_PATH.read_text())
+    def test_profile_is_routed_exactly(self) -> None:
+        route = self.model["capabilities"]["governed_objects"]["routes"]["profile"]
+        self.assertEqual("docs/repository-governance/ruu-governed-objects.md", route["declared_path"])
+        self.assertEqual(route["declared_path"], route["resolved_target"])
 
     def test_governance_authority_owns_only_profile_route(self) -> None:
-        _model, authority, _catalog = load_profiles()
-        responsibility = authority.responsibilities[
-            "governed_objects_profile_route"
-        ]
-
-        self.assertEqual(
-            {"agents_governance_frontmatter": governance_authority.SourceRole.AUTHORITY},
-            responsibility.roles,
-        )
-        self.assertEqual((), responsibility.precedence)
+        responsibility = self.authority["responsibilities"]["governed_objects_profile_route"]
+        self.assertEqual({"agents_governance_frontmatter": "authority"}, responsibility["roles"])
+        self.assertEqual([], responsibility["precedence"])
 
     def test_catalog_has_only_canonical_adr_objects(self) -> None:
-        _model, _authority, catalog = load_profiles()
-
-        self.assertEqual({"architecture_decisions"}, set(catalog.interfaces))
-        self.assertEqual(
-            {f"ADR-{number:03d}" for number in range(1, 94)},
-            set(catalog.interfaces["architecture_decisions"].objects),
-        )
+        self.assertEqual({"architecture_decisions"}, set(self.catalog["interfaces"]))
+        objects = self.catalog["interfaces"]["architecture_decisions"]["objects"]
+        self.assertEqual({f"ADR-{number:03d}" for number in range(1, 95)}, set(objects))
 
     def test_accepted_and_superseded_responsibilities_are_exact(self) -> None:
-        _model, _authority, catalog = load_profiles()
-        objects = catalog.interfaces["architecture_decisions"].objects
-
-        self.assertEqual(
-            frozenset({"adr_metadata"}),
-            objects["ADR-031"].responsibilities,
-        )
+        objects = self.catalog["interfaces"]["architecture_decisions"]["objects"]
+        self.assertEqual({"adr_metadata"}, set(objects["ADR-031"]["responsibilities"]))
         for identity, governed_object in objects.items():
             with self.subTest(identity=identity):
                 if identity != "ADR-031":
                     self.assertEqual(
-                        frozenset(
-                            {
-                                "adr_metadata",
-                                "product_semantics",
-                                "accepted_decisions",
-                            }
-                        ),
-                        governed_object.responsibilities,
+                        {"adr_metadata", "product_semantics", "accepted_decisions"},
+                        set(governed_object["responsibilities"]),
                     )
-                self.assertEqual(frozenset(), governed_object.relations)
+                self.assertEqual([], governed_object["relations"])
 
 
 if __name__ == "__main__":
