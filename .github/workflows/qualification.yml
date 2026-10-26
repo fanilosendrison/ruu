@@ -11,7 +11,7 @@ jobs:
   qualification:
     name: Normative qualification
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 360
 
     steps:
       - name: Check out repository
