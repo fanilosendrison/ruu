@@ -9,6 +9,7 @@ from proto_ring_executable_binding import (
     ProtoRingExecutableError,
     invoke_compat_result,
     load_executable_provider_binding,
+    realized_provider,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def check(root: Path = ROOT) -> list[str]:
     try:
         binding = load_executable_provider_binding(root)
+        realized_provider(root)
         identity = invoke_compat_result(root, "engine.identity", {})
     except ProtoRingExecutableError as error:
         return [str(error)]

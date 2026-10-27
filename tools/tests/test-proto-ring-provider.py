@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Core negative paths and live checks for Ruu's native provider boundary."""
-
 from __future__ import annotations
 import copy
 import importlib.util
@@ -13,18 +12,14 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
-
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "tools"
 EXPECTED = "4ae1a2a549d7dae8e4cce7f727b9bc5330f3823f"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
-
 import proto_ring_executable_binding as boundary
 import proto_ring_result_validation as result_shapes
 from proto_ring_source_test_support import source_fixture, source_git, symlinked_git_source
-
-
 def load_script(name: str):
     path = TOOLS / name
     spec = importlib.util.spec_from_file_location(name.removesuffix(".py"), path)
@@ -34,12 +29,11 @@ def load_script(name: str):
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
-
-
 checker = load_script("check-proto-ring-provider.py")
+ProcessScopedProviderRealizationTests = load_script(
+    "tests/test-process-scoped-provider-realization.py"
+).ProcessScopedProviderRealizationTests
 from proto_ring_preparation_tests import NativeProviderPreparationTests  # noqa: E402,F401
-
-
 def fake_executable(directory: str, responses: list[object], exit_code: int = 0) -> Path:
     path = Path(directory) / "fake-proto-ring"
     lines = "".join(json.dumps(response) + "\n" for response in responses)
@@ -68,6 +62,7 @@ class NativeProviderCoreNegativePathTests(unittest.TestCase):
     """The exact 33 qualified fail-closed provider regressions."""
 
     def setUp(self) -> None:
+        boundary._clear_process_realizations_for_tests()
         self.binding = boundary.ExecutableProviderBinding(
             "fanilosendrison/proto-ring", EXPECTED
         )
@@ -347,8 +342,16 @@ class NativeProviderCoreNegativePathTests(unittest.TestCase):
             run.assert_not_called()
             self.assertEqual([], list(Path(temporary).iterdir()))
 
+    def tearDown(self) -> None:
+        boundary._clear_process_realizations_for_tests()
 
 class NativeProviderPositiveTests(unittest.TestCase):
+    def setUp(self) -> None:
+        boundary._clear_process_realizations_for_tests()
+
+    def tearDown(self) -> None:
+        boundary._clear_process_realizations_for_tests()
+
     def test_live_native_provider_matches_authority(self) -> None:
         binding = boundary.load_executable_provider_binding(ROOT)
         self.assertEqual(EXPECTED, binding.commit)
